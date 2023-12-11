@@ -201,8 +201,8 @@ def _run():
         f.write('#define NELEV '+str(len(ELEVATIONS))+'\n')
         f.write('#define NAZIM '+str(maxl)+'\n')
         f.write('#define NSAMP '+str(L)+'\n')
+        f.write('#define BIGVALUE '+BIGVALUE+'\n')
         
-
         f.write('const float elevations[NELEV]=')
         f.write(list2cpparray(ELEVATIONS))
         f.write(';\n')
@@ -210,7 +210,7 @@ def _run():
         f.write('const float azimuths[NELEV][NAZIM]={')
         for i,e in enumerate(ELEVATIONS):
             azims = np.arange(0,360,AZIMUTHSTEPS[i])
-            f.write(list2cpparray2(azims,maxl,BIGVALUE))
+            f.write(list2cpparray2(azims,maxl,'BIGVALUE'))
             f.write(',\n')
         f.write('};\n')
         

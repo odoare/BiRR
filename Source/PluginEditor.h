@@ -51,6 +51,6 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dampingSliderAttachment;
 
     int addArrayToBuffer(float *bufPtr, float *hrtfPtr, float gain);
-    
+    int proximityIndex(const float *data, int length, float value);
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessorEditor)
 };

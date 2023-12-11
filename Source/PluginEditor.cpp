@@ -11,6 +11,7 @@
 #include "hrtf.h"
 
 #define INV_SOUNDSPEED 2.9412e-03
+#define EIGHTYOVERPI 57.295779513
 
 #define DEBUG_OUTPUTS
 
@@ -121,12 +122,23 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
           float r = pow(1-damp,abs(ix)+abs(iy));
           float gain = r/dist;
 
-          // For now we fix elevation and azimuth at zero (i=4, j=0)
-          int i = 4;
-          int j = 0;
+          //Elevation angle is zero here
+          int elevationIndex = 4;
 
-          addArrayToBuffer(&dataL[indice], &lhrtf[i][j][0], gain);
-          addArrayToBuffer(&dataR[indice], &rhrtf[i][j][0], gain);
+          // Azimutal angle calculation
+          float theta = atan2(ly-y,-lx+x)*EIGHTYOVERPI-90;
+          int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta);
+
+          #ifdef DEBUG_OUTPUTS
+          cout << "Azimutal index:" << azimutalIndex << endl;
+          #endif
+
+          // // For now we fix elevation and azimuth at zero (i=4, j=0)
+          // int i = 4;
+          // int j = 0;
+
+          addArrayToBuffer(&dataL[indice], &lhrtf[elevationIndex][azimutalIndex][0], gain);
+          addArrayToBuffer(&dataR[indice], &rhrtf[elevationIndex][azimutalIndex][0], gain);
         }
       }
 
@@ -231,4 +243,23 @@ int ReverbAudioProcessorEditor::addArrayToBuffer(float *bufPtr, float *hrtfPtr, 
 
   }
   return 0;
+
+}
+
+int ReverbAudioProcessorEditor::proximityIndex(const float *data, int length, float value)
+{
+  int proxIndex = 0;
+  int minDistance = BIGVALUE;
+
+  for (int i=0; i<length; i++)
+  {
+    float actualDistance = abs(data[i]-value);
+    if (actualDistance < minDistance)
+    {
+      proxIndex = i;
+      minDistance = actualDistance;
+    }
+  }
+  return proxIndex;
+
 }
