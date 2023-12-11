@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="SD3Wpk" name="Binaural_Room_Reverb_2D" projectType="audioplug"
-              useAppConfig="0" addUsingNamespaceToJuceHeader="0" displaySplashScreen="1"
-              jucerFormatVersion="1">
-  <MAINGROUP id="NKvv2q" name="Binaural_Room_Reverb_2D">
+<JUCERPROJECT id="SD3Wpk" name="BiRR2D" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              companyName="OdioMechanics" companyWebsite="www.OdioMechanics.com"
+              pluginFormats="buildLV2,buildVST3" pluginManufacturerCode="ODME"
+              pluginCode="BRR2" aaxIdentifier="http://www.odiomechanics.com/plugins/BiRR2D"
+              pluginName="BiRR2D" pluginDesc="Binaural room reverb, 2D" pluginVST3Category="Reverb,Spatial,Stereo"
+              pluginAAXCategory="8" lv2Uri="http://www.odiomechanics.com/plugins/BiRR2D">
+  <MAINGROUP id="NKvv2q" name="BiRR2D">
     <GROUP id="{1DE6DEF3-95E7-6E92-E4F8-B1B7D70EF90E}" name="Source">
       <FILE id="wigs0B" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
@@ -31,11 +35,12 @@
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
-  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"
+               JUCE_DSP_USE_STATIC_FFTW="1"/>
   <EXPORTFORMATS>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraLinkerFlags="/usr/lib/x86_64-linux-gnu/libfftw3*.a&#10;">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="0" name="Release" targetName="Binaural_Room_Reverb_2D"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR2D"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../JUCE/JUCE/modules"/>
@@ -55,7 +60,7 @@
     </LINUX_MAKE>
     <VS2022 targetFolder="Builds/VisualStudio2022">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="0" name="Release" targetName="Binaural_Room_Reverb_2D"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR2D"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../JUCE/JUCE/modules"/>
@@ -75,7 +80,7 @@
     </VS2022>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="0" name="Release" targetName="Binaural_Room_Reverb_2D"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR2D"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../JUCE/JUCE/modules"/>

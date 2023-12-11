@@ -21,7 +21,7 @@ using namespace std;
 #endif      
 
 //==============================================================================
-BinauRoomRevAudioProcessorEditor::BinauRoomRevAudioProcessorEditor (BinauRoomRevAudioProcessor& p)
+ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     roomXSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
@@ -192,12 +192,12 @@ BinauRoomRevAudioProcessorEditor::BinauRoomRevAudioProcessorEditor (BinauRoomRev
 
 }
 
-BinauRoomRevAudioProcessorEditor::~BinauRoomRevAudioProcessorEditor()
+ReverbAudioProcessorEditor::~ReverbAudioProcessorEditor()
 {
 }
 
 //==============================================================================
-void BinauRoomRevAudioProcessorEditor::paint (juce::Graphics& g)
+void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
@@ -207,7 +207,7 @@ void BinauRoomRevAudioProcessorEditor::paint (juce::Graphics& g)
     // g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
 }
 
-void BinauRoomRevAudioProcessorEditor::resized()
+void ReverbAudioProcessorEditor::resized()
 {
     roomXSlider.setBounds(getWidth()/4-40,getHeight()/5-80,80,80);
     roomYSlider.setBounds(3*getWidth()/4-40,getHeight()/5-80,80,80);
@@ -223,7 +223,7 @@ void BinauRoomRevAudioProcessorEditor::resized()
 
 }
 
-int BinauRoomRevAudioProcessorEditor::addArrayToBuffer(float *bufPtr, float *hrtfPtr, float gain)
+int ReverbAudioProcessorEditor::addArrayToBuffer(float *bufPtr, float *hrtfPtr, float gain)
 {
   for (int i=0; i<NSAMP; i++)
   {

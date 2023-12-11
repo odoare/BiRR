@@ -10,7 +10,7 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-BinauRoomRevAudioProcessor::BinauRoomRevAudioProcessor()
+ReverbAudioProcessor::ReverbAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
@@ -24,17 +24,17 @@ BinauRoomRevAudioProcessor::BinauRoomRevAudioProcessor()
 {
 }
 
-BinauRoomRevAudioProcessor::~BinauRoomRevAudioProcessor()
+ReverbAudioProcessor::~ReverbAudioProcessor()
 {
 }
 
 //==============================================================================
-const juce::String BinauRoomRevAudioProcessor::getName() const
+const juce::String ReverbAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
 
-bool BinauRoomRevAudioProcessor::acceptsMidi() const
+bool ReverbAudioProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
     return true;
@@ -43,7 +43,7 @@ bool BinauRoomRevAudioProcessor::acceptsMidi() const
    #endif
 }
 
-bool BinauRoomRevAudioProcessor::producesMidi() const
+bool ReverbAudioProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
     return true;
@@ -52,7 +52,7 @@ bool BinauRoomRevAudioProcessor::producesMidi() const
    #endif
 }
 
-bool BinauRoomRevAudioProcessor::isMidiEffect() const
+bool ReverbAudioProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
     return true;
@@ -61,37 +61,37 @@ bool BinauRoomRevAudioProcessor::isMidiEffect() const
    #endif
 }
 
-double BinauRoomRevAudioProcessor::getTailLengthSeconds() const
+double ReverbAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
 
-int BinauRoomRevAudioProcessor::getNumPrograms()
+int ReverbAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
                 // so this should be at least 1, even if you're not really implementing programs.
 }
 
-int BinauRoomRevAudioProcessor::getCurrentProgram()
+int ReverbAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
 
-void BinauRoomRevAudioProcessor::setCurrentProgram (int index)
+void ReverbAudioProcessor::setCurrentProgram (int index)
 {
 }
 
-const juce::String BinauRoomRevAudioProcessor::getProgramName (int index)
+const juce::String ReverbAudioProcessor::getProgramName (int index)
 {
     return {};
 }
 
-void BinauRoomRevAudioProcessor::changeProgramName (int index, const juce::String& newName)
+void ReverbAudioProcessor::changeProgramName (int index, const juce::String& newName)
 {
 }
 
 //==============================================================================
-void BinauRoomRevAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void ReverbAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     spec.maximumBlockSize = samplesPerBlock;
     spec.sampleRate = sampleRate;
@@ -101,14 +101,14 @@ void BinauRoomRevAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     irLoader.prepare(spec);
 }
 
-void BinauRoomRevAudioProcessor::releaseResources()
+void ReverbAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool BinauRoomRevAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool ReverbAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
     juce::ignoreUnused (layouts);
@@ -133,7 +133,7 @@ bool BinauRoomRevAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 }
 #endif
 
-void BinauRoomRevAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void ReverbAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
@@ -156,26 +156,26 @@ void BinauRoomRevAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 }
 
 //==============================================================================
-bool BinauRoomRevAudioProcessor::hasEditor() const
+bool ReverbAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-juce::AudioProcessorEditor* BinauRoomRevAudioProcessor::createEditor()
+juce::AudioProcessorEditor* ReverbAudioProcessor::createEditor()
 {
-    return new BinauRoomRevAudioProcessorEditor (*this);
+    return new ReverbAudioProcessorEditor (*this);
     //return new juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
-void BinauRoomRevAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void ReverbAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 }
 
-void BinauRoomRevAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void ReverbAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
@@ -185,10 +185,10 @@ void BinauRoomRevAudioProcessor::setStateInformation (const void* data, int size
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new BinauRoomRevAudioProcessor();
+    return new ReverbAudioProcessor();
 }
 
-juce::AudioProcessorValueTreeState::ParameterLayout BinauRoomRevAudioProcessor::createParameters()
+juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::createParameters()
 {
     // std::vector<std::unique_ptr<juce::RangedAudioParameter>> params ;
     // params.push_back (std::make_unique<juce::AudioParameterFloat>("Gain","Gain",0.0f,1.0f,0.5f));

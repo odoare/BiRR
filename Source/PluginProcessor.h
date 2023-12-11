@@ -13,12 +13,12 @@
 //==============================================================================
 /**
 */
-class BinauRoomRevAudioProcessor  : public juce::AudioProcessor
+class ReverbAudioProcessor  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
-    BinauRoomRevAudioProcessor();
-    ~BinauRoomRevAudioProcessor() override;
+    ReverbAudioProcessor();
+    ~ReverbAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -65,5 +65,5 @@ public:
 private:
     
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BinauRoomRevAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessor)
 };

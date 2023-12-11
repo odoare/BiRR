@@ -14,11 +14,11 @@
 //==============================================================================
 /**
 */
-class BinauRoomRevAudioProcessorEditor  : public juce::AudioProcessorEditor
+class ReverbAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
-    BinauRoomRevAudioProcessorEditor (BinauRoomRevAudioProcessor&);
-    ~BinauRoomRevAudioProcessorEditor() override;
+    ReverbAudioProcessorEditor (ReverbAudioProcessor&);
+    ~ReverbAudioProcessorEditor() override;
 
     //==============================================================================
     void paint (juce::Graphics&) override;
@@ -27,7 +27,7 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
-    BinauRoomRevAudioProcessor& audioProcessor;
+    ReverbAudioProcessor& audioProcessor;
 
     juce::TextButton addButton;
     juce::TextButton removeButton;
@@ -52,5 +52,5 @@ private:
 
     int addArrayToBuffer(float *bufPtr, float *hrtfPtr, float gain);
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BinauRoomRevAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessorEditor)
 };
