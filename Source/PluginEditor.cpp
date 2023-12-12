@@ -12,6 +12,7 @@
 
 #define INV_SOUNDSPEED 2.9412e-03
 #define EIGHTYOVERPI 57.295779513
+#define OMEGASTART 125663.706
 
 #define DEBUG_OUTPUTS
 
@@ -115,8 +116,8 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
         x = 2*float(ceil(float(ix)/2))*rx+pow(-1,ix)*sx;
         for (int iy = 0; iy < n ; ++iy)
         {
-          y = 2*ceil(float(iy)/2)*ry+pow(-1,iy)*sy;
-          float dist = sqrt((x-rx)*(x-rx)+(y-ry)*(y-ry));
+          y = 2*float(ceil(float(iy)/2))*ry+pow(-1,iy)*sy;
+          float dist = sqrt((x-lx)*(x-lx)+(y-ly)*(y-ly));
           float time = dist*INV_SOUNDSPEED;
           int indice = int(round(time*audioProcessor.spec.sampleRate));
           float r = pow(1-damp,abs(ix)+abs(iy));
@@ -126,11 +127,17 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
           int elevationIndex = 4;
 
           // Azimutal angle calculation
-          float theta = atan2(ly-y,-lx+x)*EIGHTYOVERPI-90;
+          float theta = atan2f(y-ly,-x+lx)*EIGHTYOVERPI-90;
           int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta);
 
           #ifdef DEBUG_OUTPUTS
-          cout << "Azimutal index:" << azimutalIndex << endl;
+          if (ix==0 and iy==0)
+          {
+            cout << "x = " << x << "      y = " << y << endl;
+            cout << "r = " << r << "      dist = " << dist << endl;
+            cout << "y-ly = " << y-ly << "         -x+lx = " << -lx+x << endl;
+            cout << "Theta = " << theta << "        Azimutal index = " << azimutalIndex << endl;
+          }
           #endif
 
           // // For now we fix elevation and azimuth at zero (i=4, j=0)
@@ -223,10 +230,13 @@ void ReverbAudioProcessorEditor::resized()
 {
     roomXSlider.setBounds(getWidth()/4-40,getHeight()/5-80,80,80);
     roomYSlider.setBounds(3*getWidth()/4-40,getHeight()/5-80,80,80);
+
     listenerXSlider.setBounds(getWidth()/4-40,2*getHeight()/5-80,80,80);
     listenerYSlider.setBounds(3*getWidth()/4-40,2*getHeight()/5-80,80,80);
+    
     sourceXSlider.setBounds(getWidth()/4-40,3*getHeight()/5-80,80,80);
     sourceYSlider.setBounds(3*getWidth()/4-40,3*getHeight()/5-80,80,80);
+    
     NSlider.setBounds(getWidth()/4-80,4*getHeight()/5-80,160,80);
     dampingSlider.setBounds(3*getWidth()/4-80,4*getHeight()/5-80,160,80);
 
@@ -235,25 +245,31 @@ void ReverbAudioProcessorEditor::resized()
 
 }
 
-int ReverbAudioProcessorEditor::addArrayToBuffer(float *bufPtr, float *hrtfPtr, float gain)
+void ReverbAudioProcessorEditor::addArrayToBuffer(float *bufPtr, float *hrtfPtr, float gain)
 {
   for (int i=0; i<NSAMP; i++)
   {
     bufPtr[i] += hrtfPtr[i]*gain;
 
   }
-  return 0;
-
 }
 
 int ReverbAudioProcessorEditor::proximityIndex(const float *data, int length, float value)
 {
   int proxIndex = 0;
-  int minDistance = BIGVALUE;
-
+  float minDistance = BIGVALUE;
+  float val;
+  if (value<0.f)
+  {
+    val = value+360.f;
+  }
+  else
+  {
+    val = value;
+  }
   for (int i=0; i<length; i++)
   {
-    float actualDistance = abs(data[i]-value);
+    float actualDistance = abs(data[i]-val);
     if (actualDistance < minDistance)
     {
       proxIndex = i;
