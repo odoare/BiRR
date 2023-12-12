@@ -10,6 +10,8 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "Components/XyPad.h"
+
 
 //==============================================================================
 /**
@@ -49,8 +51,13 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> NSliderAttachment;
     juce::Slider dampingSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dampingSliderAttachment;
+    juce::Slider hfDampingSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> hfDampingSliderAttachment;
+
+    Gui::XyPad xyPad;
 
     void addArrayToBuffer(float *bufPtr, float *hrtfPtr, float gain);
     int proximityIndex(const float *data, int length, float value);
+    void lop(float *in, float *out, int sampleFreq, float hfDamping, int nRebounds, int order);    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessorEditor)
 };

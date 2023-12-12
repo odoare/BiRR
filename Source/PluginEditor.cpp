@@ -56,20 +56,33 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     addAndMakeVisible(sourceYSlider);
     sourceYSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceY",sourceYSlider);
 
-    NSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    NSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    addAndMakeVisible(NSlider);
-    NSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"N",NSlider);
-
     dampingSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     dampingSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
     addAndMakeVisible(dampingSlider);
     dampingSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"D",dampingSlider);
 
+    hfDampingSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+    hfDampingSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
+    addAndMakeVisible(hfDampingSlider);
+    hfDampingSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"HFD",hfDampingSlider);
+
+    NSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+    NSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
+    addAndMakeVisible(NSlider);
+    NSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"N",NSlider);
+
+    addAndMakeVisible(xyPad);
+    xyPad.registerSlider(&listenerXSlider, Gui::XyPad::Axis::X1);
+    xyPad.registerSlider(&listenerYSlider, Gui::XyPad::Axis::Y1);
+    xyPad.registerSlider(&sourceXSlider, Gui::XyPad::Axis::X2);
+    xyPad.registerSlider(&sourceYSlider, Gui::XyPad::Axis::Y2);
     addAndMakeVisible(addButton);
     addButton.setButtonText("Compute IR");
     addButton.onClick = [this]()
     {
+
+      float outBuf[NSAMP]; 
+
       addButton.setEnabled(false);
       removeButton.setEnabled(false);    
 
@@ -83,7 +96,8 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
       auto dur = (n+1)*sqrt(rx*rx+ry*ry)/340;
       int longueur = int(ceil(dur*audioProcessor.spec.sampleRate)+NSAMP);
       auto damp = audioProcessor.apvts.getRawParameterValue("D")->load();
-
+      auto hfDamp = audioProcessor.apvts.getRawParameterValue("HFD")->load();
+      
       #ifdef DEBUG_OUTPUTS
       cout << "rx : " << rx << "\n" ;
       cout << "ry : " << ry << "\n" ;
@@ -95,6 +109,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
       cout << "dur : " << dur << "\n" ;
       cout << "longueur : " << longueur << "\n" ;
       cout << "damp : " << damp << "\n" ;
+      cout << "hfDamp : " << damp << "\n" ;
       auto start = std::chrono::high_resolution_clock::now();
       #endif
 
@@ -144,8 +159,11 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
           // int i = 4;
           // int j = 0;
 
-          addArrayToBuffer(&dataL[indice], &lhrtf[elevationIndex][azimutalIndex][0], gain);
-          addArrayToBuffer(&dataR[indice], &rhrtf[elevationIndex][azimutalIndex][0], gain);
+          // Apply lowpass filter
+          lop(&lhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], audioProcessor.getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+          addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+          lop(&rhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], audioProcessor.getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+          addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
         }
       }
 
@@ -207,12 +225,17 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 500);
+    setSize (600, 500);
+    setResizable(true,true);
 
 }
 
 ReverbAudioProcessorEditor::~ReverbAudioProcessorEditor()
 {
+  xyPad.deregisterSlider(&listenerXSlider);
+  xyPad.deregisterSlider(&listenerYSlider);
+  xyPad.deregisterSlider(&sourceXSlider);
+  xyPad.deregisterSlider(&sourceYSlider);
 }
 
 //==============================================================================
@@ -228,20 +251,24 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
 
 void ReverbAudioProcessorEditor::resized()
 {
-    roomXSlider.setBounds(getWidth()/4-40,getHeight()/5-80,80,80);
-    roomYSlider.setBounds(3*getWidth()/4-40,getHeight()/5-80,80,80);
+    roomXSlider.setBounds(getWidth()/6-40,getHeight()/6-80,80,80);
+    roomYSlider.setBounds(3*getWidth()/6-40,getHeight()/6-80,80,80);
 
-    listenerXSlider.setBounds(getWidth()/4-40,2*getHeight()/5-80,80,80);
-    listenerYSlider.setBounds(3*getWidth()/4-40,2*getHeight()/5-80,80,80);
+    listenerXSlider.setBounds(getWidth()/6-40,2*getHeight()/6-80,80,80);
+    listenerYSlider.setBounds(3*getWidth()/6-40,2*getHeight()/6-80,80,80);
     
-    sourceXSlider.setBounds(getWidth()/4-40,3*getHeight()/5-80,80,80);
-    sourceYSlider.setBounds(3*getWidth()/4-40,3*getHeight()/5-80,80,80);
+    sourceXSlider.setBounds(getWidth()/6-40,3*getHeight()/6-80,80,80);
+    sourceYSlider.setBounds(3*getWidth()/6-40,3*getHeight()/6-80,80,80);
     
-    NSlider.setBounds(getWidth()/4-80,4*getHeight()/5-80,160,80);
-    dampingSlider.setBounds(3*getWidth()/4-80,4*getHeight()/5-80,160,80);
+    dampingSlider.setBounds(getWidth()/6-80,4*getHeight()/6-80,160,80);
+    hfDampingSlider.setBounds(3*getWidth()/6-80,4*getHeight()/6-80,160,80);
 
-    addButton.setBounds(getWidth()/4-80,5*getHeight()/5-80,160,60);
-    removeButton.setBounds(3*getWidth()/4-80,5*getHeight()/5-80,160,60);
+    NSlider.setBounds(getWidth()/6-80,5*getHeight()/6-80,160,80);
+
+    addButton.setBounds(getWidth()/6-80,6*getHeight()/6-80,160,60);
+    removeButton.setBounds(3*getWidth()/6-80,6*getHeight()/6-80,160,60);
+
+    xyPad.setBounds(4*getWidth()/6-20,getHeight()/6-20,200,200);
 
 }
 
@@ -278,4 +305,24 @@ int ReverbAudioProcessorEditor::proximityIndex(const float *data, int length, fl
   }
   return proxIndex;
 
+}
+
+void ReverbAudioProcessorEditor::lop(float *in, float *out, int sampleFreq, float hfDamping, int nRebounds, int order)
+{
+    float om = OMEGASTART*(exp(-hfDamping*nRebounds));
+    float alpha1 = exp(-om/sampleFreq);
+    float alpha = 1 - alpha1;
+    out[0] = alpha*in[0];
+    for (int i=1;i<NSAMP;i++)
+    {
+      out[i] = alpha*in[i] + alpha1*out[i-1];
+    }
+    for (int j=0; j<order-1; j++)
+    {
+      out[0] *= alpha;
+      for (int i=1;i<NSAMP;i++)
+      {
+        out[i] = alpha*out[i] + alpha1*out[i-1];
+      }
+    }
 }
