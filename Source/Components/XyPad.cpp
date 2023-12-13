@@ -133,7 +133,8 @@ namespace Gui
                 thumb2.getX(),
                 juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), bounds.getHeight() - w, 0.0)
             );
-        }   
+        }
+        repaint();   
     }
 }
 

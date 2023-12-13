@@ -33,8 +33,8 @@ namespace Gui
 
     private:
         void sliderValueChanged(juce::Slider* slider) override;
-        Thumb thumb1{juce::Colours::magenta};
-        Thumb thumb2{juce::Colours::cyan};
+        Thumb thumb1{juce::Colours::blue};
+        Thumb thumb2{juce::Colours::red};
         static constexpr int thumbSize = 20;
 
         std::vector<juce::Slider*> x1Sliders, x2Sliders, y1Sliders, y2Sliders;
