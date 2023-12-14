@@ -25,6 +25,11 @@ namespace Gui
             moveCallback(getPosition().toDouble());
     }
 
+    void XyPad::Thumb::mouseUp(const juce::MouseEvent& event)
+    {
+        mouseUpCallback();
+    }
+
     void XyPad::Thumb::setColour(juce::Colour newColour)
     {
         thumbColour = newColour;
