@@ -66,10 +66,6 @@ private:
 
     Gui::XyPad xyPad;
 
-    void addArrayToBuffer(float *bufPtr, float *hrtfPtr, float gain);
-    int proximityIndex(const float *data, int length, float value);
-    void lop(const float* in, float* out, int sampleFreq, float hfDamping, int nRebounds, int order);
-
     const juce::Colour listenerColour = juce::Colours::blue;
     const juce::Colour sourceColour = juce::Colours::red;
 

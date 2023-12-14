@@ -2,10 +2,9 @@
 
 namespace Gui
 {
-    XyPad::Thumb::Thumb(juce::Colour col)
+    XyPad::Thumb::Thumb()
     {
         constrainer.setMinimumOnscreenAmounts(thumbSize,thumbSize,thumbSize,thumbSize);
-        thumbColour = col;
     }
 
     void XyPad::Thumb::paint(juce::Graphics& g)
@@ -26,6 +25,11 @@ namespace Gui
             moveCallback(getPosition().toDouble());
     }
 
+    void XyPad::Thumb::setColour(juce::Colour newColour)
+    {
+        thumbColour = newColour;
+    }
+
     XyPad::XyPad()
     {
         addAndMakeVisible(thumb1);
@@ -37,7 +41,6 @@ namespace Gui
             for (auto* slider : x1Sliders)
             {
                 slider->setValue(juce::jmap(position.getX(), 0.0, bounds.getWidth()-w, slider->getMinimum(), slider->getMaximum()));
-
             }
             for (auto* slider : y1Sliders)
             {
@@ -137,4 +140,3 @@ namespace Gui
         repaint();   
     }
 }
-

@@ -11,11 +11,12 @@ namespace Gui
         class Thumb : public juce::Component
         {
         public:
-            Thumb(juce::Colour col);
+            Thumb();
             void paint(juce::Graphics& g) override;
             void mouseDown(const juce::MouseEvent& event) override;
             void mouseDrag(const juce::MouseEvent& event) override;
             std::function<void(juce::Point<double>)> moveCallback;
+            void setColour(juce::Colour newColour);
             
         private:
             juce::ComponentDragger dragger;
@@ -30,11 +31,11 @@ namespace Gui
         void paint(juce::Graphics& g) override;
         void registerSlider(juce::Slider* slider, Axis axis);
         void deregisterSlider(juce::Slider* slider);
+        Thumb thumb1, thumb2;
+        juce::Colour coulour1, colour2;
 
     private:
         void sliderValueChanged(juce::Slider* slider) override;
-        Thumb thumb1{juce::Colours::blue};
-        Thumb thumb2{juce::Colours::red};
         static constexpr int thumbSize = 20;
 
         std::vector<juce::Slider*> x1Sliders, x2Sliders, y1Sliders, y2Sliders;

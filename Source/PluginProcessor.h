@@ -53,6 +53,8 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    void setIrLoader();
+
     juce::dsp::Convolution irLoader;
 
     juce::AudioBuffer<float> convBuffer;
@@ -62,7 +64,12 @@ public:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameters();  
     juce::AudioProcessorValueTreeState apvts{*this,nullptr,"Parameters",createParameters()};
 
+
 private:
+
+    void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, float gain);
+    int proximityIndex(const float *data, int length, float value);
+    void lop(const float* in, float* out, int sampleFreq, float hfDamping, int nRebounds, int order);
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessor)

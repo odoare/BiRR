@@ -8,6 +8,19 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "hrtf.h"
+
+#define DEBUG_OUTPUTS
+
+#ifdef DEBUG_OUTPUTS
+#include <iostream>
+#include <chrono>
+using namespace std;
+#endif   
+
+#define INV_SOUNDSPEED 2.9412e-03
+#define EIGHTYOVERPI 57.295779513
+#define OMEGASTART 125663.706
 
 //==============================================================================
 ReverbAudioProcessor::ReverbAudioProcessor()
@@ -151,7 +164,7 @@ void ReverbAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     juce::dsp::AudioBlock<float> block {buffer};
     if (irLoader.getCurrentIRSize()>0)
     {
-        irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
+        irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));        
     }
 }
 
@@ -182,6 +195,8 @@ void ReverbAudioProcessor::setStateInformation (const void* data, int sizeInByte
         apvts.replaceState(tree);
     }
 
+    // Call the impulse response calculator and loader
+    setIrLoader();
 }
 
 //==============================================================================
@@ -193,12 +208,6 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::createParameters()
 {
-    // std::vector<std::unique_ptr<juce::RangedAudioParameter>> params ;
-    // params.push_back (std::make_unique<juce::AudioParameterFloat>("Gain","Gain",0.0f,1.0f,0.5f));
-    // params.push_back (std::make_unique<juce::AudioParameterBool>("Phase","Phase",false));
-
-    // return {params.begin(),params.end()};
-
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     layout.add(std::make_unique<juce::AudioParameterFloat>("RoomX","RoomX",1.0f,10.0f,3.0f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("RoomY","RoomY",1.0f,10.0f,3.0f));
@@ -211,5 +220,165 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
     layout.add(std::make_unique<juce::AudioParameterFloat>("HFD","HFD",juce::NormalisableRange<float>(0.0f,1.0f,0.001f,0.3f),0.1f));
 
     return layout;
+}
 
+// This is the function where the impulse response is calculated
+void ReverbAudioProcessor::setIrLoader()
+{
+    float outBuf[NSAMP]; 
+
+    auto rx = apvts.getRawParameterValue("RoomX")->load();
+    auto ry = apvts.getRawParameterValue("RoomY")->load();
+    auto lx = rx*(apvts.getRawParameterValue("ListenerX")->load());
+    auto ly = ry*(apvts.getRawParameterValue("ListenerY")->load());
+    auto sx = rx*(apvts.getRawParameterValue("SourceX")->load());
+    auto sy = ry*(apvts.getRawParameterValue("SourceY")->load());
+    auto n = apvts.getRawParameterValue("N")->load();
+    auto dur = (n+1)*sqrt(rx*rx+ry*ry)/340;
+    int longueur = int(ceil(dur*spec.sampleRate)+NSAMP);
+    auto damp = apvts.getRawParameterValue("D")->load();
+    auto hfDamp = apvts.getRawParameterValue("HFD")->load();
+    
+    #ifdef DEBUG_OUTPUTS
+    cout << "rx : " << rx << "\n" ;
+    cout << "ry : " << ry << "\n" ;
+    cout << "lx : " << lx << "\n" ;
+    cout << "ly : " << ly << "\n" ;
+    cout << "sx : " << sx << "\n" ;
+    cout << "sy : " << sy << "\n" ;
+    cout << "n : " << n << "\n" ;
+    cout << "dur : " << dur << "\n" ;
+    cout << "longueur : " << longueur << "\n" ;
+    cout << "damp : " << damp << "\n" ;
+    cout << "hfDamp : " << damp << "\n" ;
+    auto start = std::chrono::high_resolution_clock::now();
+    #endif
+
+    juce::AudioBuffer<float> buf;
+    buf.setSize (2, int(longueur));
+    auto* dataL = buf.getWritePointer(0);
+    auto* dataR = buf.getWritePointer(1);
+
+    for (int sample=0; sample<buf.getNumSamples(); ++sample)
+    {
+        dataL[sample] = 0;
+        dataR[sample] = 0;
+    }
+    
+    float x,y;
+
+    for (int ix = 0; ix < n ; ++ix)
+    {
+    x = 2*float(ceil(float(ix)/2))*rx+pow(-1,ix)*sx;
+    for (int iy = 0; iy < n ; ++iy)
+    {
+        y = 2*float(ceil(float(iy)/2))*ry+pow(-1,iy)*sy;
+        float dist = sqrt((x-lx)*(x-lx)+(y-ly)*(y-ly));
+        float time = dist*INV_SOUNDSPEED;
+        int indice = int(round(time*spec.sampleRate));
+        float r = pow(1-damp,abs(ix)+abs(iy));
+        float gain = r/dist;
+
+        //Elevation angle is zero here
+        int elevationIndex = 4;
+
+        // Azimutal angle calculation
+        float theta = atan2f(y-ly,-x+lx)*EIGHTYOVERPI-90;
+        int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta);
+
+        #ifdef DEBUG_OUTPUTS
+        if (ix==0 and iy==0)
+        {
+          cout << "x = " << x << "      y = " << y << endl;
+          cout << "r = " << r << "      dist = " << dist << endl;
+          cout << "y-ly = " << y-ly << "         -x+lx = " << -lx+x << endl;
+          cout << "Theta = " << theta << "        Azimutal index = " << azimutalIndex << endl;
+        }
+        #endif
+
+        // Apply lowpass filter and add grain to buffer
+        lop(&lhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+        addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+        lop(&rhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+        addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+    }
+    }
+
+    #ifdef DEBUG_OUTPUTS
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    cout << "Buffer preparation duration:" << duration.count() << "µs" << endl;
+    start = std::chrono::high_resolution_clock::now();
+    #endif
+    
+    reset();
+    irLoader.loadImpulseResponse(std::move (buf),
+                        spec.sampleRate,
+                        juce::dsp::Convolution::Stereo::yes,
+                        juce::dsp::Convolution::Trim::no,
+                        juce::dsp::Convolution::Normalise::no);
+
+    #ifdef DEBUG_OUTPUTS
+    stop = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    cout << "Buffer fill duration:" << duration.count() << "µs" << endl;
+    #endif
+}
+
+// Add a given array to a buffer
+void ReverbAudioProcessor::addArrayToBuffer(float *bufPtr, const float *hrtfPtr, float gain)
+{
+  for (int i=0; i<NSAMP; i++)
+  {
+    bufPtr[i] += hrtfPtr[i]*gain;
+
+  }
+}
+
+// Compares the values in data to a float prameter value and returns the nearest index
+int ReverbAudioProcessor::proximityIndex(const float *data, int length, float value)
+{
+  int proxIndex = 0;
+  float minDistance = BIGVALUE;
+  float val;
+  if (value<0.f)
+  {
+    val = value+360.f;
+  }
+  else
+  {
+    val = value;
+  }
+  for (int i=0; i<length; i++)
+  {
+    float actualDistance = abs(data[i]-val);
+    if (actualDistance < minDistance)
+    {
+      proxIndex = i;
+      minDistance = actualDistance;
+    }
+  }
+  return proxIndex;
+
+}
+
+// Basic lowpass filter
+void ReverbAudioProcessor::lop(const float* in, float* out, int sampleFreq, float hfDamping, int nRebounds, int order)
+{
+    float om = OMEGASTART*(exp(-hfDamping*nRebounds));
+    float alpha1 = exp(-om/sampleFreq);
+    float alpha = 1 - alpha1;
+    out[0] = alpha*in[0];
+    for (int i=1;i<NSAMP;i++)
+    {
+      out[i] = alpha*in[i] + alpha1*out[i-1];
+    }
+    for (int j=0; j<order-1; j++)
+    {
+      out[0] *= alpha;
+      for (int i=1;i<NSAMP;i++)
+      {
+        out[i] = alpha*out[i] + alpha1*out[i-1];
+      }
+    }
 }
