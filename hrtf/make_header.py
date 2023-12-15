@@ -1,13 +1,13 @@
-# pynoverb/load_hrtf_mit_kemar.py
+# hrtf/load_hrtf_mit_kemar.py
 #
 # -------------------------------------------------
-# Imports HRTF
+# Imports HRTF data and save the data in a header
+# for use in C++ hrtf projects
 # -------------------------------------------------
 #
-# Part of pynoverb package
+# Part of BiRR package
 # (c) OD - 2023
 # https://github.com/odoare/pynoverb
-
 
 import numpy as np
 import os
