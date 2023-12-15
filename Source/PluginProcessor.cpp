@@ -386,8 +386,3 @@ void ReverbAudioProcessor::lop(const float* in, float* out, int sampleFreq, floa
       }
     }
 }
-
-// Basic allpass filter
-// 
-
-// =a1​x[n]−a1​y[n−1]+x[n−1]

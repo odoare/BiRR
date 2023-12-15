@@ -57,8 +57,6 @@ public:
 
     juce::dsp::Convolution irLoader;
 
-    //juce::AudioBuffer<float> convBuffer;
-
     juce::dsp::ProcessSpec spec;
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameters();  
