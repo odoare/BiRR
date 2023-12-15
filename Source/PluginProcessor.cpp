@@ -16,7 +16,7 @@
 #include <iostream>
 #include <chrono>
 using namespace std;
-#endif   
+#endif
 
 #define INV_SOUNDSPEED 2.9412e-03
 #define EIGHTYOVERPI 57.295779513
@@ -218,14 +218,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
     layout.add(std::make_unique<juce::AudioParameterInt>("N","N",1,150,20));
     layout.add(std::make_unique<juce::AudioParameterFloat>("D","D",juce::NormalisableRange<float>(0.0f,1.0f,0.001f,0.3f),0.1f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("HFD","HFD",juce::NormalisableRange<float>(0.0f,1.0f,0.001f,0.3f),0.1f));
-
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Diffusion","Diffusion",juce::NormalisableRange<float>(0.0f,1.0f,0.001f,0.3f),0.1f));
+    
     return layout;
 }
 
 // This is the function where the impulse response is calculated
 void ReverbAudioProcessor::setIrLoader()
 {
-    float outBuf[NSAMP]; 
+    float outBuf[NSAMP], outBuf2[NSAMP]; 
 
     auto rx = apvts.getRawParameterValue("RoomX")->load();
     auto ry = apvts.getRawParameterValue("RoomY")->load();
@@ -238,6 +239,7 @@ void ReverbAudioProcessor::setIrLoader()
     int longueur = int(ceil(dur*spec.sampleRate)+NSAMP);
     auto damp = apvts.getRawParameterValue("D")->load();
     auto hfDamp = apvts.getRawParameterValue("HFD")->load();
+    auto diffusion = apvts.getRawParameterValue("Diffusion")->load();
     
     #ifdef DEBUG_OUTPUTS
     cout << "rx : " << rx << "\n" ;
@@ -298,8 +300,10 @@ void ReverbAudioProcessor::setIrLoader()
 
         // Apply lowpass filter and add grain to buffer
         lop(&lhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+        // alp(&outBuf[0], &outBuf2[0], getSampleRate(),diffusion,abs(ix)+abs(iy));
         addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
         lop(&rhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+        // alp(&outBuf[0], &outBuf2[0], getSampleRate(),diffusion,abs(ix)+abs(iy));
         addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
     }
     }
@@ -365,9 +369,9 @@ int ReverbAudioProcessor::proximityIndex(const float *data, int length, float va
 // Basic lowpass filter
 void ReverbAudioProcessor::lop(const float* in, float* out, int sampleFreq, float hfDamping, int nRebounds, int order)
 {
-    float om = OMEGASTART*(exp(-hfDamping*nRebounds));
-    float alpha1 = exp(-om/sampleFreq);
-    float alpha = 1 - alpha1;
+    const float om = OMEGASTART*(exp(-hfDamping*nRebounds));
+    const float alpha1 = exp(-om/sampleFreq);
+    const float alpha = 1 - alpha1;
     out[0] = alpha*in[0];
     for (int i=1;i<NSAMP;i++)
     {
@@ -382,3 +386,8 @@ void ReverbAudioProcessor::lop(const float* in, float* out, int sampleFreq, floa
       }
     }
 }
+
+// Basic allpass filter
+// 
+
+// =a1​x[n]−a1​y[n−1]+x[n−1]

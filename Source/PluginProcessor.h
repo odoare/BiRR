@@ -57,7 +57,7 @@ public:
 
     juce::dsp::Convolution irLoader;
 
-    juce::AudioBuffer<float> convBuffer;
+    //juce::AudioBuffer<float> convBuffer;
 
     juce::dsp::ProcessSpec spec;
 
@@ -70,7 +70,8 @@ private:
     void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, float gain);
     int proximityIndex(const float *data, int length, float value);
     void lop(const float* in, float* out, int sampleFreq, float hfDamping, int nRebounds, int order);
-    
+    // void alp(const float* in, float* out, int sampleFreq, float amount, int nRebounds);
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessor)
 };

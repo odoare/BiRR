@@ -4,7 +4,7 @@
 
 namespace Gui
 {
-    class XyPad : public juce::Component, juce::Slider::Listener
+    class XyPad2 : public juce::Component, juce::Slider::Listener
     {
     public:
         enum class Axis {X1, Y1, X2, Y2};
@@ -28,7 +28,7 @@ namespace Gui
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Thumb);
         };
 
-        XyPad();
+        XyPad2();
         void resized() override;
         void paint(juce::Graphics& g) override;
         void registerSlider(juce::Slider* slider, Axis axis);
@@ -42,7 +42,7 @@ namespace Gui
 
         std::vector<juce::Slider*> x1Sliders, x2Sliders, y1Sliders, y2Sliders;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(XyPad);
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(XyPad2);
     };
     
 }

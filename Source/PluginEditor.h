@@ -10,8 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-#include "Components/XyPad.h"
-
+#include "Components/XyPad2.h"
 
 //==============================================================================
 /**
@@ -64,7 +63,11 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> hfDampingSliderAttachment;
     juce::Label hfDampingLabel{"hfDampingLabel", "HF Wall absorbtion"};
 
-    Gui::XyPad xyPad;
+    juce::Slider diffusionSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> diffusionSliderAttachment;
+    juce::Label diffusionLabel{"diffusionLabel", "Diffusion"};
+
+    Gui::XyPad2 xyPad2;
 
     const juce::Colour listenerColour = juce::Colours::blue;
     const juce::Colour sourceColour = juce::Colours::red;

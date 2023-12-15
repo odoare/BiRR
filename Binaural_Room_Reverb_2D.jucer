@@ -10,8 +10,8 @@
   <MAINGROUP id="NKvv2q" name="BiRR2D">
     <GROUP id="{1DE6DEF3-95E7-6E92-E4F8-B1B7D70EF90E}" name="Source">
       <GROUP id="{948E793C-A2D4-0EFF-109F-624367E4B162}" name="Components">
-        <FILE id="pAtK4J" name="XyPad.cpp" compile="1" resource="0" file="Source/Components/XyPad.cpp"/>
-        <FILE id="JOtbYj" name="XyPad.h" compile="0" resource="0" file="Source/Components/XyPad.h"/>
+        <FILE id="q1uBPG" name="XyPad2.h" compile="0" resource="0" file="Source/Components/XyPad2.h"/>
+        <FILE id="ArxPbs" name="XyPad2.cpp" compile="1" resource="0" file="Source/Components/XyPad2.cpp"/>
       </GROUP>
       <FILE id="wigs0B" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>

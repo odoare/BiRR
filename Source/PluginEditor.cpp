@@ -120,61 +120,28 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     NLabel.setJustificationType(juce::Justification::centred);
     NLabel.attachToComponent(&NSlider,false);
 
-    addAndMakeVisible(xyPad);
-    xyPad.registerSlider(&listenerXSlider, Gui::XyPad::Axis::X1);
-    xyPad.registerSlider(&listenerYSlider, Gui::XyPad::Axis::Y1);
-    xyPad.registerSlider(&sourceXSlider, Gui::XyPad::Axis::X2);
-    xyPad.registerSlider(&sourceYSlider, Gui::XyPad::Axis::Y2);
-    xyPad.thumb1.setColour(listenerColour);
-    xyPad.thumb2.setColour(sourceColour);
-    xyPad.thumb1.mouseUpCallback = updateFunc;
-    xyPad.thumb2.mouseUpCallback = updateFunc;
+    // diffusionSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+    // diffusionSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
+    // diffusionSlider.setColour(juce::Slider::thumbColourId, juce::Colours::green);
+    // diffusionSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::green);
+    // diffusionSlider.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
+    // addAndMakeVisible(diffusionSlider);
+    // diffusionSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"Diffusion",diffusionSlider);
 
-    // addAndMakeVisible(addButton);
-    // addButton.setButtonText("Compute IR");
-    // addButton.onClick = [this]()
-    // {
+    // addAndMakeVisible(diffusionLabel);
+    // diffusionLabel.setJustificationType(juce::Justification::centred);
+    // diffusionLabel.attachToComponent(&diffusionSlider,false);
+    // diffusionSlider.onDragEnd = updateFunc;
 
-    //   addButton.setEnabled(false);
-    //   removeButton.setEnabled(false);    
-
-    //   audioProcessor.setIrLoader();
-
-    //   addButton.setEnabled(true);
-    //   removeButton.setEnabled(true);
-    // };
-
-    // addAndMakeVisible(removeButton);
-    // removeButton.setButtonText("Reset");
-    // removeButton.onClick = [this]()
-    // {
-
-    //   addButton.setEnabled(false);
-    //   removeButton.setEnabled(false); 
-      
-    //   juce::AudioBuffer<float> buf;
-    //   buf.setSize (1, 10);
-      
-    //   for (int channel = 0; channel < buf.getNumChannels() ; ++channel)
-    //   {
-    //       auto* channelData = buf.getWritePointer (channel);
-    //       for (int sample=0; sample<buf.getNumSamples(); ++sample)
-    //       {
-    //           channelData[sample] = 0 ;
-    //       }
-    //       channelData[0] = 1.0f;
-    //   }
-
-    //   audioProcessor.irLoader.loadImpulseResponse (std::move (buf),
-    //                       audioProcessor.spec.sampleRate,
-    //                       juce::dsp::Convolution::Stereo::yes,
-    //                       juce::dsp::Convolution::Trim::no,
-    //                       juce::dsp::Convolution::Normalise::no);
-
-    //   addButton.setEnabled(true);
-    //   removeButton.setEnabled(true);
-
-    // };
+    addAndMakeVisible(xyPad2);
+    xyPad2.registerSlider(&listenerXSlider, Gui::XyPad2::Axis::X1);
+    xyPad2.registerSlider(&listenerYSlider, Gui::XyPad2::Axis::Y1);
+    xyPad2.registerSlider(&sourceXSlider, Gui::XyPad2::Axis::X2);
+    xyPad2.registerSlider(&sourceYSlider, Gui::XyPad2::Axis::Y2);
+    xyPad2.thumb1.setColour(listenerColour);
+    xyPad2.thumb2.setColour(sourceColour);
+    xyPad2.thumb1.mouseUpCallback = updateFunc;
+    xyPad2.thumb2.mouseUpCallback = updateFunc;
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -184,10 +151,10 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
 
 ReverbAudioProcessorEditor::~ReverbAudioProcessorEditor()
 {
-  xyPad.deregisterSlider(&listenerXSlider);
-  xyPad.deregisterSlider(&listenerYSlider);
-  xyPad.deregisterSlider(&sourceXSlider);
-  xyPad.deregisterSlider(&sourceYSlider);
+  xyPad2.deregisterSlider(&listenerXSlider);
+  xyPad2.deregisterSlider(&listenerYSlider);
+  xyPad2.deregisterSlider(&sourceXSlider);
+  xyPad2.deregisterSlider(&sourceYSlider);
 }
 
 //==============================================================================
@@ -225,9 +192,11 @@ void ReverbAudioProcessorEditor::resized()
     listenerXSlider.setBounds(uxb+ux,uyb+15*uy,9*ux,uy);
     listenerYSlider.setBounds(uxb+10*ux,uyb+6*uy,ux,9*uy);
 
-    xyPad.setBounds(uxb+ux,uyb+6*uy,9*ux,9*uy);
+    xyPad2.setBounds(uxb+ux,uyb+6*uy,9*ux,9*uy);
 
-    NSlider.setBounds(uxb+12*ux,uyb+5*uy,4*ux,4*uy);
+    // diffusionSlider.setBounds(uxb+12*ux,uyb+5*uy,4*ux,4*uy);
+
+    NSlider.setBounds(uxb+12*ux,uyb+10*uy,4*ux,4*uy);
 
     addButton.setBounds(uxb+12*ux,uyb+10*uy,4*ux,2*uy);
 

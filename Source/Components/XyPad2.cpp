@@ -1,41 +1,41 @@
-#include "XyPad.h"
+#include "XyPad2.h"
 
 namespace Gui
 {
-    XyPad::Thumb::Thumb()
+    XyPad2::Thumb::Thumb()
     {
         constrainer.setMinimumOnscreenAmounts(thumbSize,thumbSize,thumbSize,thumbSize);
     }
 
-    void XyPad::Thumb::paint(juce::Graphics& g)
+    void XyPad2::Thumb::paint(juce::Graphics& g)
     {
         g.setColour(thumbColour);
         g.fillEllipse(getLocalBounds().toFloat());
     }
 
-    void XyPad::Thumb::mouseDown(const juce::MouseEvent& event)
+    void XyPad2::Thumb::mouseDown(const juce::MouseEvent& event)
     {
         dragger.startDraggingComponent(this, event);
     }
 
-    void XyPad::Thumb::mouseDrag(const juce::MouseEvent& event)
+    void XyPad2::Thumb::mouseDrag(const juce::MouseEvent& event)
     {
         dragger.dragComponent(this, event, &constrainer);
         if (moveCallback)
             moveCallback(getPosition().toDouble());
     }
 
-    void XyPad::Thumb::mouseUp(const juce::MouseEvent& event)
+    void XyPad2::Thumb::mouseUp(const juce::MouseEvent& event)
     {
         mouseUpCallback();
     }
 
-    void XyPad::Thumb::setColour(juce::Colour newColour)
+    void XyPad2::Thumb::setColour(juce::Colour newColour)
     {
         thumbColour = newColour;
     }
 
-    XyPad::XyPad()
+    XyPad2::XyPad2()
     {
         addAndMakeVisible(thumb1);
         addAndMakeVisible(thumb2);
@@ -68,19 +68,31 @@ namespace Gui
         };
     }
 
-    void XyPad::paint(juce::Graphics& g)
+    void XyPad2::paint(juce::Graphics& g)
     {
         g.setColour(juce::Colours::black);
         g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.0f);
     }
 
-    void XyPad::resized()
+    void XyPad2::resized()
     {
+        const auto bounds = getLocalBounds();
+        const auto w = static_cast<double>(thumbSize);
+
         thumb1.setBounds(getLocalBounds().withSizeKeepingCentre(thumbSize,thumbSize));
         thumb2.setBounds(getLocalBounds().withSizeKeepingCentre(thumbSize,thumbSize));
+
+        thumb1.setTopLeftPosition(
+                juce::jmap(x1Sliders[0]->getValue(), x1Sliders[0]->getMinimum(), x1Sliders[0]->getMaximum(), 0.0, bounds.getWidth() - w),
+                juce::jmap(y1Sliders[0]->getValue(), y1Sliders[0]->getMinimum(), y1Sliders[0]->getMaximum(), bounds.getHeight() - w, 0.0)
+            );
+        thumb2.setTopLeftPosition(
+                juce::jmap(x2Sliders[0]->getValue(), x2Sliders[0]->getMinimum(), x2Sliders[0]->getMaximum(), 0.0, bounds.getWidth() - w),
+                juce::jmap(y2Sliders[0]->getValue(), y2Sliders[0]->getMinimum(), y2Sliders[0]->getMaximum(), bounds.getHeight() - w, 0.0)
+            );
     }
 
-    void XyPad::registerSlider(juce::Slider* slider, Axis axis)
+    void XyPad2::registerSlider(juce::Slider* slider, Axis axis)
     {
         slider->addListener(this);
         if (axis == Axis::X1)
@@ -93,7 +105,7 @@ namespace Gui
             y2Sliders.push_back(slider);
     }
 
-    void XyPad::deregisterSlider(juce::Slider* slider)
+    void XyPad2::deregisterSlider(juce::Slider* slider)
     {
         slider->removeListener(this);
         x1Sliders.erase(std::remove(x1Sliders.begin(), x1Sliders.end(), slider), x1Sliders.end());
@@ -102,7 +114,7 @@ namespace Gui
         y2Sliders.erase(std::remove(y2Sliders.begin(), y2Sliders.end(), slider), y2Sliders.end());
     }
 
-    void XyPad::sliderValueChanged(juce::Slider* slider)
+    void XyPad2::sliderValueChanged(juce::Slider* slider)
     {
         // Avoid loopback
         if (thumb1.isMouseOverOrDragging(false))
@@ -122,7 +134,6 @@ namespace Gui
                 juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), 0.0, bounds.getWidth() - w),
                 thumb1.getY()
             );
-
         } else if (isY1AxisSlider)
         {
             thumb1.setTopLeftPosition(
