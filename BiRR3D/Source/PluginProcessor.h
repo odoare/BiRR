@@ -13,12 +13,12 @@
 //==============================================================================
 /**
 */
-class BiRR3DAudioProcessor  : public juce::AudioProcessor
+class ReverbAudioProcessor  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
-    BiRR3DAudioProcessor();
-    ~BiRR3DAudioProcessor() override;
+    ReverbAudioProcessor();
+    ~ReverbAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -53,7 +53,23 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    void setIrLoader();
+
+    juce::dsp::Convolution irLoader;
+
+    juce::dsp::ProcessSpec spec;
+
+    static juce::AudioProcessorValueTreeState::ParameterLayout createParameters();  
+    juce::AudioProcessorValueTreeState apvts{*this,nullptr,"Parameters",createParameters()};
+
+
 private:
+
+    void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, float gain);
+    int proximityIndex(const float *data, int length, float value);
+    void lop(const float* in, float* out, int sampleFreq, float hfDamping, int nRebounds, int order);
+    // void alp(const float* in, float* out, int sampleFreq, float amount, int nRebounds);
+
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BiRR3DAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessor)
 };
