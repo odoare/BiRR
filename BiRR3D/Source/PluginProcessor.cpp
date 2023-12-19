@@ -220,7 +220,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceY","SourceY",0.01f,0.99f,0.75f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceZ","SourceZ",0.01f,0.99f,0.75f));
     layout.add(std::make_unique<juce::AudioParameterInt>("N","N",1,150,20));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("D","D",juce::NormalisableRange<float>(0.05f,0.5f,0.001f,0.3f),0.1f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("D","D",juce::NormalisableRange<float>(0.04f,0.7f,0.001f,0.3f),0.1f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("HFD","HFD",juce::NormalisableRange<float>(0.01f,0.3f,0.001f,0.3f),0.1f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Diffusion","Diffusion",juce::NormalisableRange<float>(0.0f,1.0f,0.001f,0.3f),0.1f));
 
@@ -246,7 +246,7 @@ void ReverbAudioProcessor::setIrLoader()
     auto hfDamp = apvts.getRawParameterValue("HFD")->load();
     auto diffusion = apvts.getRawParameterValue("Diffusion")->load();
 
-    int n = int(log10(1e-3)/log10(1-damp));
+    int n = int(log10(2e-2)/log10(1-damp));
     auto dur = (n+1)*sqrt(rx*rx+ry*ry+rz*rz)/340;
     int longueur = int(ceil(dur*spec.sampleRate)+NSAMP+int(spec.sampleRate*SIGMA_DELTAT));
 

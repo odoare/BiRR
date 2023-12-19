@@ -14,13 +14,13 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     auto updateFunc = [this](){
-      calculatingLabel.setVisible(true);
+      // calculatingLabel.setVisible(true);
+      calculatingLabel.setText("Calculating...", juce::NotificationType::sendNotification);
       calculatingLabel.repaint();
-      repaint();
-      this->repaint();
       audioProcessor.setIrLoader();
-      calculatingLabel.setVisible(false);
-      };
+      calculatingLabel.setText("Done.", juce::NotificationType::sendNotification);
+      calculatingLabel.repaint();
+    };
 
     roomXSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     roomXSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
@@ -148,7 +148,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     hfDampingSlider.onDragEnd = updateFunc;
 
     addAndMakeVisible(calculatingLabel);
-    //calculatingLabel.setVisible(false);
+    // calculatingLabel.setVisible(false);
     
     // NSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     // NSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
