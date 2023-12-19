@@ -18,9 +18,10 @@
 using namespace std;
 #endif
 
-#define INV_SOUNDSPEED 2.9412e-03
-#define EIGHTYOVERPI 57.295779513
-#define OMEGASTART 125663.706
+#define INV_SOUNDSPEED 2.9412e-03f
+#define EIGHTYOVERPI 57.295779513f
+#define OMEGASTART 125663.706f
+#define SIGMA_DELTAT 1e-3f
 
 //==============================================================================
 ReverbAudioProcessor::ReverbAudioProcessor()
@@ -211,15 +212,18 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     layout.add(std::make_unique<juce::AudioParameterFloat>("RoomX","RoomX",1.0f,10.0f,3.0f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("RoomY","RoomY",1.0f,10.0f,3.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("RoomZ","RoomZ",1.0f,10.0f,3.0f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerX","ListenerX",0.01f,0.99f,0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerY","ListenerY",0.01f,0.99f,0.25f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerZ","ListenerZ",0.01f,0.99f,0.25f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceX","SourceX",0.01f,0.99f,0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceY","SourceY",0.01f,0.99f,0.75f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("SourceZ","SourceZ",0.01f,0.99f,0.75f));
     layout.add(std::make_unique<juce::AudioParameterInt>("N","N",1,150,20));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("D","D",juce::NormalisableRange<float>(0.0f,1.0f,0.001f,0.3f),0.1f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("HFD","HFD",juce::NormalisableRange<float>(0.0f,1.0f,0.001f,0.3f),0.1f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("D","D",juce::NormalisableRange<float>(0.05f,0.5f,0.001f,0.3f),0.1f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("HFD","HFD",juce::NormalisableRange<float>(0.01f,0.3f,0.001f,0.3f),0.1f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Diffusion","Diffusion",juce::NormalisableRange<float>(0.0f,1.0f,0.001f,0.3f),0.1f));
-    
+
     return layout;
 }
 
@@ -230,24 +234,32 @@ void ReverbAudioProcessor::setIrLoader()
 
     auto rx = apvts.getRawParameterValue("RoomX")->load();
     auto ry = apvts.getRawParameterValue("RoomY")->load();
+    auto rz = apvts.getRawParameterValue("RoomZ")->load();
     auto lx = rx*(apvts.getRawParameterValue("ListenerX")->load());
     auto ly = ry*(apvts.getRawParameterValue("ListenerY")->load());
+    auto lz = rz*(apvts.getRawParameterValue("ListenerZ")->load());
     auto sx = rx*(apvts.getRawParameterValue("SourceX")->load());
     auto sy = ry*(apvts.getRawParameterValue("SourceY")->load());
-    auto n = apvts.getRawParameterValue("N")->load();
-    auto dur = (n+1)*sqrt(rx*rx+ry*ry)/340;
-    int longueur = int(ceil(dur*spec.sampleRate)+NSAMP);
+    auto sz = rz*(apvts.getRawParameterValue("SourceZ")->load());
+    //auto n = apvts.getRawParameterValue("N")->load();
     auto damp = apvts.getRawParameterValue("D")->load();
     auto hfDamp = apvts.getRawParameterValue("HFD")->load();
     auto diffusion = apvts.getRawParameterValue("Diffusion")->load();
-    
+
+    int n = int(log10(1e-3)/log10(1-damp));
+    auto dur = (n+1)*sqrt(rx*rx+ry*ry+rz*rz)/340;
+    int longueur = int(ceil(dur*spec.sampleRate)+NSAMP+int(spec.sampleRate*SIGMA_DELTAT));
+
     #ifdef DEBUG_OUTPUTS
     cout << "rx : " << rx << "\n" ;
     cout << "ry : " << ry << "\n" ;
+    cout << "rz : " << rz << "\n" ;
     cout << "lx : " << lx << "\n" ;
     cout << "ly : " << ly << "\n" ;
+    cout << "lz : " << lz << "\n" ;
     cout << "sx : " << sx << "\n" ;
     cout << "sy : " << sy << "\n" ;
+    cout << "sz : " << sz << "\n" ;
     cout << "n : " << n << "\n" ;
     cout << "dur : " << dur << "\n" ;
     cout << "longueur : " << longueur << "\n" ;
@@ -267,45 +279,56 @@ void ReverbAudioProcessor::setIrLoader()
         dataR[sample] = 0;
     }
     
-    float x,y;
+    float x,y,z;
 
     for (int ix = 0; ix < n ; ++ix)
     {
-    x = 2*float(ceil(float(ix)/2))*rx+pow(-1,ix)*sx;
-    for (int iy = 0; iy < n ; ++iy)
-    {
+      x = 2*float(ceil(float(ix)/2))*rx+pow(-1,ix)*sx;
+      for (int iy = 0; iy < n ; ++iy)
+      {
         y = 2*float(ceil(float(iy)/2))*ry+pow(-1,iy)*sy;
-        float dist = sqrt((x-lx)*(x-lx)+(y-ly)*(y-ly));
-        float time = dist*INV_SOUNDSPEED;
-        int indice = int(round(time*spec.sampleRate));
-        float r = pow(1-damp,abs(ix)+abs(iy));
-        float gain = r/dist;
-
-        //Elevation angle is zero here
-        int elevationIndex = 4;
-
-        // Azimutal angle calculation
-        float theta = atan2f(y-ly,-x+lx)*EIGHTYOVERPI-90;
-        int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta);
-
-        #ifdef DEBUG_OUTPUTS
-        if (ix==0 and iy==0)
+        for (int iz=0; iz<n; ++iz)
         {
-          cout << "x = " << x << "      y = " << y << endl;
-          cout << "r = " << r << "      dist = " << dist << endl;
-          cout << "y-ly = " << y-ly << "         -x+lx = " << -lx+x << endl;
-          cout << "Theta = " << theta << "        Azimutal index = " << azimutalIndex << endl;
-        }
-        #endif
+          z = 2*float(ceil(float(iz)/2))*rz+pow(-1,iz)*sz;
+          float dist = sqrt((x-lx)*(x-lx)+(y-ly)*(y-ly)+(z-lz)*(z-lz));
+          float time = dist*INV_SOUNDSPEED;
+          //float random = (rand() % 100)/100.0f;
+          auto random = juce::Random::getSystemRandom().nextFloat();
+          int indice = int(round((time+random*SIGMA_DELTAT)*spec.sampleRate));
+          //int indice = int(round((time)*spec.sampleRate));
+          float r = pow(1-damp,abs(ix)+abs(iy)+abs(iz));
+          float gain = pow(-1,ix+iy+iz)*r/dist;
 
-        // Apply lowpass filter and add grain to buffer
-        lop(&lhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
-        // alp(&outBuf[0], &outBuf2[0], getSampleRate(),diffusion,abs(ix)+abs(iy));
-        addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
-        lop(&rhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
-        // alp(&outBuf[0], &outBuf2[0], getSampleRate(),diffusion,abs(ix)+abs(iy));
-        addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
-    }
+          //Elevation angle is zero here
+          float rp = sqrt((sx-lx)*(sx-lx)+(sy-ly)*(sy-ly));
+          float elev = atan2f(sz-lz,rp)*EIGHTYOVERPI;
+          int elevationIndex = proximityIndex(&elevations[0],NELEV,elev,false);
+          //elevationIndex = 4;
+
+          // Azimutal angle calculation
+          float theta = atan2f(y-ly,-x+lx)*EIGHTYOVERPI-90;
+          int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta,true);
+
+          #ifdef DEBUG_OUTPUTS
+          if (ix==0 and iy==0 and iz==0)
+          {
+            cout << "x = " << x << "      y = " << y << "      z = " << z << endl;
+            cout << "r = " << r << "      dist = " << dist << endl;
+            cout << "y-ly = " << y-ly << "         -x+lx = " << -lx+x << endl;
+            cout << "elev = " << elev << "          elevationIndex = " << elevationIndex << endl;
+            cout << "Theta = " << theta << "        Azimutal index = " << azimutalIndex << endl;
+          }
+          #endif
+
+          // Apply lowpass filter and add grain to buffer
+          lop(&lhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+          // alp(&outBuf[0], &outBuf2[0], getSampleRate(),diffusion,abs(ix)+abs(iy));
+          addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+          lop(&rhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+          // alp(&outBuf[0], &outBuf2[0], getSampleRate(),diffusion,abs(ix)+abs(iy));
+          addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+        }
+      }
     }
 
     #ifdef DEBUG_OUTPUTS
@@ -335,17 +358,16 @@ void ReverbAudioProcessor::addArrayToBuffer(float *bufPtr, const float *hrtfPtr,
   for (int i=0; i<NSAMP; i++)
   {
     bufPtr[i] += hrtfPtr[i]*gain;
-
   }
 }
 
 // Compares the values in data to a float prameter value and returns the nearest index
-int ReverbAudioProcessor::proximityIndex(const float *data, int length, float value)
+int ReverbAudioProcessor::proximityIndex(const float *data, const int length, const float value, const bool wrap)
 {
   int proxIndex = 0;
   float minDistance = BIGVALUE;
   float val;
-  if (value<0.f)
+  if (wrap and value<0.f)
   {
     val = value+360.f;
   }

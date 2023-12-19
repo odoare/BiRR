@@ -6,6 +6,10 @@
               pluginManufacturerCode="ODME" pluginCode="BRR3" lv2Uri="http://www.odiomechanics/plugins/BiRR3"
               pluginAAXCategory="8">
   <MAINGROUP id="BIm9jF" name="BiRR3D">
+    <GROUP id="{D1C5BAF7-BCC1-4FA1-8B57-FE3DA373394C}" name="Components">
+      <FILE id="EWRFcW" name="XyPad2.cpp" compile="1" resource="0" file="Source/Components/XyPad2.cpp"/>
+      <FILE id="cKDPIF" name="XyPad2.h" compile="0" resource="0" file="Source/Components/XyPad2.h"/>
+    </GROUP>
     <GROUP id="{06E13A3E-246C-4F43-EBED-8C65CF204F5E}" name="Source">
       <FILE id="w3ocrs" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
@@ -13,6 +17,7 @@
             file="Source/PluginProcessor.h"/>
       <FILE id="Gv1BeC" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
+      <FILE id="qHbRc1" name="hrtf.h" compile="0" resource="0" file="Source/hrtf.h"/>
       <FILE id="eSzCgh" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
   </MAINGROUP>

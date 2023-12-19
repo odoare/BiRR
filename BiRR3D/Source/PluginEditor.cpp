@@ -13,7 +13,14 @@
 ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    auto updateFunc = [this](){audioProcessor.setIrLoader();};
+    auto updateFunc = [this](){
+      calculatingLabel.setVisible(true);
+      calculatingLabel.repaint();
+      repaint();
+      this->repaint();
+      audioProcessor.setIrLoader();
+      calculatingLabel.setVisible(false);
+      };
 
     roomXSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     roomXSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
@@ -28,10 +35,6 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     roomXLabel.setJustificationType(juce::Justification::centred);
     roomXLabel.attachToComponent(&roomXSlider,false);
 
-    addAndMakeVisible(roomYLabel);
-    roomYLabel.setJustificationType(juce::Justification::centred);
-    roomYLabel.attachToComponent(&roomYSlider,false);
-
     roomYSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     roomYSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
     roomYSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::teal);
@@ -40,6 +43,23 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     addAndMakeVisible(roomYSlider);
     roomYSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"RoomY",roomYSlider);
     roomYSlider.onDragEnd = updateFunc;
+
+    addAndMakeVisible(roomYLabel);
+    roomYLabel.setJustificationType(juce::Justification::centred);
+    roomYLabel.attachToComponent(&roomYSlider,false);
+
+    roomZSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+    roomZSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
+    roomZSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::teal);
+    roomZSlider.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
+    roomZSlider.setColour(juce::Slider::thumbColourId, juce::Colours::teal);
+    addAndMakeVisible(roomZSlider);
+    roomZSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"RoomZ",roomZSlider);
+    roomZSlider.onDragEnd = updateFunc;
+
+    addAndMakeVisible(roomZLabel);
+    roomZLabel.setJustificationType(juce::Justification::centred);
+    roomZLabel.attachToComponent(&roomZSlider,false);
 
     listenerXSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
     listenerXSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
@@ -61,6 +81,16 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     listenerYSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"ListenerY",listenerYSlider);
     listenerYSlider.onDragEnd = updateFunc;
 
+    listenerZSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    listenerZSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
+    listenerZSlider.setColour(juce::Slider::thumbColourId, listenerColour);
+    listenerZSlider.setColour(juce::Slider::trackColourId, juce::Colours::black);
+    listenerZSlider.setColour(juce::Slider::backgroundColourId, juce::Colours::black);
+    listenerZSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+    addAndMakeVisible(listenerZSlider);
+    listenerZSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"ListenerZ",listenerZSlider);
+    listenerZSlider.onDragEnd = updateFunc;
+
     sourceXSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
     sourceXSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
     sourceXSlider.setColour(juce::Slider::thumbColourId, sourceColour);
@@ -80,6 +110,16 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     addAndMakeVisible(sourceYSlider);
     sourceYSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceY",sourceYSlider);
     sourceYSlider.onDragEnd = updateFunc;
+
+    sourceZSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    sourceZSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
+    sourceZSlider.setColour(juce::Slider::thumbColourId, sourceColour);
+    sourceZSlider.setColour(juce::Slider::trackColourId, juce::Colours::black);
+    sourceZSlider.setColour(juce::Slider::backgroundColourId, juce::Colours::black);
+    sourceZSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+    addAndMakeVisible(sourceZSlider);
+    sourceZSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceZ",sourceZSlider);
+    sourceZSlider.onDragEnd = updateFunc;
 
     dampingSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     dampingSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
@@ -107,18 +147,21 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     hfDampingLabel.attachToComponent(&hfDampingSlider,false);
     hfDampingSlider.onDragEnd = updateFunc;
 
-    NSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    NSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    NSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::orange);
-    NSlider.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
-    NSlider.setColour(juce::Slider::thumbColourId, juce::Colours::orange);
-    addAndMakeVisible(NSlider);
-    NSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"N",NSlider);
-    NSlider.onDragEnd = updateFunc;
+    addAndMakeVisible(calculatingLabel);
+    //calculatingLabel.setVisible(false);
+    
+    // NSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+    // NSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
+    // NSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::orange);
+    // NSlider.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
+    // NSlider.setColour(juce::Slider::thumbColourId, juce::Colours::orange);
+    // addAndMakeVisible(NSlider);
+    // NSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"N",NSlider);
+    // NSlider.onDragEnd = updateFunc;
 
-    addAndMakeVisible(NLabel);
-    NLabel.setJustificationType(juce::Justification::centred);
-    NLabel.attachToComponent(&NSlider,false);
+    // addAndMakeVisible(NLabel);
+    // NLabel.setJustificationType(juce::Justification::centred);
+    // NLabel.attachToComponent(&NSlider,false);
 
     // diffusionSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     // diffusionSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
@@ -183,8 +226,13 @@ void ReverbAudioProcessorEditor::resized()
     
     roomXSlider.setBounds(uxb,uyb,4*ux,4*uy);
     roomYSlider.setBounds(uxb+4*ux,uyb,4*ux,4*uy);
-    dampingSlider.setBounds(uxb+8*ux,uyb,4*ux,4*uy);
-    hfDampingSlider.setBounds(uxb+12*ux,uyb,4*ux,4*uy);
+    roomZSlider.setBounds(uxb+8*ux,uyb,4*ux,4*uy);
+
+    sourceZSlider.setBounds(uxb+12*ux,uyb+11*uy,2*ux,4*uy);
+    listenerZSlider.setBounds(uxb+14*ux,uyb+11*uy,2*ux,4*uy);
+
+    dampingSlider.setBounds(uxb+12*ux,uyb,4*ux,4*uy);
+    hfDampingSlider.setBounds(uxb+12*ux,uyb+6*uy,4*ux,4*uy);
 
     sourceXSlider.setBounds(uxb+ux,uyb+5*uy,9*ux,uy);
     sourceYSlider.setBounds(uxb,uyb+6*uy,ux,9*uy);
@@ -194,10 +242,12 @@ void ReverbAudioProcessorEditor::resized()
 
     xyPad2.setBounds(uxb+ux,uyb+6*uy,9*ux,9*uy);
 
+    calculatingLabel.setBounds(uxb+12*ux,uyb+15*uy,4*ux,uy);
+
     // diffusionSlider.setBounds(uxb+12*ux,uyb+5*uy,4*ux,4*uy);
 
-    NSlider.setBounds(uxb+12*ux,uyb+10*uy,4*ux,4*uy);
+    // NSlider.setBounds(uxb+12*ux,uyb+13.5*uy,4*ux,4*uy);
 
-    addButton.setBounds(uxb+12*ux,uyb+10*uy,4*ux,2*uy);
+    //addButton.setBounds(uxb+12*ux,uyb+10*uy,4*ux,2*uy);
 
 }

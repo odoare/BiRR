@@ -42,18 +42,26 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> roomYSliderAttachment;
     juce::Label roomYLabel{"roomYLabel", "Y Size (m)"};
 
+    juce::Slider roomZSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> roomZSliderAttachment;
+    juce::Label roomZLabel{"roomZLabel", "Z Size (m)"};
+
     juce::Slider listenerXSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerXSliderAttachment;
     juce::Slider listenerYSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerYSliderAttachment;
+    juce::Slider listenerZSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerZSliderAttachment;
     juce::Slider sourceXSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sourceXSliderAttachment;
     juce::Slider sourceYSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sourceYSliderAttachment;
+    juce::Slider sourceZSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sourceZSliderAttachment;
 
-    juce::Slider NSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> NSliderAttachment;
-    juce::Label NLabel{"NLabel", "Number of rebounds"};
+    // juce::Slider NSlider;
+    // std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> NSliderAttachment;
+    // juce::Label NLabel{"NLabel", "Number of rebounds"};
 
     juce::Slider dampingSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dampingSliderAttachment;
@@ -71,6 +79,8 @@ private:
 
     const juce::Colour listenerColour = juce::Colours::blue;
     const juce::Colour sourceColour = juce::Colours::red;
+
+    juce::Label calculatingLabel{"calculatingLabel", "Calculating..."};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessorEditor)
 };

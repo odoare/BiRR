@@ -66,7 +66,7 @@ public:
 private:
 
     void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, float gain);
-    int proximityIndex(const float *data, int length, float value);
+    int proximityIndex(const float *data, const int length, const float value, const bool wrap);
     void lop(const float* in, float* out, int sampleFreq, float hfDamping, int nRebounds, int order);
     // void alp(const float* in, float* out, int sampleFreq, float amount, int nRebounds);
 
