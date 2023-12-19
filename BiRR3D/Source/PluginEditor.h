@@ -82,5 +82,8 @@ private:
 
     juce::Label calculatingLabel{"calculatingLabel", "Calculating..."};
 
+    void addController(juce::Slider&, juce::Slider::SliderStyle, juce::Colour, juce::Colour);
+    void addAndConnectLabel(juce::Slider&, juce::Label&);
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessorEditor)
 };

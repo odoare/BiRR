@@ -14,168 +14,77 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     auto updateFunc = [this](){
-      // calculatingLabel.setVisible(true);
-      calculatingLabel.setText("Calculating...", juce::NotificationType::sendNotification);
+      calculatingLabel.setVisible(true);
       calculatingLabel.repaint();
+      repaint();
+      this->repaint();
       audioProcessor.setIrLoader();
-      calculatingLabel.setText("Done.", juce::NotificationType::sendNotification);
-      calculatingLabel.repaint();
-    };
+      calculatingLabel.setVisible(false);
+      };
 
-    roomXSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    roomXSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    roomXSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::teal);
-    roomXSlider.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
-    roomXSlider.setColour(juce::Slider::thumbColourId, juce::Colours::teal);
-    addAndMakeVisible(roomXSlider);
+    // Room size controllers
+    addController(roomXSlider, juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag, juce::Colours::teal,juce::Colours::black);
+    addAndConnectLabel(roomXSlider, roomXLabel);
     roomXSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"RoomX",roomXSlider);
     roomXSlider.onDragEnd = updateFunc;
 
-    addAndMakeVisible(roomXLabel);
-    roomXLabel.setJustificationType(juce::Justification::centred);
-    roomXLabel.attachToComponent(&roomXSlider,false);
-
-    roomYSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    roomYSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    roomYSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::teal);
-    roomYSlider.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
-    roomYSlider.setColour(juce::Slider::thumbColourId, juce::Colours::teal);
-    addAndMakeVisible(roomYSlider);
+    addController(roomYSlider, juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag, juce::Colours::teal,juce::Colours::black);
+    addAndConnectLabel(roomYSlider, roomYLabel);
     roomYSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"RoomY",roomYSlider);
     roomYSlider.onDragEnd = updateFunc;
 
-    addAndMakeVisible(roomYLabel);
-    roomYLabel.setJustificationType(juce::Justification::centred);
-    roomYLabel.attachToComponent(&roomYSlider,false);
-
-    roomZSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    roomZSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    roomZSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::teal);
-    roomZSlider.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
-    roomZSlider.setColour(juce::Slider::thumbColourId, juce::Colours::teal);
-    addAndMakeVisible(roomZSlider);
+    addController(roomZSlider, juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag, juce::Colours::teal,juce::Colours::black);
+    addAndConnectLabel(roomZSlider, roomZLabel);
     roomZSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"RoomZ",roomZSlider);
     roomZSlider.onDragEnd = updateFunc;
 
-    addAndMakeVisible(roomZLabel);
-    roomZLabel.setJustificationType(juce::Justification::centred);
-    roomZLabel.attachToComponent(&roomZSlider,false);
-
-    listenerXSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
-    listenerXSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    listenerXSlider.setColour(juce::Slider::thumbColourId, listenerColour);
-    listenerXSlider.setColour(juce::Slider::trackColourId, juce::Colours::black);
-    listenerXSlider.setColour(juce::Slider::backgroundColourId, juce::Colours::black);
+    // Listener position controllers
+    addController(listenerXSlider, juce::Slider::SliderStyle::LinearHorizontal, listenerColour, juce::Colours::black);
     listenerXSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    addAndMakeVisible(listenerXSlider);
     listenerXSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"ListenerX",listenerXSlider);
     listenerXSlider.onDragEnd = updateFunc;
 
-    listenerYSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
-    listenerYSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    listenerYSlider.setColour(juce::Slider::thumbColourId, listenerColour);
-    listenerYSlider.setColour(juce::Slider::trackColourId, juce::Colours::black);
-    listenerYSlider.setColour(juce::Slider::backgroundColourId, juce::Colours::black);
+    addController(listenerYSlider, juce::Slider::SliderStyle::LinearVertical, listenerColour, juce::Colours::black);
     listenerYSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    addAndMakeVisible(listenerYSlider);
     listenerYSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"ListenerY",listenerYSlider);
     listenerYSlider.onDragEnd = updateFunc;
 
-    listenerZSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
-    listenerZSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    listenerZSlider.setColour(juce::Slider::thumbColourId, listenerColour);
-    listenerZSlider.setColour(juce::Slider::trackColourId, juce::Colours::black);
-    listenerZSlider.setColour(juce::Slider::backgroundColourId, juce::Colours::black);
+    addController(listenerZSlider, juce::Slider::SliderStyle::LinearVertical, listenerColour, juce::Colours::black);
     listenerZSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    addAndMakeVisible(listenerZSlider);
     listenerZSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"ListenerZ",listenerZSlider);
     listenerZSlider.onDragEnd = updateFunc;
 
-    sourceXSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
-    sourceXSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    sourceXSlider.setColour(juce::Slider::thumbColourId, sourceColour);
-    sourceXSlider.setColour(juce::Slider::trackColourId, juce::Colours::black);
-    sourceXSlider.setColour(juce::Slider::backgroundColourId, juce::Colours::black);
+    // Source position controllers
+    addController(sourceXSlider, juce::Slider::SliderStyle::LinearHorizontal, sourceColour, juce::Colours::black);
     sourceXSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    addAndMakeVisible(sourceXSlider);
     sourceXSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceX",sourceXSlider);
     sourceXSlider.onDragEnd = updateFunc;
 
-    sourceYSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
-    sourceYSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    sourceYSlider.setColour(juce::Slider::thumbColourId, sourceColour);
-    sourceYSlider.setColour(juce::Slider::trackColourId, juce::Colours::black);
-    sourceYSlider.setColour(juce::Slider::backgroundColourId, juce::Colours::black);
+    addController(sourceYSlider, juce::Slider::SliderStyle::LinearVertical, sourceColour, juce::Colours::black);
     sourceYSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    addAndMakeVisible(sourceYSlider);
     sourceYSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceY",sourceYSlider);
     sourceYSlider.onDragEnd = updateFunc;
 
-    sourceZSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
-    sourceZSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    sourceZSlider.setColour(juce::Slider::thumbColourId, sourceColour);
-    sourceZSlider.setColour(juce::Slider::trackColourId, juce::Colours::black);
-    sourceZSlider.setColour(juce::Slider::backgroundColourId, juce::Colours::black);
+    addController(sourceZSlider, juce::Slider::SliderStyle::LinearVertical, sourceColour, juce::Colours::black);
     sourceZSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    addAndMakeVisible(sourceZSlider);
     sourceZSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceZ",sourceZSlider);
     sourceZSlider.onDragEnd = updateFunc;
 
-    dampingSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    dampingSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    dampingSlider.setColour(juce::Slider::thumbColourId, juce::Colours::green);
-    dampingSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::green);
-    dampingSlider.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
-    addAndMakeVisible(dampingSlider);
+
+    // Damping sliders
+    addController(dampingSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::green,juce::Colours::black);
+    addAndConnectLabel(dampingSlider, dampingLabel);
     dampingSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"D",dampingSlider);
     dampingSlider.onDragEnd = updateFunc;
 
-    addAndMakeVisible(dampingLabel);
-    dampingLabel.setJustificationType(juce::Justification::centred);
-    dampingLabel.attachToComponent(&dampingSlider,false);
-
-    hfDampingSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    hfDampingSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    hfDampingSlider.setColour(juce::Slider::thumbColourId, juce::Colours::green);
-    hfDampingSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::green);
-    hfDampingSlider.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
-    addAndMakeVisible(hfDampingSlider);
+    addController(hfDampingSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::green,juce::Colours::black);
+    addAndConnectLabel(hfDampingSlider, hfDampingLabel);
     hfDampingSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"HFD",hfDampingSlider);
-
-    addAndMakeVisible(hfDampingLabel);
-    hfDampingLabel.setJustificationType(juce::Justification::centred);
-    hfDampingLabel.attachToComponent(&hfDampingSlider,false);
     hfDampingSlider.onDragEnd = updateFunc;
 
-    addAndMakeVisible(calculatingLabel);
-    // calculatingLabel.setVisible(false);
+    //addAndMakeVisible(calculatingLabel);
+    //calculatingLabel.setVisible(false);
     
-    // NSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    // NSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    // NSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::orange);
-    // NSlider.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
-    // NSlider.setColour(juce::Slider::thumbColourId, juce::Colours::orange);
-    // addAndMakeVisible(NSlider);
-    // NSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"N",NSlider);
-    // NSlider.onDragEnd = updateFunc;
-
-    // addAndMakeVisible(NLabel);
-    // NLabel.setJustificationType(juce::Justification::centred);
-    // NLabel.attachToComponent(&NSlider,false);
-
-    // diffusionSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    // diffusionSlider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
-    // diffusionSlider.setColour(juce::Slider::thumbColourId, juce::Colours::green);
-    // diffusionSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::green);
-    // diffusionSlider.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
-    // addAndMakeVisible(diffusionSlider);
-    // diffusionSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"Diffusion",diffusionSlider);
-
-    // addAndMakeVisible(diffusionLabel);
-    // diffusionLabel.setJustificationType(juce::Justification::centred);
-    // diffusionLabel.attachToComponent(&diffusionSlider,false);
-    // diffusionSlider.onDragEnd = updateFunc;
-
     addAndMakeVisible(xyPad2);
     xyPad2.registerSlider(&listenerXSlider, Gui::XyPad2::Axis::X1);
     xyPad2.registerSlider(&listenerYSlider, Gui::XyPad2::Axis::Y1);
@@ -250,4 +159,27 @@ void ReverbAudioProcessorEditor::resized()
 
     //addButton.setBounds(uxb+12*ux,uyb+10*uy,4*ux,2*uy);
 
+}
+
+void ReverbAudioProcessorEditor::addController(juce::Slider& slider,
+                                                    juce::Slider::SliderStyle style,
+                                                    juce::Colour fillCol,
+                                                    juce::Colour outlineCol)
+{
+  slider.setSliderStyle(style);
+  slider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
+  slider.setColour(juce::Slider::thumbColourId, fillCol);
+  slider.setColour(juce::Slider::rotarySliderFillColourId, fillCol);
+  slider.setColour(juce::Slider::trackColourId, outlineCol);
+  slider.setColour(juce::Slider::backgroundColourId, outlineCol);
+  slider.setColour(juce::Slider::rotarySliderOutlineColourId, outlineCol);
+  addAndMakeVisible(slider);
+}
+
+void ReverbAudioProcessorEditor::addAndConnectLabel(juce::Slider& slider,
+                                                juce::Label& label)
+{
+  addAndMakeVisible(label);
+  label.setJustificationType(juce::Justification::centred);
+  label.attachToComponent(&slider,false);
 }
