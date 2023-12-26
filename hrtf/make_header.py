@@ -13,8 +13,16 @@ import numpy as np
 import os
 import wave as _wave
 import numpy as _np
+import scipy.fft as _fft
+from copy import deepcopy
+from scipy.signal import savgol_filter
 
 BIGVALUE = '1e9'
+ELEVATIONS = np.array([-40,-30,-20,-10,0,10,20,30,40,50,60,70,80,90])
+AZIMUTHSTEPS = np.array([6.43,6,5,5,5,5,5,6,6.43,8,10,15,30,360])
+CHEMIN = os.path.dirname(os.path.realpath(__file__))+'/'
+L = 128
+
 
 def _wav2array(nchannels, sampwidth, data):
     """data must be the string containing the bytes from the wav file."""
@@ -148,16 +156,16 @@ def list2cpparray2(l,n,big_value):
     out += '}'
     return out
 
-def _run():
-    location = os.path.dirname(os.path.realpath(__file__))
-    chemin = location+'/'
+def load():
+    # location = os.path.dirname(os.path.realpath(__file__))
+    # chemin = location+'/'
     # Load HRTFs
-    ELEVATIONS = np.array([-40,-30,-20,-10,0,10,20,30,40,50,60,70,80,90])
-    AZIMUTHSTEPS = np.array([6.43,6,5,5,5,5,5,6,6.43,8,10,15,30,360])
+    # ELEVATIONS = np.array([-40,-30,-20,-10,0,10,20,30,40,50,60,70,80,90])
+    # AZIMUTHSTEPS = np.array([6.43,6,5,5,5,5,5,6,6.43,8,10,15,30,360])
     lmax = len(range(0,360,5))
     #AZIMUTH = range(0,360,5)
     #ELEVATION = 0
-    L = 128
+
     NORM = 2**15
     lhrtf = np.zeros((len(ELEVATIONS),lmax,L))
     rhrtf = np.zeros((len(ELEVATIONS),lmax,L))
@@ -165,7 +173,7 @@ def _run():
         #print(ind1)
         for ind2,az in enumerate(np.arange(0,360,AZIMUTHSTEPS[ind1])):
             if az<=180:
-                fich = chemin+'mitcompact/H'+str(el)+'e'+str(round(az)).zfill(3)+'a.wav'
+                fich = CHEMIN+'mitcompact/H'+str(el)+'e'+str(round(az)).zfill(3)+'a.wav'
                 #print(fich)
                 #fs,y = wavfile.read(fich)
                 fs, sw, y = readwav(file=fich)
@@ -175,13 +183,13 @@ def _run():
                 rhrtf[ind1,ind2,:] = y[:,1]
             else:
                 try:
-                    fich = chemin+'mitcompact/H'+str(el)+'e'+str(int(np.round(360-az))).zfill(3)+'a.wav'
+                    fich = CHEMIN+'mitcompact/H'+str(el)+'e'+str(int(np.round(360-az))).zfill(3)+'a.wav'
                     #print(fich)
                     # fs,y = wavfile.read(fich)
                     fs, sw, y = readwav(file=fich)
                     # print(type(y))
                 except:
-                    fich = chemin+'mitcompact/H'+str(el)+'e'+str(int(np.round(360-az)+1)).zfill(3)+'a.wav'
+                    fich = CHEMIN+'mitcompact/H'+str(el)+'e'+str(int(np.round(360-az)+1)).zfill(3)+'a.wav'
                     #print(fich)
                     # fs,y = wavfile.read(fich)
                     fs, sw, y = readwav(file=fich)
@@ -192,12 +200,29 @@ def _run():
     lhrtf = lhrtf/NORM
     rhrtf = rhrtf/NORM
 
+    return lhrtf, rhrtf
+
+def normalize(lhrtf,rhrtf,elev_ref=4,azim_ref=0):
+    """ Filter all the RIRs relative to one reference RIR
+    """
+    lh = deepcopy(lhrtf)
+    rh = deepcopy(rhrtf)
+    filt = 1/savgol_filter(_np.abs(_fft.rfft(lhrtf[elev_ref][azim_ref][:])),7,3)
+    #filt = 1/_np.abs(_fft.rfft(lhrtf[elev_ref][azim_ref][:]))
+    for ind1,el in enumerate(ELEVATIONS):
+        for ind2,az in enumerate(np.arange(0,360,AZIMUTHSTEPS[ind1])):
+            lh[ind1][ind2][:] = _fft.irfft(_fft.rfft(lhrtf[ind1][ind2][:])*filt)
+            rh[ind1][ind2][:] = _fft.irfft(_fft.rfft(rhrtf[ind1][ind2][:])*filt)
+    return lh, rh
+
+def save(lhrtf,rhrtf):
+
     azim_lengths = list()
     for i,a in enumerate(AZIMUTHSTEPS):
         azim_lengths.append(round(360/min(AZIMUTHSTEPS)))
     maxl = max(azim_lengths)
 
-    with open(chemin+'hrtf.h',mode='w') as f:
+    with open(CHEMIN+'hrtf.h',mode='w') as f:
         f.write('#define NELEV '+str(len(ELEVATIONS))+'\n')
         f.write('#define NAZIM '+str(maxl)+'\n')
         f.write('#define NSAMP '+str(L)+'\n')
@@ -248,5 +273,42 @@ def _run():
                 f.write(',\n')
         f.write('};\n')
 
+        lhrtf, rhrtf = normalize(lhrtf,rhrtf)
+
+        f.write('float lhrtfn[NELEV][NAZIM][NSAMP]={')
+        for i,e in enumerate(ELEVATIONS):
+            f.write('{')
+            azim = np.arange(0,360,AZIMUTHSTEPS[i])
+            for j,a in enumerate(azim):
+                f.write(list2cpparray(lhrtf[i,j,:]))
+                if j==len(azim)-1:
+                    f.write('\n')
+                else:
+                    f.write(',\n')
+            f.write('}')
+            if i==len(ELEVATIONS)-1:
+                f.write('\n')
+            else:
+                f.write(',\n')
+        f.write('};\n')
+
+        f.write('float rhrtfn[NELEV][NAZIM][NSAMP]={')
+        for i,e in enumerate(ELEVATIONS):
+            f.write('{')
+            azim = np.arange(0,360,AZIMUTHSTEPS[i])
+            for j,a in enumerate(azim):
+                f.write(list2cpparray(rhrtf[i,j,:]))
+                if j==len(azim)-1:
+                    f.write('\n')
+                else:
+                    f.write(',\n')
+            f.write('}')
+            if i==len(ELEVATIONS)-1:
+                f.write('\n')
+            else:
+                f.write(',\n')
+        f.write('};\n')
+
 if __name__ == '__main__':
-    _run()
+    lhrtf, rhrtf = load()
+    save(lhrtf,rhrtf)
