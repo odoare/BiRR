@@ -19,6 +19,7 @@ using namespace std;
 #endif
 
 #define INV_SOUNDSPEED 2.9412e-03f
+#define PIOVEREIGHTY 1.745329252e-02f
 #define EIGHTYOVERPI 57.295779513f
 #define OMEGASTART 125663.706f
 #define SIGMA_DELTAT 1e-3f
@@ -29,13 +30,14 @@ ReverbAudioProcessor::ReverbAudioProcessor()
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
                       #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+                       .withInput  ("Input",  juce::AudioChannelSet::mono(), true)
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        )
 #endif
 {
+
 }
 
 ReverbAudioProcessor::~ReverbAudioProcessor()
@@ -219,10 +221,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceX","SourceX",0.01f,0.99f,0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceY","SourceY",0.01f,0.99f,0.75f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceZ","SourceZ",0.01f,0.99f,0.75f));
-    layout.add(std::make_unique<juce::AudioParameterInt>("N","N",1,150,20));
     layout.add(std::make_unique<juce::AudioParameterFloat>("D","D",juce::NormalisableRange<float>(0.04f,0.7f,0.001f,0.3f),0.1f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("HFD","HFD",juce::NormalisableRange<float>(0.01f,0.3f,0.001f,0.3f),0.1f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("Diffusion","Diffusion",juce::NormalisableRange<float>(0.0f,1.0f,0.001f,0.3f),0.1f));
+    
+    juce::StringArray choices;
+    choices.addArray(CHOICES);
+    layout.add(std::make_unique<juce::AudioParameterChoice>("Reverb type", "Reverb type", choices, 1));
 
     return layout;
 }
@@ -230,7 +234,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
 // This is the function where the impulse response is calculated
 void ReverbAudioProcessor::setIrLoader()
 {
-    float outBuf[NSAMP], outBuf2[NSAMP]; 
+    static float outBuf[NSAMP], inBuf[NSAMP];
+
+    // inBuf is the buffer used for the non-binaural method
+    inBuf[10] = 1.f;
 
     auto rx = apvts.getRawParameterValue("RoomX")->load();
     auto ry = apvts.getRawParameterValue("RoomY")->load();
@@ -241,10 +248,10 @@ void ReverbAudioProcessor::setIrLoader()
     auto sx = rx*(apvts.getRawParameterValue("SourceX")->load());
     auto sy = ry*(apvts.getRawParameterValue("SourceY")->load());
     auto sz = rz*(apvts.getRawParameterValue("SourceZ")->load());
-    //auto n = apvts.getRawParameterValue("N")->load();
     auto damp = apvts.getRawParameterValue("D")->load();
     auto hfDamp = apvts.getRawParameterValue("HFD")->load();
-    auto diffusion = apvts.getRawParameterValue("Diffusion")->load();
+    auto type = apvts.getRawParameterValue("Reverb type")->load();
+    // auto diffusion = apvts.getRawParameterValue("Diffusion")->load();
 
     int n = int(log10(2e-2)/log10(1-damp));
     auto dur = (n+1)*sqrt(rx*rx+ry*ry+rz*rz)/340;
@@ -265,6 +272,7 @@ void ReverbAudioProcessor::setIrLoader()
     cout << "longueur : " << longueur << "\n" ;
     cout << "damp : " << damp << "\n" ;
     cout << "hfDamp : " << damp << "\n" ;
+    cout << "type : " << type << "\n" ;
     auto start = std::chrono::high_resolution_clock::now();
     #endif
 
@@ -292,18 +300,14 @@ void ReverbAudioProcessor::setIrLoader()
           z = 2*float(ceil(float(iz)/2))*rz+pow(-1,iz)*sz;
           float dist = sqrt((x-lx)*(x-lx)+(y-ly)*(y-ly)+(z-lz)*(z-lz));
           float time = dist*INV_SOUNDSPEED;
-          //float random = (rand() % 100)/100.0f;
-          auto random = juce::Random::getSystemRandom().nextFloat();
-          int indice = int(round((time+random*SIGMA_DELTAT)*spec.sampleRate));
-          //int indice = int(round((time)*spec.sampleRate));
+
+          int indice = int(round((time+juce::Random::getSystemRandom().nextFloat()*SIGMA_DELTAT)*spec.sampleRate));
           float r = pow(1-damp,abs(ix)+abs(iy)+abs(iz));
           float gain = pow(-1,ix+iy+iz)*r/dist;
 
-          //Elevation angle is zero here
           float rp = sqrt((sx-lx)*(sx-lx)+(sy-ly)*(sy-ly));
           float elev = atan2f(sz-lz,rp)*EIGHTYOVERPI;
           int elevationIndex = proximityIndex(&elevations[0],NELEV,elev,false);
-          //elevationIndex = 4;
 
           // Azimutal angle calculation
           float theta = atan2f(y-ly,-x+lx)*EIGHTYOVERPI-90;
@@ -319,14 +323,30 @@ void ReverbAudioProcessor::setIrLoader()
             cout << "Theta = " << theta << "        Azimutal index = " << azimutalIndex << endl;
           }
           #endif
-
-          // Apply lowpass filter and add grain to buffer
-          lop(&lhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
-          // alp(&outBuf[0], &outBuf2[0], getSampleRate(),diffusion,abs(ix)+abs(iy));
-          addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
-          lop(&rhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
-          // alp(&outBuf[0], &outBuf2[0], getSampleRate(),diffusion,abs(ix)+abs(iy));
-          addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+          
+          if (type==1){
+            // Apply lowpass filter and add grain to buffer
+            lop(&lhrtfn[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+            addArrayToBuffer(&dataL[indice], &outBuf[0], gain*0.707);
+            lop(&rhrtfn[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+            addArrayToBuffer(&dataR[indice], &outBuf[0], gain*0.707);
+          }
+          // if (type==2){
+          //   // Apply lowpass filter and add grain to buffer
+          //   lop(&lhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+          //   addArrayToBuffer(&dataL[indice], &outBuf[0], gain*0.707);
+          //   lop(&rhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+          //   addArrayToBuffer(&dataR[indice], &outBuf[0], gain*0.707);
+          // }
+          else if (type==0){
+            // Apply lowpass filter and add grain to buffer
+            auto panGain = -sin(PIOVEREIGHTY*(theta/2-45));
+            lop(&inBuf[0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+            addArrayToBuffer(&dataL[indice], &outBuf[0], gain*panGain);
+            panGain = sin(PIOVEREIGHTY*(theta/2+45));
+            lop(&inBuf[0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+            addArrayToBuffer(&dataR[indice], &outBuf[0], gain*panGain);
+          }
         }
       }
     }
@@ -353,7 +373,7 @@ void ReverbAudioProcessor::setIrLoader()
 }
 
 // Add a given array to a buffer
-void ReverbAudioProcessor::addArrayToBuffer(float *bufPtr, const float *hrtfPtr, float gain)
+void ReverbAudioProcessor::addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain)
 {
   for (int i=0; i<NSAMP; i++)
   {
@@ -385,11 +405,10 @@ int ReverbAudioProcessor::proximityIndex(const float *data, const int length, co
     }
   }
   return proxIndex;
-
 }
 
 // Basic lowpass filter
-void ReverbAudioProcessor::lop(const float* in, float* out, int sampleFreq, float hfDamping, int nRebounds, int order)
+void ReverbAudioProcessor::lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order)
 {
     const float om = OMEGASTART*(exp(-hfDamping*nRebounds));
     const float alpha1 = exp(-om/sampleFreq);

@@ -10,6 +10,8 @@
 
 #include <JuceHeader.h>
 
+#define CHOICES {"Stereo", "Binaural"}
+
 //==============================================================================
 /**
 */
@@ -62,12 +64,11 @@ public:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameters();  
     juce::AudioProcessorValueTreeState apvts{*this,nullptr,"Parameters",createParameters()};
 
-
 private:
 
-    void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, float gain);
+    void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
     int proximityIndex(const float *data, const int length, const float value, const bool wrap);
-    void lop(const float* in, float* out, int sampleFreq, float hfDamping, int nRebounds, int order);
+    void lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order);
     // void alp(const float* in, float* out, int sampleFreq, float amount, int nRebounds);
 
     //==============================================================================

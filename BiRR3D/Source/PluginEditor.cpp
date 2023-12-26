@@ -13,13 +13,14 @@
 ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
+  logo = juce::ImageCache::getFromMemory(BinaryData::logo_png, BinaryData::logo_pngSize);
     auto updateFunc = [this](){
-      calculatingLabel.setVisible(true);
-      calculatingLabel.repaint();
-      repaint();
-      this->repaint();
+      // calculatingLabel.setVisible(true);
+      // calculatingLabel.repaint();
+      // repaint();
+      // this->repaint();
       audioProcessor.setIrLoader();
-      calculatingLabel.setVisible(false);
+      // calculatingLabel.setVisible(false);
       };
 
     // Room size controllers
@@ -53,6 +54,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     listenerZSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     listenerZSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"ListenerZ",listenerZSlider);
     listenerZSlider.onDragEnd = updateFunc;
+    addAndConnectLabel(listenerZSlider, listenerZLabel);
 
     // Source position controllers
     addController(sourceXSlider, juce::Slider::SliderStyle::LinearHorizontal, sourceColour, juce::Colours::black);
@@ -69,7 +71,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     sourceZSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     sourceZSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceZ",sourceZSlider);
     sourceZSlider.onDragEnd = updateFunc;
-
+    addAndConnectLabel(sourceZSlider, sourceZLabel);
 
     // Damping sliders
     addController(dampingSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::green,juce::Colours::black);
@@ -82,9 +84,17 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     hfDampingSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"HFD",hfDampingSlider);
     hfDampingSlider.onDragEnd = updateFunc;
 
-    //addAndMakeVisible(calculatingLabel);
-    //calculatingLabel.setVisible(false);
-    
+    // Reverb type combo box
+    juce::StringArray choices;
+    choices.addArray(CHOICES);
+    typeComboBox.addItemList(choices,1);
+    typeComboBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.apvts,"Reverb type",typeComboBox);
+    typeLabel.attachToComponent(&typeComboBox,false);
+    addAndMakeVisible(typeComboBox);
+    addAndMakeVisible(typeLabel);
+    typeComboBox.onChange = updateFunc;
+
+    // XY Pad
     addAndMakeVisible(xyPad2);
     xyPad2.registerSlider(&listenerXSlider, Gui::XyPad2::Axis::X1);
     xyPad2.registerSlider(&listenerYSlider, Gui::XyPad2::Axis::Y1);
@@ -97,7 +107,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (500, 500);
+    setSize (550, 480);
     setResizable(true,true);
 }
 
@@ -112,52 +122,65 @@ ReverbAudioProcessorEditor::~ReverbAudioProcessorEditor()
 //==============================================================================
 void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
 {
+    static const float border = 0.01;
+    float uxb = border*getWidth();
+    float uyb = border*getHeight();
+    auto ux = (1-2*border)*getWidth()/20;
+    auto uy = (1-2*border)*getHeight()/18;
+
     auto diagonale = (getLocalBounds().getTopLeft() - getLocalBounds().getBottomRight()).toFloat();
     auto length = diagonale.getDistanceFromOrigin();
     auto perpendicular = diagonale.rotatedAboutOrigin (juce::degreesToRadians (90.0f)) / length;
     auto height = float (getWidth() * getHeight()) / length;
-
-    auto bluegreengrey = juce::Colour::fromFloatRGBA(0.15f,0.20f,0.25f,1.0f);
-
-    juce::ColourGradient grad (bluegreengrey.darker().darker(), perpendicular * height,
+    auto bluegreengrey = juce::Colour::fromFloatRGBA(0.17f,0.22f,0.27f,1.0f);
+    juce::ColourGradient grad (bluegreengrey.darker().darker().darker(), perpendicular * height,
                            bluegreengrey, perpendicular * -height, false);
     g.setGradientFill(grad);
     g.fillAll();
+
+    g.setColour(listenerColour);
+    g.drawSingleLineText("o Listener", uxb+18*ux, uyb+8*uy,juce::Justification::centred);
+    g.setColour(sourceColour);
+    g.drawSingleLineText("o Source", uxb+18*ux, uyb+7*uy,juce::Justification::centred);
+
+    auto r = juce::Rectangle<float>(uxb+16*ux,uyb+14*uy,4*ux,4*uy);
+    g.drawImage(logo, r);
+
+    g.setColour(juce::Colours::grey);
+    g.setFont(28);
+    g.drawSingleLineText("BiRR3D", uxb+14*ux, uyb+15*uy,juce::Justification::centred);
+    g.setFont(12);
+    g.drawMultiLineText("Binaural Room Reverb 3D", uxb+12*ux, uyb+16*uy, 4*ux, juce::Justification::centred);
+    
 }
 
 void ReverbAudioProcessorEditor::resized()
 {
-    static const float border = 0.05;
+    static const float border = 0.01;
     float uxb = border*getWidth();
     float uyb = border*getHeight();
-    auto ux = (1-2*border)*getWidth()/16;
-    auto uy = (1-2*border)*getHeight()/16;
+    auto ux = (1-2*border)*getWidth()/20;
+    auto uy = (1-2*border)*getHeight()/18;
     
-    roomXSlider.setBounds(uxb,uyb,4*ux,4*uy);
-    roomYSlider.setBounds(uxb+4*ux,uyb,4*ux,4*uy);
-    roomZSlider.setBounds(uxb+8*ux,uyb,4*ux,4*uy);
+    roomXSlider.setBounds(uxb,uyb+uy,4*ux,4*uy);
+    roomYSlider.setBounds(uxb+4*ux,uyb+uy,4*ux,4*uy);
+    roomZSlider.setBounds(uxb+8*ux,uyb+uy,4*ux,4*uy);
 
-    sourceZSlider.setBounds(uxb+12*ux,uyb+11*uy,2*ux,4*uy);
-    listenerZSlider.setBounds(uxb+14*ux,uyb+11*uy,2*ux,4*uy);
+    sourceZSlider.setBounds(uxb+12*ux,uyb+7*uy,2*ux,5*uy);
+    listenerZSlider.setBounds(uxb+14*ux,uyb+7*uy,2*ux,5*uy);
 
-    dampingSlider.setBounds(uxb+12*ux,uyb,4*ux,4*uy);
-    hfDampingSlider.setBounds(uxb+12*ux,uyb+6*uy,4*ux,4*uy);
+    dampingSlider.setBounds(uxb+12*ux,uyb+uy,4*ux,4*uy);
+    hfDampingSlider.setBounds(uxb+16*ux,uyb+uy,4*ux,4*uy);
 
-    sourceXSlider.setBounds(uxb+ux,uyb+5*uy,9*ux,uy);
-    sourceYSlider.setBounds(uxb,uyb+6*uy,ux,9*uy);
+    sourceXSlider.setBounds(uxb+ux,uyb+6*uy,10*ux,uy);
+    sourceYSlider.setBounds(uxb,uyb+7*uy,ux,10*uy);
 
-    listenerXSlider.setBounds(uxb+ux,uyb+15*uy,9*ux,uy);
-    listenerYSlider.setBounds(uxb+10*ux,uyb+6*uy,ux,9*uy);
+    listenerXSlider.setBounds(uxb+ux,uyb+17*uy,10*ux,uy);
+    listenerYSlider.setBounds(uxb+11*ux,uyb+7*uy,ux,10*uy);
 
-    xyPad2.setBounds(uxb+ux,uyb+6*uy,9*ux,9*uy);
+    xyPad2.setBounds(uxb+ux,uyb+7*uy,10*ux,10*uy);
 
-    calculatingLabel.setBounds(uxb+12*ux,uyb+15*uy,4*ux,uy);
-
-    // diffusionSlider.setBounds(uxb+12*ux,uyb+5*uy,4*ux,4*uy);
-
-    // NSlider.setBounds(uxb+12*ux,uyb+13.5*uy,4*ux,4*uy);
-
-    //addButton.setBounds(uxb+12*ux,uyb+10*uy,4*ux,2*uy);
+    typeComboBox.setBounds(uxb+16*ux,uyb+10*uy,4*ux,uy);
 
 }
 

@@ -51,6 +51,8 @@ private:
     juce::Slider listenerYSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerYSliderAttachment;
     juce::Slider listenerZSlider;
+    juce::Label listenerZLabel{"listenerZLabel", "Z"};
+
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerZSliderAttachment;
     juce::Slider sourceXSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sourceXSliderAttachment;
@@ -58,6 +60,7 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sourceYSliderAttachment;
     juce::Slider sourceZSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sourceZSliderAttachment;
+    juce::Label sourceZLabel{"sourceZLabel", "Z"};
 
     // juce::Slider NSlider;
     // std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> NSliderAttachment;
@@ -71,19 +74,25 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> hfDampingSliderAttachment;
     juce::Label hfDampingLabel{"hfDampingLabel", "HF Wall absorbtion"};
 
-    juce::Slider diffusionSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> diffusionSliderAttachment;
-    juce::Label diffusionLabel{"diffusionLabel", "Diffusion"};
+    juce::ComboBox typeComboBox;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> typeComboBoxAttachment;
+    juce::Label typeLabel{"typeLabel", "Reverb type"};
+    
+    // juce::Slider diffusionSlider;
+    // std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> diffusionSliderAttachment;
+    // juce::Label diffusionLabel{"diffusionLabel", "Diffusion"};
 
     Gui::XyPad2 xyPad2;
 
     const juce::Colour listenerColour = juce::Colours::blue;
     const juce::Colour sourceColour = juce::Colours::red;
 
-    juce::Label calculatingLabel{"calculatingLabel", "Calculating..."};
+    // juce::Label calculatingLabel{"calculatingLabel", "Calculating..."};
 
     void addController(juce::Slider&, juce::Slider::SliderStyle, juce::Colour, juce::Colour);
     void addAndConnectLabel(juce::Slider&, juce::Label&);
+
+    juce::Image logo;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessorEditor)
 };
