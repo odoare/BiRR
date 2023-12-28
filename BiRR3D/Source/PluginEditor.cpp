@@ -103,7 +103,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     xyPad2.thumb2.mouseUpCallback = updateFunc;
 
     addAndMakeVisible(calculateButton);
-    calculateButton.setButtonText("Calculate");
+    calculateButton.setButtonText("Update");
     // We don't use updateFunc here because it has to update even if autoUpdate is false
     calculateButton.onClick = [this](){      
         audioProcessor.setIrLoader();
@@ -206,6 +206,7 @@ void ReverbAudioProcessorEditor::addController(juce::Slider& slider,
 {
   slider.setSliderStyle(style);
   slider.setTextBoxStyle(juce::Slider::TextBoxBelow,true,100,20);
+  slider.setTextBoxIsEditable(true);
   slider.setColour(juce::Slider::thumbColourId, fillCol);
   slider.setColour(juce::Slider::rotarySliderFillColourId, fillCol);
   slider.setColour(juce::Slider::trackColourId, outlineCol);
