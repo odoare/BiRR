@@ -84,6 +84,11 @@ private:
 
     Gui::XyPad2 xyPad2;
 
+    juce::TextButton calculateButton;
+    juce::ToggleButton autoButton;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> autoButtonAttachment;
+    juce::Label autoLabel{"autoLabel", "Auto update"};
+    
     const juce::Colour listenerColour = juce::Colours::blue;
     const juce::Colour sourceColour = juce::Colours::red;
 

@@ -207,7 +207,7 @@ def normalize(lhrtf,rhrtf,elev_ref=4,azim_ref=0):
     """
     lh = deepcopy(lhrtf)
     rh = deepcopy(rhrtf)
-    filt = 1/savgol_filter(_np.abs(_fft.rfft(lhrtf[elev_ref][azim_ref][:])),7,3)
+    filt = (1/savgol_filter(_np.abs(_fft.rfft(lhrtf[elev_ref][azim_ref][:])),20,5))
     #filt = 1/_np.abs(_fft.rfft(lhrtf[elev_ref][azim_ref][:]))
     for ind1,el in enumerate(ELEVATIONS):
         for ind2,az in enumerate(np.arange(0,360,AZIMUTHSTEPS[ind1])):

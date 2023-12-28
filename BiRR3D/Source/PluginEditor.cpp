@@ -14,14 +14,11 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
   logo = juce::ImageCache::getFromMemory(BinaryData::logo_png, BinaryData::logo_pngSize);
-    auto updateFunc = [this](){
-      // calculatingLabel.setVisible(true);
-      // calculatingLabel.repaint();
-      // repaint();
-      // this->repaint();
-      audioProcessor.setIrLoader();
-      // calculatingLabel.setVisible(false);
+    auto updateFunc = [this](){      
+      if (audioProcessor.apvts.getRawParameterValue("Auto update")->load()==true){
+        audioProcessor.setIrLoader();
       };
+    };
 
     // Room size controllers
     addController(roomXSlider, juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag, juce::Colours::teal,juce::Colours::black);
@@ -105,6 +102,18 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     xyPad2.thumb1.mouseUpCallback = updateFunc;
     xyPad2.thumb2.mouseUpCallback = updateFunc;
 
+    addAndMakeVisible(calculateButton);
+    calculateButton.setButtonText("Calculate");
+    // We don't use updateFunc here because it has to update even if autoUpdate is false
+    calculateButton.onClick = [this](){      
+        audioProcessor.setIrLoader();
+      };
+
+    addAndMakeVisible(autoButton);
+    autoButtonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts,"Auto update",autoButton);
+    addAndMakeVisible(autoLabel);
+    autoLabel.attachToComponent(&autoButton,false);
+
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (550, 480);
@@ -138,20 +147,22 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
     g.setGradientFill(grad);
     g.fillAll();
 
+    g.setFont(18);
     g.setColour(listenerColour);
-    g.drawSingleLineText("o Listener", uxb+18*ux, uyb+8*uy,juce::Justification::centred);
+    g.drawSingleLineText("O Listener", uxb+18*ux, uyb+8*uy,juce::Justification::centred);
     g.setColour(sourceColour);
-    g.drawSingleLineText("o Source", uxb+18*ux, uyb+7*uy,juce::Justification::centred);
+    g.drawSingleLineText("O Source", uxb+18*ux, uyb+7*uy,juce::Justification::centred);
 
     auto r = juce::Rectangle<float>(uxb+16*ux,uyb+14*uy,4*ux,4*uy);
     g.drawImage(logo, r);
 
     g.setColour(juce::Colours::grey);
     g.setFont(28);
-    g.drawSingleLineText("BiRR3D", uxb+14*ux, uyb+15*uy,juce::Justification::centred);
+    g.drawSingleLineText("BiRR3D", uxb+14*ux, uyb+15.5*uy,juce::Justification::centred);
     g.setFont(12);
     g.drawMultiLineText("Binaural Room Reverb 3D", uxb+12*ux, uyb+16*uy, 4*ux, juce::Justification::centred);
-    
+    g.setFont(16);
+    g.drawMultiLineText("v0.1", uxb+12*ux, uyb+17*uy, 4*ux, juce::Justification::centred);
 }
 
 void ReverbAudioProcessorEditor::resized()
@@ -182,6 +193,10 @@ void ReverbAudioProcessorEditor::resized()
 
     typeComboBox.setBounds(uxb+16*ux,uyb+10*uy,4*ux,uy);
 
+    calculateButton.setBounds(uxb+12*ux,uyb+12.5*uy,3*ux,uy);
+
+    autoButton.setBounds(uxb+15.5*ux,uyb+12.5*uy,4*ux,uy);
+    autoLabel.setTopLeftPosition(uxb+16.5*ux,uyb+12.5*uy);
 }
 
 void ReverbAudioProcessorEditor::addController(juce::Slider& slider,

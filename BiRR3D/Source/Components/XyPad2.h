@@ -38,7 +38,7 @@ namespace Gui
 
     private:
         void sliderValueChanged(juce::Slider* slider) override;
-        static constexpr int thumbSize = 20;
+        static constexpr int thumbSize = 25;
 
         std::vector<juce::Slider*> x1Sliders, x2Sliders, y1Sliders, y2Sliders;
 

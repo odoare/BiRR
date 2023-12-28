@@ -10,7 +10,7 @@ namespace Gui
     void XyPad2::Thumb::paint(juce::Graphics& g)
     {
         g.setColour(thumbColour);
-        g.fillEllipse(getLocalBounds().toFloat());
+        g.drawEllipse(getLocalBounds().reduced(5).toFloat(),5.f);
     }
 
     void XyPad2::Thumb::mouseDown(const juce::MouseEvent& event)

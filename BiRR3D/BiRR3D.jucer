@@ -2,9 +2,10 @@
 
 <JUCERPROJECT id="JVECeb" name="BiRR3D" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              pluginFormats="buildAU,buildLV2,buildVST3" pluginManufacturer="Odiomechanics"
-              pluginManufacturerCode="ODME" pluginCode="BRR3" lv2Uri="http://www.odiomechanics/plugins/BiRR3"
-              pluginAAXCategory="8">
+              pluginFormats="buildAU,buildLV2,buildVST3" pluginManufacturer="FX Mechanics"
+              pluginManufacturerCode="ODME" pluginCode="BRR3" lv2Uri="http://www.fxmechanics.com/plugins/BiRR3"
+              pluginAAXCategory="8" version="0.1" companyName="FX Mechanics"
+              companyWebsite="www.fxmechanics.com">
   <MAINGROUP id="BIm9jF" name="BiRR3D">
     <GROUP id="{C8F98279-7F49-5105-5D3E-5EA88F0C7230}" name="Assets">
       <FILE id="L5ddy9" name="logo.png" compile="0" resource="1" file="Assets/logo.png"/>

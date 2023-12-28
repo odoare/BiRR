@@ -228,6 +228,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
     choices.addArray(CHOICES);
     layout.add(std::make_unique<juce::AudioParameterChoice>("Reverb type", "Reverb type", choices, 1));
 
+    layout.add(std::make_unique<juce::AudioParameterBool>("Auto update","Auto update", true));
+
     return layout;
 }
 
