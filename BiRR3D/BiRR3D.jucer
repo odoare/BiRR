@@ -46,7 +46,7 @@
   <EXPORTFORMATS>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraLinkerFlags="/usr/lib/x86_64-linux-gnu/libfftw3*.a">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR3D"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR3D" optimisation="6"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../JUCE/JUCE/modules"/>
