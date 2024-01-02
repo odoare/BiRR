@@ -316,7 +316,7 @@ void ReverbAudioProcessor::setIrLoader()
           int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta,true);
 
           #ifdef DEBUG_OUTPUTS
-          if (ix==0 and iy==0 and iz==0)
+          if (ix==0 && iy==0 && iz==0)
           {
             cout << "x = " << x << "      y = " << y << "      z = " << z << endl;
             cout << "r = " << r << "      dist = " << dist << endl;
@@ -389,7 +389,7 @@ int ReverbAudioProcessor::proximityIndex(const float *data, const int length, co
   int proxIndex = 0;
   float minDistance = BIGVALUE;
   float val;
-  if (wrap and value<0.f)
+  if (wrap && value<0.f)
   {
     val = value+360.f;
   }
