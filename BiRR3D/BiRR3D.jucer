@@ -9,8 +9,11 @@
   <MAINGROUP id="BIm9jF" name="BiRR3D">
     <GROUP id="{C8F98279-7F49-5105-5D3E-5EA88F0C7230}" name="Assets">
       <FILE id="L5ddy9" name="logo.png" compile="0" resource="1" file="Assets/logo.png"/>
+      <FILE id="xFWVa1" name="logo686.png" compile="0" resource="1" file="Assets/logo686.png"/>
     </GROUP>
     <GROUP id="{D1C5BAF7-BCC1-4FA1-8B57-FE3DA373394C}" name="Components">
+      <FILE id="q8pSzK" name="FxmeLookAndFeel.h" compile="0" resource="0"
+            file="Source/Components/FxmeLookAndFeel.h"/>
       <FILE id="EWRFcW" name="XyPad2.cpp" compile="1" resource="0" file="Source/Components/XyPad2.cpp"/>
       <FILE id="cKDPIF" name="XyPad2.h" compile="0" resource="0" file="Source/Components/XyPad2.h"/>
     </GROUP>

@@ -13,7 +13,7 @@
 ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-  logo = juce::ImageCache::getFromMemory(BinaryData::logo_png, BinaryData::logo_pngSize);
+  logo = juce::ImageCache::getFromMemory(BinaryData::logo686_png, BinaryData::logo686_pngSize);
     auto updateFunc = [this](){      
       if (audioProcessor.apvts.getRawParameterValue("Auto update")->load()==true){
         audioProcessor.setIrLoader();
@@ -25,16 +25,19 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     addAndConnectLabel(roomXSlider, roomXLabel);
     roomXSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"RoomX",roomXSlider);
     roomXSlider.onDragEnd = updateFunc;
+    roomXSlider.setLookAndFeel(&knobLookAndFeel);
 
     addController(roomYSlider, juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag, juce::Colours::teal,juce::Colours::black);
     addAndConnectLabel(roomYSlider, roomYLabel);
     roomYSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"RoomY",roomYSlider);
     roomYSlider.onDragEnd = updateFunc;
+    roomYSlider.setLookAndFeel(&knobLookAndFeel);
 
     addController(roomZSlider, juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag, juce::Colours::teal,juce::Colours::black);
     addAndConnectLabel(roomZSlider, roomZLabel);
     roomZSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"RoomZ",roomZSlider);
     roomZSlider.onDragEnd = updateFunc;
+    roomZSlider.setLookAndFeel(&knobLookAndFeel);
 
     // Listener position controllers
     addController(listenerXSlider, juce::Slider::SliderStyle::LinearHorizontal, listenerColour, juce::Colours::black);
@@ -75,11 +78,13 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     addAndConnectLabel(dampingSlider, dampingLabel);
     dampingSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"D",dampingSlider);
     dampingSlider.onDragEnd = updateFunc;
+    dampingSlider.setLookAndFeel(&knobLookAndFeel);
 
     addController(hfDampingSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::green,juce::Colours::black);
     addAndConnectLabel(hfDampingSlider, hfDampingLabel);
     hfDampingSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"HFD",hfDampingSlider);
     hfDampingSlider.onDragEnd = updateFunc;
+    hfDampingSlider.setLookAndFeel(&knobLookAndFeel);
 
     // Reverb type combo box
     juce::StringArray choices;
@@ -166,6 +171,9 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
     g.drawMultiLineText("v0.1", uxb+12*ux, uyb+17*uy, 4*ux, juce::Justification::centred);
 }
 
+#define DELTAX 0.88f
+#define DELTAY 1.f
+
 void ReverbAudioProcessorEditor::resized()
 {
     static const float border = 0.01;
@@ -173,16 +181,18 @@ void ReverbAudioProcessorEditor::resized()
     float uyb = border*getHeight();
     auto ux = (1-2*border)*getWidth()/20;
     auto uy = (1-2*border)*getHeight()/18;
+    auto dux=DELTAX*ux;
+    auto duy=DELTAY*uy;
     
-    roomXSlider.setBounds(uxb,uyb+uy,4*ux,4*uy);
-    roomYSlider.setBounds(uxb+4*ux,uyb+uy,4*ux,4*uy);
-    roomZSlider.setBounds(uxb+8*ux,uyb+uy,4*ux,4*uy);
+    roomXSlider.setBounds(uxb,uyb+uy,4*dux,4*duy);
+    roomYSlider.setBounds(uxb+4*ux,uyb+uy,4*dux,4*duy);
+    roomZSlider.setBounds(uxb+8*ux,uyb+uy,4*dux,4*duy);
 
     sourceZSlider.setBounds(uxb+12*ux,uyb+7*uy,2*ux,5*uy);
     listenerZSlider.setBounds(uxb+14*ux,uyb+7*uy,2*ux,5*uy);
 
-    dampingSlider.setBounds(uxb+12*ux,uyb+uy,4*ux,4*uy);
-    hfDampingSlider.setBounds(uxb+16*ux,uyb+uy,4*ux,4*uy);
+    dampingSlider.setBounds(uxb+12*ux,uyb+uy,4*ux,4*duy);
+    hfDampingSlider.setBounds(uxb+16*ux,uyb+uy,4*ux,4*duy);
 
     sourceXSlider.setBounds(uxb+ux,uyb+6*uy,10*ux,uy);
     sourceYSlider.setBounds(uxb,uyb+7*uy,ux,10*uy);

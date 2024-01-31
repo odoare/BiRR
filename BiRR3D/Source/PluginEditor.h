@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "Components/XyPad2.h"
+#include "Components/FxmeLookAndFeel.h"
 
 //==============================================================================
 /**
@@ -96,6 +97,8 @@ private:
 
     void addController(juce::Slider&, juce::Slider::SliderStyle, juce::Colour, juce::Colour);
     void addAndConnectLabel(juce::Slider&, juce::Label&);
+
+    FxmeKnobLookAndFeel knobLookAndFeel;
 
     juce::Image logo;
 

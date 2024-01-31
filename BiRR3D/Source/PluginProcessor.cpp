@@ -342,10 +342,10 @@ void ReverbAudioProcessor::setIrLoader()
           // }
           else if (type==0){
             // Apply lowpass filter and add grain to buffer
-            auto panGain = -sin(PIOVEREIGHTY*(theta/2-45));
+            auto panGain = -sin(PIOVEREIGHTY*(0.5f*theta-45));
             lop(&inBuf[0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
             addArrayToBuffer(&dataL[indice], &outBuf[0], gain*panGain);
-            panGain = sin(PIOVEREIGHTY*(theta/2+45));
+            panGain = sin(PIOVEREIGHTY*(0.5*theta+45));
             lop(&inBuf[0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
             addArrayToBuffer(&dataR[indice], &outBuf[0], gain*panGain);
           }
