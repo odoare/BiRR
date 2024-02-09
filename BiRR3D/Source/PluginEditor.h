@@ -83,7 +83,7 @@ private:
     // std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> diffusionSliderAttachment;
     // juce::Label diffusionLabel{"diffusionLabel", "Diffusion"};
 
-    Gui::XyPad2 xyPad2;
+    Gui::XyPad2h xyPad2;
 
     juce::TextButton calculateButton;
     juce::ToggleButton autoButton;

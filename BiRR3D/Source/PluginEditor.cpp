@@ -98,10 +98,10 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
 
     // XY Pad
     addAndMakeVisible(xyPad2);
-    xyPad2.registerSlider(&listenerXSlider, Gui::XyPad2::Axis::X1);
-    xyPad2.registerSlider(&listenerYSlider, Gui::XyPad2::Axis::Y1);
-    xyPad2.registerSlider(&sourceXSlider, Gui::XyPad2::Axis::X2);
-    xyPad2.registerSlider(&sourceYSlider, Gui::XyPad2::Axis::Y2);
+    xyPad2.registerSlider(&listenerXSlider, Gui::XyPad2h::Axis::X1);
+    xyPad2.registerSlider(&listenerYSlider, Gui::XyPad2h::Axis::Y1);
+    xyPad2.registerSlider(&sourceXSlider, Gui::XyPad2h::Axis::X2);
+    xyPad2.registerSlider(&sourceYSlider, Gui::XyPad2h::Axis::Y2);
     xyPad2.thumb1.setColour(listenerColour);
     xyPad2.thumb2.setColour(sourceColour);
     xyPad2.thumb1.mouseUpCallback = updateFunc;

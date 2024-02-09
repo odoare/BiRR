@@ -38,20 +38,33 @@ namespace Gui
 
     Head::Head(int ts)
     {
-        headSize = ts;
-        constrainer.setMinimumOnscreenAmounts(headSize,headSize,headSize,headSize);
+        thumbSize = ts;
+        constrainer.setMinimumOnscreenAmounts(thumbSize,thumbSize,thumbSize,thumbSize);
     }
 
     void Head::paint(juce::Graphics& g)
     {
+        float thickness = 5.f;
+
         g.setColour(headColour);
         g.fillEllipse(getLocalBounds().reduced(5).toFloat());
-        g.fillEllipse(getLocalBounds().reduced(10,0).toFloat());
+
+        juce::Path nose;
+        juce::Rectangle<int> rect(0.f,0.f,thickness,.5f*thumbSize);
+        nose.addRectangle(rect);
+        g.fillPath(nose,juce::AffineTransform::translation(-thickness/2,0.f).rotated(headOrientation+3.1415927f).translated(thumbSize/2,thumbSize/2));
+        //g.fillEllipse(getLocalBounds().reduced(8,0).toFloat());
     }
 
     void Head::mouseDown(const juce::MouseEvent& event)
     {
         dragger.startDraggingComponent(this, event);
+    }
+
+    void Head::mouseDoubleClick(const juce::MouseEvent& event)
+    {
+        headOrientation = 0.f;
+        repaint();
     }
 
     void Head::mouseDrag(const juce::MouseEvent& event)
@@ -64,6 +77,13 @@ namespace Gui
     void Head::mouseUp(const juce::MouseEvent& event)
     {
         mouseUpCallback();
+    }
+
+    void Head::mouseWheelMove(const juce::MouseEvent& e, const juce::MouseWheelDetails& wheel)
+    {
+        juce::MouseWheelDetails w(wheel);
+        headOrientation += w.deltaY;
+        repaint();
     }
 
     void Head::setColour(juce::Colour newColour)
@@ -202,7 +222,7 @@ namespace Gui
     XyPad2h::XyPad2h()
     {
         addAndMakeVisible(thumb1);
-        addAndMakeVisible(head1);
+        addAndMakeVisible(thumb2);
         thumb1.moveCallback = [&](juce::Point<double> position)
         {
             const auto bounds = getLocalBounds().toDouble();
@@ -216,10 +236,10 @@ namespace Gui
                 slider->setValue(juce::jmap(position.getY(), bounds.getHeight()-w, 0.0, slider->getMinimum(), slider->getMaximum()));
             }
         };
-        head1.moveCallback = [&](juce::Point<double> position)
+        thumb2.moveCallback = [&](juce::Point<double> position)
         {
             const auto bounds = getLocalBounds().toDouble();
-            const auto w = static_cast<double>(head1.headSize);
+            const auto w = static_cast<double>(thumb2.thumbSize);
             for (auto* slider : x2Sliders)
             {
                 slider->setValue(juce::jmap(position.getX(), 0.0, bounds.getWidth()-w, slider->getMinimum(), slider->getMaximum()));
@@ -242,16 +262,16 @@ namespace Gui
     {
         const auto bounds = getLocalBounds();
         const auto w1 = static_cast<double>(thumb1.thumbSize);
-        const auto w2 = static_cast<double>(head1.headSize);
+        const auto w2 = static_cast<double>(thumb2.thumbSize);
 
         thumb1.setBounds(getLocalBounds().withSizeKeepingCentre(thumb1.thumbSize,thumb1.thumbSize));
-        head1.setBounds(getLocalBounds().withSizeKeepingCentre(head1.headSize,head1.headSize));
+        thumb2.setBounds(getLocalBounds().withSizeKeepingCentre(thumb2.thumbSize,thumb2.thumbSize));
 
         thumb1.setTopLeftPosition(
                 juce::jmap(x1Sliders[0]->getValue(), x1Sliders[0]->getMinimum(), x1Sliders[0]->getMaximum(), 0.0, bounds.getWidth() - w1),
                 juce::jmap(y1Sliders[0]->getValue(), y1Sliders[0]->getMinimum(), y1Sliders[0]->getMaximum(), bounds.getHeight() - w1, 0.0)
             );
-        head1.setTopLeftPosition(
+        thumb2.setTopLeftPosition(
                 juce::jmap(x2Sliders[0]->getValue(), x2Sliders[0]->getMinimum(), x2Sliders[0]->getMaximum(), 0.0, bounds.getWidth() - w2),
                 juce::jmap(y2Sliders[0]->getValue(), y2Sliders[0]->getMinimum(), y2Sliders[0]->getMaximum(), bounds.getHeight() - w2, 0.0)
             );
@@ -268,6 +288,8 @@ namespace Gui
             y1Sliders.push_back(slider);
         if (axis == Axis::Y2)
             y2Sliders.push_back(slider);
+        if (axis == Axis::O1)
+            o1Sliders.push_back(slider);
     }
 
     void XyPad2h::deregisterSlider(juce::Slider* slider)
@@ -277,6 +299,7 @@ namespace Gui
         x2Sliders.erase(std::remove(x2Sliders.begin(), x2Sliders.end(), slider), x2Sliders.end());
         y1Sliders.erase(std::remove(y1Sliders.begin(), y1Sliders.end(), slider), y1Sliders.end());
         y2Sliders.erase(std::remove(y2Sliders.begin(), y2Sliders.end(), slider), y2Sliders.end());
+        o1Sliders.erase(std::remove(y2Sliders.begin(), y2Sliders.end(), slider), y2Sliders.end());
     }
 
     void XyPad2h::sliderValueChanged(juce::Slider* slider)
@@ -284,16 +307,17 @@ namespace Gui
         // Avoid loopback
         if (thumb1.isMouseOverOrDragging(false))
             return;
-        if (head1.isMouseOverOrDragging(false))
+        if (thumb2.isMouseOverOrDragging(false))
             return;
 
         const auto isX1AxisSlider = std::find(x1Sliders.begin(), x1Sliders.end(), slider) != x1Sliders.end();
         const auto isX2AxisSlider = std::find(x2Sliders.begin(), x2Sliders.end(), slider) != x2Sliders.end();
         const auto isY1AxisSlider = std::find(y1Sliders.begin(), y1Sliders.end(), slider) != y1Sliders.end();
+        const auto isY2AxisSlider = std::find(y2Sliders.begin(), y2Sliders.end(), slider) != y2Sliders.end();
         
         const auto bounds = getLocalBounds().toDouble();
         const auto w1 = static_cast<double>(thumb1.thumbSize);
-        const auto w2 = static_cast<double>(head1.headSize);
+        const auto w2 = static_cast<double>(thumb2.thumbSize);
         if (isX1AxisSlider)
         {
             thumb1.setTopLeftPosition(
@@ -308,14 +332,14 @@ namespace Gui
             );
         } else if (isX2AxisSlider)
         {
-            head1.setTopLeftPosition(
+            thumb2.setTopLeftPosition(
                 juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), 0.0, bounds.getWidth() - w2),
-                head1.getY()
+                thumb2.getY()
             );
-        } else
+        } else if (isY2AxisSlider)
         {
-            head1.setTopLeftPosition(
-                head1.getX(),
+            thumb2.setTopLeftPosition(
+                thumb2.getX(),
                 juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), bounds.getHeight() - w2, 0.0)
             );
         }
