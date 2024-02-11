@@ -57,7 +57,7 @@ public:
     juce::Slider::SliderLayout layout;
     layout.sliderBounds = slider.getLocalBounds().reduced(5);
 
-    // Text blow the knob
+    // Text below the knob
     layout.textBoxBounds = slider.getLocalBounds().withHeight(localBounds.getHeight()*0.25);
     layout.textBoxBounds.translate(0,localBounds.getHeight()*0.9f);
 

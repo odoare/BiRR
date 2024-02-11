@@ -10,7 +10,7 @@
 
 #include <JuceHeader.h>
 
-#define CHOICES {"Stereo", "Binaural"}
+#define CHOICES {"XY", "MS with Cardio", "MS with Omni", "Binaural"}
 
 //==============================================================================
 /**

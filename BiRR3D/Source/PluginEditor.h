@@ -53,6 +53,10 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerYSliderAttachment;
     juce::Slider listenerZSlider;
     juce::Label listenerZLabel{"listenerZLabel", "Z"};
+    
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerOSliderAttachment;
+    juce::Slider listenerOSlider;
+    juce::Label listenerOLabel{"listenerOLabel", "O"};
 
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerZSliderAttachment;
     juce::Slider sourceXSlider;
@@ -77,13 +81,25 @@ private:
 
     juce::ComboBox typeComboBox;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> typeComboBoxAttachment;
-    juce::Label typeLabel{"typeLabel", "Reverb type"};
+    juce::Label typeLabel{"typeLabel", "Microphones"};
     
+    juce::Slider widthSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> widthSliderAttachment;
+    juce::Label widthLabel{"widthLabel", "Stereo Width"};
+
+    juce::Slider directLevelSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> directLevelSliderAttachment;
+    juce::Label directLevelLabel{"directLevelLabel", "Direct Level"};
+
+    juce::Slider reflectionsLevelSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> reflectionsLevelSliderAttachment;
+    juce::Label reflectionsLevelLabel{"reflectionsLevelLabel", "Reflections Level"};
+
     // juce::Slider diffusionSlider;
     // std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> diffusionSliderAttachment;
     // juce::Label diffusionLabel{"diffusionLabel", "Diffusion"};
 
-    Gui::XyPad2 xyPad2;
+    Gui::XyPad2h xyPad2;
 
     juce::TextButton calculateButton;
     juce::ToggleButton autoButton;
