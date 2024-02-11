@@ -56,6 +56,18 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     listenerZSlider.onDragEnd = updateFunc;
     addAndConnectLabel(listenerZSlider, listenerZLabel);
 
+    addController(listenerOSlider, juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag, listenerColour, juce::Colours::black);
+    listenerOSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+    listenerOSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"ListenerO",listenerOSlider);
+    listenerOSlider.onDragEnd = updateFunc;
+    addAndConnectLabel(listenerOSlider, listenerOLabel);
+    juce::Slider::RotaryParameters par;
+    par.startAngleRadians = -juce::MathConstants<float>::pi;
+    par.endAngleRadians = juce::MathConstants<float>::pi;
+    par.stopAtEnd = true;
+    listenerOSlider.setRotaryParameters(par);
+    listenerOSlider.setLookAndFeel(&knobLookAndFeel);
+
     // Source position controllers
     addController(sourceXSlider, juce::Slider::SliderStyle::LinearHorizontal, sourceColour, juce::Colours::black);
     sourceXSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
@@ -86,6 +98,24 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     hfDampingSlider.onDragEnd = updateFunc;
     hfDampingSlider.setLookAndFeel(&knobLookAndFeel);
 
+    addController(widthSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::orange,juce::Colours::black);
+    addAndConnectLabel(widthSlider, widthLabel);
+    widthSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"Stereo Width",widthSlider);
+    widthSlider.onDragEnd = updateFunc;
+    widthSlider.setLookAndFeel(&knobLookAndFeel);
+
+    addController(directLevelSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::orange,juce::Colours::black);
+    addAndConnectLabel(directLevelSlider, directLevelLabel);
+    directLevelSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"Direct Level",directLevelSlider);
+    directLevelSlider.onDragEnd = updateFunc;
+    directLevelSlider.setLookAndFeel(&knobLookAndFeel);
+
+    addController(reflectionsLevelSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::orange,juce::Colours::black);
+    addAndConnectLabel(reflectionsLevelSlider, reflectionsLevelLabel);
+    reflectionsLevelSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"Reflections Level",reflectionsLevelSlider);
+    reflectionsLevelSlider.onDragEnd = updateFunc;
+    reflectionsLevelSlider.setLookAndFeel(&knobLookAndFeel);
+
     // Reverb type combo box
     juce::StringArray choices;
     choices.addArray(CHOICES);
@@ -102,6 +132,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     xyPad2.registerSlider(&listenerYSlider, Gui::XyPad2h::Axis::Y1);
     xyPad2.registerSlider(&sourceXSlider, Gui::XyPad2h::Axis::X2);
     xyPad2.registerSlider(&sourceYSlider, Gui::XyPad2h::Axis::Y2);
+    xyPad2.registerSlider(&listenerOSlider, Gui::XyPad2h::Axis::O1);
     xyPad2.thumb1.setColour(listenerColour);
     xyPad2.thumb2.setColour(sourceColour);
     xyPad2.thumb1.mouseUpCallback = updateFunc;
@@ -121,7 +152,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (550, 480);
+    setSize (650, 480);
     setResizable(true,true);
 }
 
@@ -139,7 +170,7 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
     static const float border = 0.01;
     float uxb = border*getWidth();
     float uyb = border*getHeight();
-    auto ux = (1-2*border)*getWidth()/20;
+    auto ux = (1-2*border)*getWidth()/24;
     auto uy = (1-2*border)*getHeight()/18;
 
     auto diagonale = (getLocalBounds().getTopLeft() - getLocalBounds().getBottomRight()).toFloat();
@@ -159,16 +190,16 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
     g.setColour(sourceColour);
     g.drawSingleLineText("O Source", uxb+18*ux, uyb+7*uy,juce::Justification::centred);
 
-    auto r = juce::Rectangle<float>(uxb+16*ux,uyb+14*uy,4*ux,4*uy);
+    auto r = juce::Rectangle<float>(uxb+20.5*ux,uyb+15*uy,3*ux,3*ux);
     g.drawImage(logo, r);
 
-    g.setColour(juce::Colours::grey);
-    g.setFont(28);
-    g.drawSingleLineText("BiRR3D", uxb+14*ux, uyb+15.5*uy,juce::Justification::centred);
-    g.setFont(12);
-    g.drawMultiLineText("Binaural Room Reverb 3D", uxb+12*ux, uyb+16*uy, 4*ux, juce::Justification::centred);
-    g.setFont(16);
-    g.drawMultiLineText("v0.1", uxb+12*ux, uyb+17*uy, 4*ux, juce::Justification::centred);
+    // g.setColour(juce::Colours::grey);
+    // g.setFont(28);
+    // g.drawSingleLineText("BiRR3D", uxb+14*ux, uyb+15.5*uy,juce::Justification::centred);
+    // g.setFont(12);
+    // g.drawMultiLineText("Binaural Room Reverb 3D", uxb+12*ux, uyb+16*uy, 4*ux, juce::Justification::centred);
+    // g.setFont(16);
+    // g.drawMultiLineText("v0.1", uxb+12*ux, uyb+17*uy, 4*ux, juce::Justification::centred);
 }
 
 #define DELTAX 0.88f
@@ -179,7 +210,7 @@ void ReverbAudioProcessorEditor::resized()
     static const float border = 0.01;
     float uxb = border*getWidth();
     float uyb = border*getHeight();
-    auto ux = (1-2*border)*getWidth()/20;
+    auto ux = (1-2*border)*getWidth()/24;
     auto uy = (1-2*border)*getHeight()/18;
     auto dux=DELTAX*ux;
     auto duy=DELTAY*uy;
@@ -199,15 +230,21 @@ void ReverbAudioProcessorEditor::resized()
 
     listenerXSlider.setBounds(uxb+ux,uyb+17*uy,10*ux,uy);
     listenerYSlider.setBounds(uxb+11*ux,uyb+7*uy,ux,10*uy);
+    listenerOSlider.setBounds(uxb+16.5*ux,uyb+9.7*uy,3*ux,3*uy);
+
+    widthSlider.setBounds(uxb+20*ux,uyb+11*uy,4*ux,4*uy);
+
+    directLevelSlider.setBounds(uxb+20*ux,uyb+uy,4*ux,4*uy);
+    reflectionsLevelSlider.setBounds(uxb+20*ux,uyb+6*uy,4*ux,4*uy);
 
     xyPad2.setBounds(uxb+ux,uyb+7*uy,10*ux,10*uy);
 
-    typeComboBox.setBounds(uxb+16*ux,uyb+10*uy,4*ux,uy);
+    typeComboBox.setBounds(uxb+12*ux,uyb+13.5*uy,7*ux,uy);
 
-    calculateButton.setBounds(uxb+12*ux,uyb+12.5*uy,3*ux,uy);
+    calculateButton.setBounds(uxb+12*ux,uyb+15.5*uy,3*ux,uy);
 
-    autoButton.setBounds(uxb+15.5*ux,uyb+12.5*uy,4*ux,uy);
-    autoLabel.setTopLeftPosition(uxb+16.5*ux,uyb+12.5*uy);
+    autoButton.setBounds(uxb+15.5*ux,uyb+15.5*uy,4*ux,uy);
+    autoLabel.setTopLeftPosition(uxb+16.3*ux,uyb+15.5*uy);
 }
 
 void ReverbAudioProcessorEditor::addController(juce::Slider& slider,

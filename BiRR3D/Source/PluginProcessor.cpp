@@ -10,7 +10,7 @@
 #include "PluginEditor.h"
 #include "hrtf.h"
 
-//#define DEBUG_OUTPUTS
+#define DEBUG_OUTPUTS
 
 #ifdef DEBUG_OUTPUTS
 #include <iostream>
@@ -218,16 +218,19 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerX","ListenerX",0.01f,0.99f,0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerY","ListenerY",0.01f,0.99f,0.25f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerZ","ListenerZ",0.01f,0.99f,0.7f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerO","ListenerO",juce::NormalisableRange<float>(-180.f,180.f,1.f,1.f),0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceX","SourceX",0.01f,0.99f,0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceY","SourceY",0.01f,0.99f,0.75f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceZ","SourceZ",0.01f,0.99f,0.7f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("D","D",juce::NormalisableRange<float>(0.04f,0.7f,0.001f,0.3f),0.1f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("D","D",juce::NormalisableRange<float>(0.02f,0.7f,0.001f,0.3f),0.1f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("HFD","HFD",juce::NormalisableRange<float>(0.01f,0.3f,0.001f,0.3f),0.1f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Stereo Width","Stereo Width",juce::NormalisableRange<float>(0.0f,1.f,0.001f,1.f),0.5f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Direct Level","Direct Level",juce::NormalisableRange<float>(-90.0f,6.f,0.1f,1.f),0.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Reflections Level","Reflections Level",juce::NormalisableRange<float>(-90.0f,6.f,0.1f,1.f),0.f));
     
     juce::StringArray choices;
     choices.addArray(CHOICES);
     layout.add(std::make_unique<juce::AudioParameterChoice>("Reverb type", "Reverb type", choices, 1));
-
     layout.add(std::make_unique<juce::AudioParameterBool>("Auto update","Auto update", true));
 
     return layout;
@@ -253,6 +256,11 @@ void ReverbAudioProcessor::setIrLoader()
     auto damp = apvts.getRawParameterValue("D")->load();
     auto hfDamp = apvts.getRawParameterValue("HFD")->load();
     auto type = apvts.getRawParameterValue("Reverb type")->load();
+    auto headAzim = apvts.getRawParameterValue("ListenerO")->load();
+    auto sWidth = apvts.getRawParameterValue("Stereo Width")->load();
+    auto directLevel = juce::Decibels::decibelsToGain(apvts.getRawParameterValue("Direct Level")->load());
+    auto reflectionsLevel = juce::Decibels::decibelsToGain(apvts.getRawParameterValue("Reflections Level")->load());
+    
     // auto diffusion = apvts.getRawParameterValue("Diffusion")->load();
 
     int n = int(log10(2e-2)/log10(1-damp));
@@ -305,50 +313,84 @@ void ReverbAudioProcessor::setIrLoader()
 
           int indice = int(round((time+juce::Random::getSystemRandom().nextFloat()*SIGMA_DELTAT)*spec.sampleRate));
           float r = pow(1-damp,abs(ix)+abs(iy)+abs(iz));
-          float gain = pow(-1,ix+iy+iz)*r/dist;
-
+          // float gain = pow(-1,ix+iy+iz)*r/dist;
+          float gain = (r/dist) * ( (ix==0 && iy==0 && iz==0) ? directLevel : reflectionsLevel );
+          
           float rp = sqrt((sx-lx)*(sx-lx)+(sy-ly)*(sy-ly));
           float elev = atan2f(sz-lz,rp)*EIGHTYOVERPI;
-          int elevationIndex = proximityIndex(&elevations[0],NELEV,elev,false);
 
           // Azimutal angle calculation
-          float theta = atan2f(y-ly,-x+lx)*EIGHTYOVERPI-90;
-          int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta,true);
-
+          float theta = atan2f(y-ly,-x+lx)*EIGHTYOVERPI-90-headAzim;
+  
           #ifdef DEBUG_OUTPUTS
           if (ix==0 && iy==0 && iz==0)
           {
             cout << "x = " << x << "      y = " << y << "      z = " << z << endl;
             cout << "r = " << r << "      dist = " << dist << endl;
             cout << "y-ly = " << y-ly << "         -x+lx = " << -lx+x << endl;
-            cout << "elev = " << elev << "          elevationIndex = " << elevationIndex << endl;
-            cout << "Theta = " << theta << "        Azimutal index = " << azimutalIndex << endl;
+            // cout << "elev = " << elev << "          elevationIndex = " << elevationIndex << endl;
+            // cout << "Theta = " << theta << "        Azimutal index = " << azimutalIndex << endl;
           }
           #endif
           
-          if (type==1){
+          // XY
+          if (type==0){
             // Apply lowpass filter and add grain to buffer
-            lop(&lhrtfn[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
-            addArrayToBuffer(&dataL[indice], &outBuf[0], gain*0.707);
-            lop(&rhrtfn[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
-            addArrayToBuffer(&dataR[indice], &outBuf[0], gain*0.707);
-          }
-          // if (type==2){
-          //   // Apply lowpass filter and add grain to buffer
-          //   lop(&lhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
-          //   addArrayToBuffer(&dataL[indice], &outBuf[0], gain*0.707);
-          //   lop(&rhrtf[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
-          //   addArrayToBuffer(&dataR[indice], &outBuf[0], gain*0.707);
-          // }
-          else if (type==0){
-            // Apply lowpass filter and add grain to buffer
-            auto panGain = -sin(PIOVEREIGHTY*(0.5f*theta-45));
+            auto elevCardio = (1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev)));
+            auto panGain = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta+45*sWidth)))
+                            * elevCardio;
             lop(&inBuf[0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
             addArrayToBuffer(&dataL[indice], &outBuf[0], gain*panGain);
-            panGain = sin(PIOVEREIGHTY*(0.5*theta+45));
+            panGain = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta-45*sWidth)))
+                        * elevCardio;
             lop(&inBuf[0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
             addArrayToBuffer(&dataR[indice], &outBuf[0], gain*panGain);
           }
+
+          // MS with cardio mic for mid channel
+          if (type==1){
+            // Apply lowpass filter and add grain to buffer
+            lop(&inBuf[0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+            auto gainMid = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta)))
+                            * (1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev)));
+            auto gainSide = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev))
+                            * juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(theta));
+
+            addArrayToBuffer(&dataL[indice], &outBuf[0], gain*(gainMid-gainSide*sWidth));
+            addArrayToBuffer(&dataR[indice], &outBuf[0], gain*(gainMid+gainSide*sWidth));
+          }
+
+          // MS with omni mic for mid channel
+          if (type==2){
+            // Apply lowpass filter and add grain to buffer
+            lop(&inBuf[0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+            auto gainMid = 1.f;
+            auto gainSide = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev))
+                            * juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(theta));
+
+            addArrayToBuffer(&dataL[indice], &outBuf[0], gain*(gainMid-gainSide*sWidth));
+            addArrayToBuffer(&dataR[indice], &outBuf[0], gain*(gainMid+gainSide*sWidth));
+          }
+
+          // Binaural
+          if (type==3){
+            int elevationIndex = proximityIndex(&elevations[0],NELEV,elev,false);
+            int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta,true);
+            // Apply lowpass filter and add grain to buffer
+            lop(&lhrtfn[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+            addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+            lop(&rhrtfn[elevationIndex][azimutalIndex][0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+            addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+          }
+          // else if (type==0){
+          //   // Apply lowpass filter and add grain to buffer
+          //   auto panGain = abs(-juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(0.5f*theta-45)));
+          //   lop(&inBuf[0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+          //   addArrayToBuffer(&dataL[indice], &outBuf[0], gain*panGain);
+          //   panGain = abs(juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(0.5*theta+45)));
+          //   lop(&inBuf[0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
+          //   addArrayToBuffer(&dataR[indice], &outBuf[0], gain*panGain);
+          // }
         }
       }
     }

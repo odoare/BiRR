@@ -81,9 +81,13 @@ namespace Gui
 
     void Head::mouseWheelMove(const juce::MouseEvent& e, const juce::MouseWheelDetails& wheel)
     {
-        juce::MouseWheelDetails w(wheel);
-        headOrientation += w.deltaY;
-        repaint();
+        // juce::MouseWheelDetails w(wheel);
+        // if (w.deltaY>0.f)
+        //     headOrientation = juce::jmin<float>(headOrientation+w.deltaY,juce::MathConstants<float>::pi);
+        // else
+        //     headOrientation = juce::jmax<float>(headOrientation+w.deltaY,-juce::MathConstants<float>::pi);
+        // moveCallback(getPosition().toDouble());
+        // repaint();
     }
 
     void Head::setColour(juce::Colour newColour)
@@ -235,6 +239,10 @@ namespace Gui
             {
                 slider->setValue(juce::jmap(position.getY(), bounds.getHeight()-w, 0.0, slider->getMinimum(), slider->getMaximum()));
             }
+            for (auto* slider : o1Sliders)
+            {
+                slider->setValue(juce::jmap<float>(thumb1.headOrientation, -juce::MathConstants<float>::pi , juce::MathConstants<float>::pi, slider->getMinimum(), slider->getMaximum()));
+            }
         };
         thumb2.moveCallback = [&](juce::Point<double> position)
         {
@@ -342,6 +350,10 @@ namespace Gui
                 thumb2.getX(),
                 juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), bounds.getHeight() - w2, 0.0)
             );
+        }
+         else
+        {
+            thumb1.setOrientation(juce::jmap<float>(slider->getValue(), slider->getMinimum(), slider->getMaximum(), -juce::MathConstants<float>::pi , juce::MathConstants<float>::pi ));
         }
         repaint();   
     }
