@@ -14,6 +14,7 @@
     <GROUP id="{D1C5BAF7-BCC1-4FA1-8B57-FE3DA373394C}" name="Components">
       <FILE id="q8pSzK" name="FxmeLookAndFeel.h" compile="0" resource="0"
             file="Source/Components/FxmeLookAndFeel.h"/>
+      <FILE id="ZT0yuh" name="HorizontalBar.h" compile="0" resource="0" file="Source/Components/HorizontalBar.h"/>
       <FILE id="EWRFcW" name="XyPad2.cpp" compile="1" resource="0" file="Source/Components/XyPad2.cpp"/>
       <FILE id="cKDPIF" name="XyPad2.h" compile="0" resource="0" file="Source/Components/XyPad2.h"/>
     </GROUP>

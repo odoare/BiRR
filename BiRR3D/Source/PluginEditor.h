@@ -12,6 +12,8 @@
 #include "PluginProcessor.h"
 #include "Components/XyPad2.h"
 #include "Components/FxmeLookAndFeel.h"
+#include "Components/HorizontalBar.h"
+
 
 //==============================================================================
 /**
@@ -115,6 +117,8 @@ private:
     void addAndConnectLabel(juce::Slider&, juce::Label&);
 
     FxmeKnobLookAndFeel knobLookAndFeel;
+
+    Gui::HorizontalBar progressBar{[&]() { return audioProcessor.calculator.getProgress(); }};
 
     juce::Image logo;
 

@@ -150,6 +150,10 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     addAndMakeVisible(autoLabel);
     autoLabel.attachToComponent(&autoButton,false);
 
+    // Progress bar
+    progressBar.setColour(juce::Colours::green);
+    addAndMakeVisible(progressBar);
+
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (650, 480);
@@ -245,6 +249,8 @@ void ReverbAudioProcessorEditor::resized()
 
     autoButton.setBounds(uxb+15.5*ux,uyb+15.5*uy,4*ux,uy);
     autoLabel.setTopLeftPosition(uxb+16.3*ux,uyb+15.5*uy);
+
+    progressBar.setBounds(uxb+12*ux,uyb+16.5*uy,8*ux,uy);
 }
 
 void ReverbAudioProcessorEditor::addController(juce::Slider& slider,

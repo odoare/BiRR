@@ -42,12 +42,17 @@ class irCalculator : public juce::Thread
     void run() override ;
     void setParams(irCalculatorParams params);
     void setConvPointer(juce::dsp::Convolution* ip);
+    float getProgress();
 
     juce::dsp::Convolution* irp;
+    
+    bool isCalculating;
+    bool bufferTransferred;
+    juce::AudioBuffer<float> buf;
 
   private:
     irCalculatorParams p;
-    juce::AudioBuffer<float> buf;
+    float progress;
 
     // juce::dsp::Convolution& irr;
     void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
@@ -101,6 +106,7 @@ public:
     void setIrLoader();
 
     juce::dsp::Convolution irLoader;
+    irCalculator calculator;
 
     juce::dsp::ProcessSpec spec;
 
@@ -110,7 +116,6 @@ public:
 private:
 
     juce::AudioBuffer<float> buf;
-    irCalculator calculator;
 
     void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
     int proximityIndex(const float *data, const int length, const float value, const bool wrap);

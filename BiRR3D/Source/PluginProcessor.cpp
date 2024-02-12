@@ -164,6 +164,21 @@ void ReverbAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    // if (calculator.isCalculating)
+    //   cout << "Calculator is calculating" << endl;
+    // if (!calculator.isCalculating)
+    //   cout << "Calculator is not calculating" << endl;
+    // if (!calculator.isCalculating && !calculator.bufferTransferred)
+    // {
+    //   cout << "Load buffer..." << endl;
+    //   irLoader.loadImpulseResponse(std::move (calculator.buf),
+    //                     spec.sampleRate,
+    //                     juce::dsp::Convolution::Stereo::yes,
+    //                     juce::dsp::Convolution::Trim::no,
+    //                     juce::dsp::Convolution::Normalise::no);
+    //   calculator.bufferTransferred = true;
+    // }
+
     juce::dsp::AudioBlock<float> block {buffer};
     if (irLoader.getCurrentIRSize()>0)
     {
@@ -259,6 +274,7 @@ void ReverbAudioProcessor::setIrLoader()
     p.sWidth = apvts.getRawParameterValue("Stereo Width")->load();
     p.directLevel = juce::Decibels::decibelsToGain(apvts.getRawParameterValue("Direct Level")->load());
     p.reflectionsLevel = juce::Decibels::decibelsToGain(apvts.getRawParameterValue("Reflections Level")->load());
+    p.sampleRate = spec.sampleRate;
 
     cout << "Set parameters" << endl;
     calculator.setParams(p);
@@ -338,15 +354,14 @@ void ReverbAudioProcessor::lop(const float* in, float* out, const int sampleFreq
     }
 }
 
-
-
-
-
 // ======================================================================
 
 // This is the function where the impulse response is calculated
 void irCalculator::run()
 {
+
+    isCalculating = true;
+    progress = 0.f;
 
     cout << "In irCalculator::run()" << endl;
     static float outBuf[NSAMP], inBuf[NSAMP];
@@ -359,32 +374,32 @@ void irCalculator::run()
     int longueur = int(ceil(dur*p.sampleRate)+NSAMP+int(p.sampleRate*SIGMA_DELTAT));
 
     // #ifdef DEBUG_OUTPUTS
-    // cout << "rx : " << rx << "\n" ;
-    // cout << "ry : " << ry << "\n" ;
-    // cout << "rz : " << rz << "\n" ;
-    // cout << "lx : " << lx << "\n" ;
-    // cout << "ly : " << ly << "\n" ;
-    // cout << "lz : " << lz << "\n" ;
-    // cout << "sx : " << sx << "\n" ;
-    // cout << "sy : " << sy << "\n" ;
-    // cout << "sz : " << sz << "\n" ;
+    // cout << "rx : " << p.rx << "\n" ;
+    // cout << "ry : " << p.ry << "\n" ;
+    // cout << "rz : " << p.rz << "\n" ;
+    // cout << "lx : " << p.lx << "\n" ;
+    // cout << "ly : " << p.ly << "\n" ;
+    // cout << "lz : " << p.lz << "\n" ;
+    // cout << "sx : " << p.sx << "\n" ;
+    // cout << "sy : " << p.sy << "\n" ;
+    // cout << "sz : " << p.sz << "\n" ;
     // cout << "n : " << n << "\n" ;
     // cout << "dur : " << dur << "\n" ;
     // cout << "longueur : " << longueur << "\n" ;
-    // cout << "damp : " << damp << "\n" ;
-    // cout << "hfDamp : " << damp << "\n" ;
-    // cout << "type : " << type << "\n" ;
-    // auto start = std::chrono::high_resolution_clock::now();
+    // cout << "damp : " << p.damp << "\n" ;
+    // cout << "hfDamp : " << p.damp << "\n" ;
+    // cout << "type : " << p.type << "\n" ;
+    // // auto start = std::chrono::high_resolution_clock::now();
     // #endif
 
-    cout << "Set buffer size" << endl;
+    // cout << "Set buffer size" << endl;
     buf.setSize (2, int(longueur),false,true);
 
-    cout << "Set write pointers" << endl;
+    // cout << "Set write pointers" << endl;
     auto* dataL = buf.getWritePointer(0);
     auto* dataR = buf.getWritePointer(1);
 
-    cout << "Start buffer fill..." << endl;
+    // cout << "Start buffer fill..." << endl;
 
     for (int sample=0; sample<buf.getNumSamples(); ++sample)
     {
@@ -394,15 +409,15 @@ void irCalculator::run()
     
     float x,y,z;
 
-    cout << "Start Loop..." << endl;
+    // cout << "Start Loop..." << endl;
 
-    for (int ix = 0; ix < n ; ++ix)
+    for (int ix = -n+1; ix < n ; ++ix)
     {
       x = 2*float(ceil(float(ix)/2))*p.rx+pow(-1,ix)*p.sx;
-      for (int iy = 0; iy < n ; ++iy)
+      for (int iy = -n+1; iy < n ; ++iy)
       {
         y = 2*float(ceil(float(iy)/2))*p.ry+pow(-1,iy)*p.sy;
-        for (int iz=0; iz<n; ++iz)
+        for (int iz=-n+1; iz<n; ++iz)
         {
           z = 2*float(ceil(float(iz)/2))*p.rz+pow(-1,iz)*p.sz;
           float dist = sqrt((x-p.lx)*(x-p.lx)+(y-p.ly)*(y-p.ly)+(z-p.lz)*(z-p.lz));
@@ -433,7 +448,7 @@ void irCalculator::run()
           // XY
           if (p.type==0){
             // Apply lowpass filter and add grain to 
-            cout << "XY  ";
+            // cout << "XY  ";
             auto elevCardio = (1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev)));
             auto panGain = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta+45*p.sWidth)))
                             * elevCardio;
@@ -447,7 +462,7 @@ void irCalculator::run()
 
           // MS with cardio mic for mid channel
           if (p.type==1){
-            cout << "MS  ";   
+            // cout << "MS  ";   
             // Apply lowpass filter and add grain to buffer
             lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
             auto gainMid = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta)))
@@ -461,7 +476,7 @@ void irCalculator::run()
 
           // MS with omni mic for mid channel
           if (p.type==2){
-            cout << "MS2     ";
+            // cout << "MS2     ";
             // Apply lowpass filter and add grain to buffer
             lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
             auto gainMid = 1.f;
@@ -474,7 +489,7 @@ void irCalculator::run()
 
           // Binaural
           if (p.type==3){
-            cout << "Binau  ";         
+            // cout << "Binau  ";         
             int elevationIndex = proximityIndex(&elevations[0],NELEV,elev,false);
             int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta,true);
             // Apply lowpass filter and add grain to buffer
@@ -494,9 +509,11 @@ void irCalculator::run()
           // }
         }
       }
+      progress = float(ix+n-1)/float(2*n-1);
+      // cout << progress << endl;
     }
 
-    cout << "Array fill finished" << endl;
+    // cout << "Array fill finished" << endl;
 
     // #ifdef DEBUG_OUTPUTS
     // auto stop = std::chrono::high_resolution_clock::now();
@@ -506,15 +523,24 @@ void irCalculator::run()
     // #endif
     
     // reset();
-
-    cout << "Load impulse response" << endl;
+    // cout << "Load impulse response" << endl;
+    bufferTransferred = false;
+    isCalculating = false;
     irp->loadImpulseResponse(std::move (buf),
                         p.sampleRate,
                         juce::dsp::Convolution::Stereo::yes,
                         juce::dsp::Convolution::Trim::no,
                         juce::dsp::Convolution::Normalise::no);
 
-    cout << "Finished loading" << endl;
+    bufferTransferred = true;
+
+    cout << "Finished buffer filling" << endl;
+
+    // for (int i=0; i<buf.getNumSamples(); i++)
+    // {
+    //   cout << dataR[i] << "    ";
+    // }
+
 
     // #ifdef DEBUG_OUTPUTS
     // stop = std::chrono::high_resolution_clock::now();
@@ -587,6 +613,14 @@ void irCalculator::setConvPointer(juce::dsp::Convolution* ip)
 void irCalculator::setParams(irCalculatorParams params)
 {
   p = params;
+}
+
+float irCalculator::getProgress()
+{
+  if (!isCalculating && bufferTransferred)
+    return 1.0f;
+  else
+    return progress;
 }
 
 irCalculator::irCalculator() : juce::Thread("test")
