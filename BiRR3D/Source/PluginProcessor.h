@@ -12,6 +12,49 @@
 
 #define CHOICES {"XY", "MS with Cardio", "MS with Omni", "Binaural"}
 
+// ==================================================================
+class irCalculator : public juce::Thread
+  {
+
+  public:
+
+    struct irCalculatorParams{
+      float rx;
+      float ry;
+      float rz;
+      float lx;
+      float ly;
+      float lz;
+      float sx;
+      float sy;
+      float sz;
+      float damp;
+      float hfDamp;
+      int type;
+      float headAzim;
+      float sWidth;
+      float directLevel;
+      float reflectionsLevel;
+      double sampleRate;
+    };
+
+    irCalculator();
+    void run() override ;
+    void setParams(irCalculatorParams params);
+    void setConvPointer(juce::dsp::Convolution* ip);
+
+    juce::dsp::Convolution* irp;
+
+  private:
+    irCalculatorParams p;
+    juce::AudioBuffer<float> buf;
+
+    // juce::dsp::Convolution& irr;
+    void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
+    int proximityIndex(const float *data, const int length, const float value, const bool wrap);
+    void lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order);
+  };
+
 //==============================================================================
 /**
 */
@@ -65,6 +108,9 @@ public:
     juce::AudioProcessorValueTreeState apvts{*this,nullptr,"Parameters",createParameters()};
 
 private:
+
+    juce::AudioBuffer<float> buf;
+    irCalculator calculator;
 
     void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
     int proximityIndex(const float *data, const int length, const float value, const bool wrap);
