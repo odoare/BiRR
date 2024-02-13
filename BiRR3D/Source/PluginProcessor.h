@@ -40,7 +40,7 @@ class irCalculator : public juce::Thread
 
     irCalculator();
     void run() override ;
-    void setParams(irCalculatorParams params);
+    bool setParams(irCalculatorParams pa);
     void setConvPointer(juce::dsp::Convolution* ip);
     float getProgress();
 

@@ -35,14 +35,18 @@ namespace Gui
         auto bounds2 = bounds;
         bounds2.setRight(newWidth);
 
-        g.setColour(juce::Colours::black);
-        g.fillRoundedRectangle(bounds,5.0f);
-
         if (juce::approximatelyEqual(level,1.f))
-            g.setColour(juce::Colours::green);
+        {
+          g.setColour(juce::Colours::green);
+          g.fillRoundedRectangle(bounds,5.0f);
+        }
         else
-            g.setColour(juce::Colours::red);
-        g.fillRoundedRectangle(bounds2,5.0f);
+        {
+          g.setColour(juce::Colours::black);
+          g.fillRoundedRectangle(bounds,5.0f);
+          g.setColour(juce::Colours::red);
+          g.fillRoundedRectangle(bounds2,5.0f);
+        }
     }
 
     void timerCallback() override

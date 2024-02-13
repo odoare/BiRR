@@ -13,7 +13,8 @@
 ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-  logo = juce::ImageCache::getFromMemory(BinaryData::logo686_png, BinaryData::logo686_pngSize);
+    logo = juce::ImageCache::getFromMemory(BinaryData::logo686_png, BinaryData::logo686_pngSize);
+
     auto updateFunc = [this](){      
       if (audioProcessor.apvts.getRawParameterValue("Auto update")->load()==true){
         audioProcessor.setIrLoader();
@@ -168,14 +169,20 @@ ReverbAudioProcessorEditor::~ReverbAudioProcessorEditor()
   xyPad2.deregisterSlider(&sourceYSlider);
 }
 
+
+#define NX 24
+#define NY 18
+#define DELTAX 0.1f
+#define DELTAY 0.1f
+#define BORDER 0.01f
+
 //==============================================================================
 void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    static const float border = 0.01;
-    float uxb = border*getWidth();
-    float uyb = border*getHeight();
-    auto ux = (1-2*border)*getWidth()/24;
-    auto uy = (1-2*border)*getHeight()/18;
+    float uxb = BORDER*getWidth();
+    float uyb = BORDER*getHeight();
+    auto ux = (1-2*BORDER)*getWidth()/NX;
+    auto uy = (1-2*BORDER)*getHeight()/NY;
 
     auto diagonale = (getLocalBounds().getTopLeft() - getLocalBounds().getBottomRight()).toFloat();
     auto length = diagonale.getDistanceFromOrigin();
@@ -206,40 +213,38 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
     // g.drawMultiLineText("v0.1", uxb+12*ux, uyb+17*uy, 4*ux, juce::Justification::centred);
 }
 
-#define DELTAX 0.88f
-#define DELTAY 1.f
+#define RED reduced(DELTAX*dux,DELTAY*duy)
 
 void ReverbAudioProcessorEditor::resized()
 {
-    static const float border = 0.01;
-    float uxb = border*getWidth();
-    float uyb = border*getHeight();
-    auto ux = (1-2*border)*getWidth()/24;
-    auto uy = (1-2*border)*getHeight()/18;
-    auto dux=DELTAX*ux;
-    auto duy=DELTAY*uy;
+    float uxb = BORDER*getWidth();
+    float uyb =BORDER*getHeight();
+    auto ux = (1-2*BORDER)*getWidth()/24;
+    auto uy = (1-2*BORDER)*getHeight()/18;
+    auto dux=4*ux;
+    auto duy=4*uy;
     
-    roomXSlider.setBounds(uxb,uyb+uy,4*dux,4*duy);
-    roomYSlider.setBounds(uxb+4*ux,uyb+uy,4*dux,4*duy);
-    roomZSlider.setBounds(uxb+8*ux,uyb+uy,4*dux,4*duy);
+    roomXSlider.setBounds(juce::Rectangle<int>(uxb,uyb+uy,dux,duy).RED);
+    roomYSlider.setBounds(juce::Rectangle<int>(uxb+4*ux,uyb+uy,dux,duy).RED);
+    roomZSlider.setBounds(juce::Rectangle<int>(uxb+8*ux,uyb+uy,dux,duy).RED);
 
     sourceZSlider.setBounds(uxb+12*ux,uyb+7*uy,2*ux,5*uy);
     listenerZSlider.setBounds(uxb+14*ux,uyb+7*uy,2*ux,5*uy);
 
-    dampingSlider.setBounds(uxb+12*ux,uyb+uy,4*ux,4*duy);
-    hfDampingSlider.setBounds(uxb+16*ux,uyb+uy,4*ux,4*duy);
+    dampingSlider.setBounds(juce::Rectangle<int>(uxb+12*ux,uyb+uy,dux,duy).RED);
+    hfDampingSlider.setBounds(juce::Rectangle<int>(uxb+16*ux,uyb+uy,dux,duy).RED);
 
     sourceXSlider.setBounds(uxb+ux,uyb+6*uy,10*ux,uy);
     sourceYSlider.setBounds(uxb,uyb+7*uy,ux,10*uy);
 
     listenerXSlider.setBounds(uxb+ux,uyb+17*uy,10*ux,uy);
     listenerYSlider.setBounds(uxb+11*ux,uyb+7*uy,ux,10*uy);
-    listenerOSlider.setBounds(uxb+16.5*ux,uyb+9.7*uy,3*ux,3*uy);
+    listenerOSlider.setBounds(uxb+16.5*ux,uyb+9.5*uy,3*ux,3*uy);
 
-    widthSlider.setBounds(uxb+20*ux,uyb+11*uy,4*ux,4*uy);
+    widthSlider.setBounds(juce::Rectangle<int>(uxb+20*ux,uyb+11*uy,dux,duy).RED);
 
-    directLevelSlider.setBounds(uxb+20*ux,uyb+uy,4*ux,4*uy);
-    reflectionsLevelSlider.setBounds(uxb+20*ux,uyb+6*uy,4*ux,4*uy);
+    directLevelSlider.setBounds(juce::Rectangle<int>(uxb+20*ux,uyb+uy,dux,duy).RED);
+    reflectionsLevelSlider.setBounds(juce::Rectangle<int>(uxb+20*ux,uyb+6*uy,dux,duy).RED);
 
     xyPad2.setBounds(uxb+ux,uyb+7*uy,10*ux,10*uy);
 

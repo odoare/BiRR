@@ -58,7 +58,7 @@ private:
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerOSliderAttachment;
     juce::Slider listenerOSlider;
-    juce::Label listenerOLabel{"listenerOLabel", "O"};
+    juce::Label listenerOLabel{"listenerOLabel", "Head azimuth"};
 
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerZSliderAttachment;
     juce::Slider sourceXSlider;

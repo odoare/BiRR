@@ -277,88 +277,20 @@ void ReverbAudioProcessor::setIrLoader()
     p.sampleRate = spec.sampleRate;
 
     std::cout << "Set parameters" << endl;
-    calculator.setParams(p);
-
-    calculator.setConvPointer(&irLoader);
-
-    // Ask running thread to stop
-    if (calculator.isThreadRunning())
+    if (calculator.setParams(p))
     {
-      std::cout << "Thread running" << endl;
-      if (calculator.stopThread(100))
-        std::cout << "Thread stopped" << endl;
-    }
+      calculator.setConvPointer(&irLoader);
 
-    std::cout << "Start thread" << endl;
-    calculator.startThread();
-    
-    // reset();
-    // irLoader.loadImpulseResponse(std::move (buf),
-    //                     spec.sampleRate,
-    //                     juce::dsp::Convolution::Stereo::yes,
-    //                     juce::dsp::Convolution::Trim::no,
-    //                     juce::dsp::Convolution::Normalise::no);
-
-    // #ifdef DEBUG_OUTPUTS
-    // stop = std::chrono::high_resolution_clock::now();
-    // duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    // cout << "Buffer fill duration:" << duration.count() << "µs" << endl;
-    // #endif
-}
-
-// Add a given array to a buffer
-void ReverbAudioProcessor::addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain)
-{
-  for (int i=0; i<NSAMP; i++)
-  {
-    bufPtr[i] += hrtfPtr[i]*gain;
-  }
-}
-
-// Compares the values in data to a float prameter value and returns the nearest index
-int ReverbAudioProcessor::proximityIndex(const float *data, const int length, const float value, const bool wrap)
-{
-  int proxIndex = 0;
-  float minDistance = BIGVALUE;
-  float val;
-  if (wrap && value<0.f)
-  {
-    val = value+360.f;
-  }
-  else
-  {
-    val = value;
-  }
-  for (int i=0; i<length; i++)
-  {
-    float actualDistance = abs(data[i]-val);
-    if (actualDistance < minDistance)
-    {
-      proxIndex = i;
-      minDistance = actualDistance;
-    }
-  }
-  return proxIndex;
-}
-
-// Basic lowpass filter
-void ReverbAudioProcessor::lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order)
-{
-    const float om = OMEGASTART*(exp(-hfDamping*nRebounds));
-    const float alpha1 = exp(-om/sampleFreq);
-    const float alpha = 1 - alpha1;
-    out[0] = alpha*in[0];
-    for (int i=1;i<NSAMP;i++)
-    {
-      out[i] = alpha*in[i] + alpha1*out[i-1];
-    }
-    for (int j=0; j<order-1; j++)
-    {
-      out[0] *= alpha;
-      for (int i=1;i<NSAMP;i++)
+      // Ask running thread to stop
+      if (calculator.isThreadRunning())
       {
-        out[i] = alpha*out[i] + alpha1*out[i-1];
+        std::cout << "Thread running" << endl;
+        if (calculator.stopThread(100))
+          std::cout << "Thread stopped" << endl;
       }
+
+      std::cout << "Start thread" << endl;
+      calculator.startThread();
     }
 }
 
@@ -409,12 +341,6 @@ void irCalculator::run()
     buf.clear();
     auto* dataL = buf.getWritePointer(0);
     auto* dataR = buf.getWritePointer(1);
-
-    // for (int sample=0; sample<buf.getNumSamples(); ++sample)
-    // {
-    //     dataL[sample] = 0;
-    //     dataR[sample] = 0;
-    // }
     
     float x,y,z;
 
@@ -459,7 +385,6 @@ void irCalculator::run()
             // XY
             if (p.type==0){
               // Apply lowpass filter and add grain to 
-              // cout << "XY  ";
               auto elevCardio = (1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev)));
               auto panGain = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta+45*p.sWidth)))
                               * elevCardio;
@@ -473,7 +398,6 @@ void irCalculator::run()
 
             // MS with cardio mic for mid channel
             if (p.type==1){
-              // cout << "MS  ";   
               // Apply lowpass filter and add grain to buffer
               lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
               auto gainMid = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta)))
@@ -487,7 +411,6 @@ void irCalculator::run()
 
             // MS with omni mic for mid channel
             if (p.type==2){
-              // cout << "MS2     ";
               // Apply lowpass filter and add grain to buffer
               lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
               auto gainMid = 1.f;
@@ -499,8 +422,7 @@ void irCalculator::run()
             }
 
             // Binaural
-            if (p.type==3){
-              // cout << "Binau  ";         
+            if (p.type==3){      
               int elevationIndex = proximityIndex(&elevations[0],NELEV,elev,false);
               int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta,true);
               // Apply lowpass filter and add grain to buffer
@@ -509,15 +431,6 @@ void irCalculator::run()
               lop(&rhrtfn[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
               addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
             }
-            // else if (type==0){
-            //   // Apply lowpass filter and add grain to buffer
-            //   auto panGain = abs(-juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(0.5f*theta-45)));
-            //   lop(&inBuf[0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
-            //   addArrayToBuffer(&dataL[indice], &outBuf[0], gain*panGain);
-            //   panGain = abs(juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(0.5*theta+45)));
-            //   lop(&inBuf[0], &outBuf[0], getSampleRate(),hfDamp,abs(ix)+abs(iy),1);
-            //   addArrayToBuffer(&dataR[indice], &outBuf[0], gain*panGain);
-            // }
           }
         }
         progress = float(ix+n-1)/float(2*n-1);
@@ -549,12 +462,6 @@ void irCalculator::run()
     bufferTransferred = true;
 
     std::cout << "Finished buffer filling" << endl;
-
-    // for (int i=0; i<buf.getNumSamples(); i++)
-    // {
-    //   cout << dataR[i] << "    ";
-    // }
-
 
     // #ifdef DEBUG_OUTPUTS
     // stop = std::chrono::high_resolution_clock::now();
@@ -624,9 +531,31 @@ void irCalculator::setConvPointer(juce::dsp::Convolution* ip)
   irp = ip;
 }
 
-void irCalculator::setParams(irCalculatorParams params)
+bool irCalculator::setParams(irCalculatorParams pa)
 {
-  p = params;
+  if (juce::approximatelyEqual(p.rx,pa.rx)
+      && juce::approximatelyEqual(p.ry,pa.ry)
+      && juce::approximatelyEqual(p.rz,pa.rz)
+      && juce::approximatelyEqual(p.lx,pa.lx)
+      && juce::approximatelyEqual(p.ly,pa.ly)
+      && juce::approximatelyEqual(p.lz,pa.lz)
+      && juce::approximatelyEqual(p.sx,pa.sx)
+      && juce::approximatelyEqual(p.sy,pa.sy)
+      && juce::approximatelyEqual(p.sz,pa.sz)
+      && juce::approximatelyEqual(p.damp,pa.damp)
+      && juce::approximatelyEqual(p.hfDamp,pa.hfDamp)
+      && juce::approximatelyEqual(p.type,pa.type)
+      && juce::approximatelyEqual(p.headAzim,pa.headAzim)
+      && juce::approximatelyEqual(p.sWidth,pa.sWidth)
+      && juce::approximatelyEqual(p.directLevel,pa.directLevel)
+      && juce::approximatelyEqual(p.reflectionsLevel,pa.reflectionsLevel)
+      && juce::approximatelyEqual(p.sampleRate,pa.sampleRate))
+      return false;
+    else
+      {
+        p = pa;
+        return true;
+      }
 }
 
 float irCalculator::getProgress()
