@@ -12,6 +12,8 @@
 #include "PluginProcessor.h"
 #include "Components/XyPad2.h"
 #include "Components/FxmeLookAndFeel.h"
+#include "Components/HorizontalBar.h"
+
 
 //==============================================================================
 /**
@@ -56,7 +58,7 @@ private:
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerOSliderAttachment;
     juce::Slider listenerOSlider;
-    juce::Label listenerOLabel{"listenerOLabel", "O"};
+    juce::Label listenerOLabel{"listenerOLabel", "Head azimuth"};
 
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerZSliderAttachment;
     juce::Slider sourceXSlider;
@@ -115,6 +117,8 @@ private:
     void addAndConnectLabel(juce::Slider&, juce::Label&);
 
     FxmeKnobLookAndFeel knobLookAndFeel;
+
+    Gui::HorizontalBar progressBar{[&]() { return audioProcessor.calculator.getProgress(); }};
 
     juce::Image logo;
 
