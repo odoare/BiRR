@@ -451,8 +451,8 @@ void irCalculator::run()
     // reset();
     // cout << "Load impulse response" << endl;
 
-    bufferTransferred = false;
     isCalculating = false;
+    bufferTransferred = false;
     irp->loadImpulseResponse(std::move (buf),
                         p.sampleRate,
                         juce::dsp::Convolution::Stereo::yes,
