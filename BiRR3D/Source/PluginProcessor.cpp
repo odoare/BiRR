@@ -37,7 +37,6 @@ ReverbAudioProcessor::ReverbAudioProcessor()
                        )
 #endif
 {
-
 }
 
 ReverbAudioProcessor::~ReverbAudioProcessor()
@@ -115,6 +114,16 @@ void ReverbAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
 
     irLoader.reset();
     irLoader.prepare(spec);
+
+    for (int i=0; i<NPROC; i++)
+    {
+      calculator[i].setCalculatingBool(&isCalculating[i]);
+      calculator[i].setBuffer(&irBuffer[i]);
+    }
+    irTransfer.setCalculatingBool(&isCalculating[0]);
+    irTransfer.setBuffer(&irBuffer[0]);
+    irTransfer.setIr(&irLoader);
+    irTransfer.setSampleRate(sampleRate);
 }
 
 void ReverbAudioProcessor::releaseResources()
@@ -256,7 +265,9 @@ void ReverbAudioProcessor::setIrLoader()
 {
     std::cout << "In setIrLoader" << endl;
 
-    irCalculator::irCalculatorParams p;
+    IrCalculator::IrCalculatorParams p;
+
+    std::cout << "Set parameters" << endl;
 
     p.rx = apvts.getRawParameterValue("RoomX")->load();
     p.ry = apvts.getRawParameterValue("RoomY")->load();
@@ -276,77 +287,151 @@ void ReverbAudioProcessor::setIrLoader()
     p.reflectionsLevel = juce::Decibels::decibelsToGain(apvts.getRawParameterValue("Reflections Level")->load());
     p.sampleRate = spec.sampleRate;
 
-    std::cout << "Set parameters" << endl;
-    if (calculator.setParams(p))
-    {
-      calculator.setConvPointer(&irLoader);
+    if (setIrCaclulatorsParams(p))     // (We run the calculation only if a parameter has changed)
+    {    
 
-      // Ask running thread to stop
-      if (calculator.isThreadRunning())
+      for (int i=0;i<NPROC;i++)
       {
-        std::cout << "Thread running" << endl;
-        if (calculator.stopThread(100))
-          std::cout << "Thread stopped" << endl;
+        // We have to stop an eventual running thread (and next restart)
+        if (calculator[i].isThreadRunning())
+          {
+            std::cout << "Thread no " << i << " running" << endl;
+            if (calculator[i].stopThread(300))
+              std::cout << "Thread no " << i << " stopped" << endl;
+          }
+      }
+      
+      int n = int(log10(2e-2)/log10(1-p.damp));
+      auto dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
+      int longueur = int(ceil(dur*p.sampleRate)+NSAMP+int(p.sampleRate*SIGMA_DELTAT));
+      int chunksize = floor(2*float(n)/NPROC);
+
+      // Set the size of multithread loops
+      for (int i=0;i<NPROC;i++)
+      {
+          irBuffer[i].setSize (2, int(longueur),false,true);
+          calculator[i].n = n;
+          calculator[i].nxmin = -n+1 + i*chunksize;
+          calculator[i].nxmax = -n+1 + (i+1)*chunksize;
+          if (i==NPROC-1)
+            calculator[i].nxmax = n;
+          calculator[i].resetProgress();
       }
 
-      std::cout << "Start thread" << endl;
-      calculator.startThread();
+      for (int i=0;i<NPROC;i++)
+      {
+        std::cout << "Start thread no " << i << endl;
+        calculator[i].startThread();
+      }
     }
+
+    irTransfer.startThread();
+
+    // // Here, I should run irLoader in a thread that waits for calculators to finish ?
+
+    // for (int i=1;i<NPROC;i++)
+    // {
+    //   parallelBuffers[0].addFrom(0,0,parallelBuffers[i],0,0,parallelBuffers[i].getNumSamples());
+    //   parallelBuffers[0].addFrom(1,0,parallelBuffers[i],1,0,parallelBuffers[i].getNumSamples());
+    // }
+
+    // bufferTransferred = false;
+    // irp->loadImpulseResponse(std::move (parallelBuffers[0]),
+    //                     p.sampleRate,
+    //                     juce::dsp::Convolution::Stereo::yes,
+    //                     juce::dsp::Convolution::Trim::no,
+    //                     juce::dsp::Convolution::Normalise::no);
+
+    // bufferTransferred = true;
+
+    // std::cout << "Finished buffer filling" << endl;
+
+}
+
+
+bool ReverbAudioProcessor::setIrCaclulatorsParams(IrCalculator::IrCalculatorParams& pa)
+{
+    // We check if a parameter has changed
+    // If nothing has changed, we do nothing and return false
+    // If at least one parameter has changed we update params
+    // of each threaded calculator
+    if (juce::approximatelyEqual(p.rx,pa.rx)
+      && juce::approximatelyEqual(p.ry,pa.ry)
+      && juce::approximatelyEqual(p.rz,pa.rz)
+      && juce::approximatelyEqual(p.lx,pa.lx)
+      && juce::approximatelyEqual(p.ly,pa.ly)
+      && juce::approximatelyEqual(p.lz,pa.lz)
+      && juce::approximatelyEqual(p.sx,pa.sx)
+      && juce::approximatelyEqual(p.sy,pa.sy)
+      && juce::approximatelyEqual(p.sz,pa.sz)
+      && juce::approximatelyEqual(p.damp,pa.damp)
+      && juce::approximatelyEqual(p.hfDamp,pa.hfDamp)
+      && juce::approximatelyEqual(p.type,pa.type)
+      && juce::approximatelyEqual(p.headAzim,pa.headAzim)
+      && juce::approximatelyEqual(p.sWidth,pa.sWidth)
+      && juce::approximatelyEqual(p.directLevel,pa.directLevel)
+      && juce::approximatelyEqual(p.reflectionsLevel,pa.reflectionsLevel)
+      && juce::approximatelyEqual(p.sampleRate,pa.sampleRate))
+      return false;
+    else
+      {
+        p = pa;
+        for (int i=0;i<NPROC;i++)
+          calculator[i].setParams(pa);
+        return true;
+      }
+}
+
+float ReverbAudioProcessor::getProgress()
+{
+  if (!getCalculatingState() && getBufferTransferState() )
+    return 1.0;
+  else
+  {
+    float prog = 0;
+    for (int i=0;i<NPROC;i++)
+      prog += calculator[i].getProgress();
+    return prog/NPROC;
+  }
+}
+
+bool ReverbAudioProcessor::getCalculatingState()
+{
+  bool isCalc = false;
+  for (int i=0;i<NPROC;i++)
+    isCalc = isCalc || isCalculating[i];
+  return isCalc;
+}
+
+bool ReverbAudioProcessor::getBufferTransferState()
+{
+  return irTransfer.getBufferTransferState();
 }
 
 // ======================================================================
 
 // This is the function where the impulse response is calculated
-void irCalculator::run()
+void IrCalculator::run()
 {
 
-    isCalculating = true;
-    progress = 0.f;
+    isCalculating[0] = true;
 
     std::cout << "In irCalculator::run()" << endl;
-    static float outBuf[NSAMP], inBuf[NSAMP];
 
     // inBuf is the buffer used for the non-binaural method
+    float outBuf[NSAMP]={0.f}, inBuf[NSAMP]={0.f};
     inBuf[10] = 1.f;
-
-    int n = int(log10(2e-2)/log10(1-p.damp));
-    auto dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
-    int longueur = int(ceil(dur*p.sampleRate)+NSAMP+int(p.sampleRate*SIGMA_DELTAT));
-
-    // #ifdef DEBUG_OUTPUTS
-    // cout << "rx : " << p.rx << "\n" ;
-    // cout << "ry : " << p.ry << "\n" ;
-    // cout << "rz : " << p.rz << "\n" ;
-    // cout << "lx : " << p.lx << "\n" ;
-    // cout << "ly : " << p.ly << "\n" ;
-    // cout << "lz : " << p.lz << "\n" ;
-    // cout << "sx : " << p.sx << "\n" ;
-    // cout << "sy : " << p.sy << "\n" ;
-    // cout << "sz : " << p.sz << "\n" ;
-    // cout << "n : " << n << "\n" ;
-    // cout << "dur : " << dur << "\n" ;
-    // cout << "longueur : " << longueur << "\n" ;
-    // cout << "damp : " << p.damp << "\n" ;
-    // cout << "hfDamp : " << p.damp << "\n" ;
-    // cout << "type : " << p.type << "\n" ;
-    // // auto start = std::chrono::high_resolution_clock::now();
-    // #endif
-
-    // cout << "Set buffer size" << endl;
-    buf.setSize (2, int(longueur),false,true);
-
+    float x,y,z;
 
     // cout << "Start buffer fill..." << endl;
 
-    buf.clear();
-    auto* dataL = buf.getWritePointer(0);
-    auto* dataR = buf.getWritePointer(1);
+    bp[0].clear();
+    auto* dataL = bp[0].getWritePointer(0);
+    auto* dataR = bp[0].getWritePointer(1);
     
-    float x,y,z;
+    cout << "Start Loop ... " << endl;
 
-    // cout << "Start Loop..." << endl;
-
-    for (int ix = -n+1; ix < n ; ++ix)
+    for (int ix = nxmin; ix < nxmax ; ++ix)
     {
       x = 2*float(ceil(float(ix)/2))*p.rx+pow(-1,ix)*p.sx;
       if (!threadShouldExit())
@@ -370,17 +455,6 @@ void irCalculator::run()
 
             // Azimutal angle calculation
             float theta = atan2f(y-p.ly,-x+p.lx)*EIGHTYOVERPI-90-p.headAzim;
-    
-            // #ifdef DEBUG_OUTPUTS
-            // if (ix==0 && iy==0 && iz==0)
-            // {
-            //   cout << "x = " << x << "      y = " << y << "      z = " << z << endl;
-            //   cout << "r = " << r << "      dist = " << dist << endl;
-            //   cout << "y-ly = " << y-ly << "         -x+lx = " << -lx+x << endl;
-            //   // cout << "elev = " << elev << "          elevationIndex = " << elevationIndex << endl;
-            //   // cout << "Theta = " << theta << "        Azimutal index = " << azimutalIndex << endl;
-            // }
-            // #endif
             
             // XY
             if (p.type==0){
@@ -433,45 +507,16 @@ void irCalculator::run()
             }
           }
         }
-        progress = float(ix+n-1)/float(2*n-1);
-        // cout << progress << endl;
+        progress = float(ix-nxmin)/float(nxmax-nxmin);
       }
       else return;
     }
-
-    // cout << "Array fill finished" << endl;
-
-    // #ifdef DEBUG_OUTPUTS
-    // auto stop = std::chrono::high_resolution_clock::now();
-    // auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    // cout << "Buffer preparation duration:" << duration.count() << "µs" << endl;
-    // start = std::chrono::high_resolution_clock::now();
-    // #endif
-    
-    // reset();
-    // cout << "Load impulse response" << endl;
-
-    isCalculating = false;
-    bufferTransferred = false;
-    irp->loadImpulseResponse(std::move (buf),
-                        p.sampleRate,
-                        juce::dsp::Convolution::Stereo::yes,
-                        juce::dsp::Convolution::Trim::no,
-                        juce::dsp::Convolution::Normalise::no);
-
-    bufferTransferred = true;
-
-    std::cout << "Finished buffer filling" << endl;
-
-    // #ifdef DEBUG_OUTPUTS
-    // stop = std::chrono::high_resolution_clock::now();
-    // duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    // cout << "Buffer fill duration:" << duration.count() << "µs" << endl;
-    // #endif
+    isCalculating[0] = false;
+    cout << "End Loop ... " << endl;
 }
 
 // Add a given array to a buffer
-void irCalculator::addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain)
+void IrCalculator::addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain)
 {
   for (int i=0; i<NSAMP; i++)
   {
@@ -480,7 +525,7 @@ void irCalculator::addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const f
 }
 
 // Compares the values in data to a float prameter value and returns the nearest index
-int irCalculator::proximityIndex(const float *data, const int length, const float value, const bool wrap)
+int IrCalculator::proximityIndex(const float *data, const int length, const float value, const bool wrap)
 {
   int proxIndex = 0;
   float minDistance = BIGVALUE;
@@ -506,7 +551,7 @@ int irCalculator::proximityIndex(const float *data, const int length, const floa
 }
 
 // Basic lowpass filter
-void irCalculator::lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order)
+void IrCalculator::lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order)
 {
     const float om = OMEGASTART*(exp(-hfDamping*nRebounds));
     const float alpha1 = exp(-om/sampleFreq);
@@ -526,47 +571,119 @@ void irCalculator::lop(const float* in, float* out, const int sampleFreq, const 
     }
 }
 
-void irCalculator::setConvPointer(juce::dsp::Convolution* ip)
+// Get max
+float IrCalculator::max(const float* in)
 {
-  irp = ip;
+  float max = 0;
+  for (int i=1;i<NSAMP;i++)
+  {
+    if (in[i]>max)
+    max = in[i];
+  }
+  return max;
 }
 
-bool irCalculator::setParams(irCalculatorParams pa)
+void IrCalculator::setParams(IrCalculatorParams& pa)
 {
-  if (juce::approximatelyEqual(p.rx,pa.rx)
-      && juce::approximatelyEqual(p.ry,pa.ry)
-      && juce::approximatelyEqual(p.rz,pa.rz)
-      && juce::approximatelyEqual(p.lx,pa.lx)
-      && juce::approximatelyEqual(p.ly,pa.ly)
-      && juce::approximatelyEqual(p.lz,pa.lz)
-      && juce::approximatelyEqual(p.sx,pa.sx)
-      && juce::approximatelyEqual(p.sy,pa.sy)
-      && juce::approximatelyEqual(p.sz,pa.sz)
-      && juce::approximatelyEqual(p.damp,pa.damp)
-      && juce::approximatelyEqual(p.hfDamp,pa.hfDamp)
-      && juce::approximatelyEqual(p.type,pa.type)
-      && juce::approximatelyEqual(p.headAzim,pa.headAzim)
-      && juce::approximatelyEqual(p.sWidth,pa.sWidth)
-      && juce::approximatelyEqual(p.directLevel,pa.directLevel)
-      && juce::approximatelyEqual(p.reflectionsLevel,pa.reflectionsLevel)
-      && juce::approximatelyEqual(p.sampleRate,pa.sampleRate))
-      return false;
-    else
+  p = pa ;
+}
+
+float IrCalculator::getProgress()
+{
+  return progress;
+}
+
+void IrCalculator::resetProgress()
+{
+  progress = 0.f;
+}
+
+void IrCalculator::setCalculatingBool(bool* cp)
+{
+  isCalculating = cp;
+}
+
+void IrCalculator::setBuffer(juce::AudioBuffer<float>* b)
+{
+  bp = b;
+}
+
+IrCalculator::IrCalculator() : juce::Thread("test")
+{
+
+}
+
+// ======================================================================
+// ======================================================================
+
+IrTransfer::IrTransfer() : juce::Thread("transfer")
+{
+
+}
+
+void IrTransfer::run()
+{
+  cout << "In IrTransfer::run()" << endl;
+  hasTransferred = false;
+  // First we must wait for the buffers to be ready
+  bool isCalc = true;
+  while (isCalc)
+  {
+    isCalc = false;
+    for (int i=0;i<NPROC;i++)
       {
-        p = pa;
-        return true;
+        isCalc = isCalc || isCalculating[i];
+        //cout << i << " : " << isCalculating[i] << "    " << endl;
       }
+    //out << "isCalc : " << isCalc << endl;
+    //cout << "Waiting for buffer fill" << endl;
+    //sleep(200);
+    continue;
+  }
+
+  std::cout << "Start buffer filling" << endl; 
+
+  std::cout << "Join..." << endl; 
+
+  for (int i=1;i<NPROC;i++)
+    {
+      bp[0].addFrom(0,0,bp[i],0,0,bp[i].getNumSamples());
+      bp[0].addFrom(1,0,bp[i],1,0,bp[i].getNumSamples());
+    }
+
+  std::cout << "Convolution loader..." << endl; 
+  irp->loadImpulseResponse(std::move (bp[0]),
+                      sampleRate,
+                      juce::dsp::Convolution::Stereo::yes,
+                      juce::dsp::Convolution::Trim::no,
+                      juce::dsp::Convolution::Normalise::no);
+
+  hasTransferred = true;
+
+  std::cout << "Finished buffer filling" << endl; 
 }
 
-float irCalculator::getProgress()
+void IrTransfer::setBuffer(juce::AudioBuffer<float>* bufPointer)
 {
-  if (!isCalculating && bufferTransferred)
-    return 1.0f;
-  else
-    return progress;
+  bp = bufPointer;
+
+}
+void IrTransfer::setIr(juce::dsp::Convolution* irPointer)
+{
+  irp = irPointer;
 }
 
-irCalculator::irCalculator() : juce::Thread("test")
+void IrTransfer::setCalculatingBool(bool* ic)
 {
+  isCalculating = ic;
+}
 
+void IrTransfer::setSampleRate(double sr)
+{
+  sampleRate = sr;
+}
+
+bool IrTransfer::getBufferTransferState()
+{
+  return hasTransferred;
 }

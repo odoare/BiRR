@@ -19,6 +19,7 @@
       <FILE id="cKDPIF" name="XyPad2.h" compile="0" resource="0" file="Source/Components/XyPad2.h"/>
     </GROUP>
     <GROUP id="{06E13A3E-246C-4F43-EBED-8C65CF204F5E}" name="Source">
+      <FILE id="uyhGlE" name="Squeeze.h" compile="0" resource="0" file="Source/Squeeze.h"/>
       <FILE id="w3ocrs" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="byi4q8" name="PluginProcessor.h" compile="0" resource="0"
