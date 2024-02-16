@@ -9,9 +9,81 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "dsp/RoomIR.h"
+
+#define CHOICES {"XY", "MS with Cardio", "MS with Omni", "Binaural"}
 
 #define NPROC 6
+
+// ==================================================================
+class IrCalculator : public juce::Thread
+  {
+
+  public:
+
+    struct IrCalculatorParams{
+      float rx;
+      float ry;
+      float rz;
+      float lx;
+      float ly;
+      float lz;
+      float sx;
+      float sy;
+      float sz;
+      float damp;
+      float hfDamp;
+      int type;
+      float headAzim;
+      float sWidth;
+      float directLevel;
+      float reflectionsLevel;
+      double sampleRate;
+    };
+
+    IrCalculator();
+    void run() override ;
+    void setParams(IrCalculatorParams& pa);
+    float getProgress();
+    void resetProgress();
+    void setCalculatingBool(bool* cp);
+    void setBuffer(juce::AudioBuffer<float>* b);
+
+    // min an max indices which iR is calculated in this thread
+    int n, nxmin, nxmax;
+    
+  private:
+    IrCalculatorParams p;
+    float progress;
+    bool* isCalculating;
+    juce::AudioBuffer<float>* bp;
+    
+    void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
+    int proximityIndex(const float *data, const int length, const float value, const bool wrap);
+    void lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order);
+    float max(const float* in);
+  };
+
+// ==================================================================
+class IrTransfer : public juce::Thread
+{
+
+public:
+    IrTransfer();
+    void run() override ;
+    void setBuffer(juce::AudioBuffer<float>* bufPointer);
+    void setIr(juce::dsp::Convolution* irPointer);
+    void setCalculatingBool(bool* ic);
+    void setSampleRate(double sr);
+    bool getBufferTransferState();
+
+private:
+    juce::AudioBuffer<float>* bp;
+    juce::dsp::Convolution* irp;
+    bool* isCalculating;
+    bool hasTransferred;
+    double sampleRate;
+};
+
 
 //==============================================================================
 /**
@@ -58,7 +130,17 @@ public:
 
     void setIrLoader();
 
-    RoomIR roomIR;
+    bool setIrCaclulatorsParams(IrCalculator::IrCalculatorParams& pa);
+
+    float getProgress();
+    bool getCalculatingState();
+    bool getBufferTransferState();
+
+    juce::dsp::Convolution irLoader;
+    IrCalculator calculator[NPROC];
+    bool isCalculating[NPROC];
+    IrTransfer irTransfer;
+    juce::AudioBuffer<float> irBuffer[NPROC];
 
     juce::dsp::ProcessSpec spec;
 
@@ -66,6 +148,8 @@ public:
     juce::AudioProcessorValueTreeState apvts{*this,nullptr,"Parameters",createParameters()};
 
 private:
+
+    IrCalculator::IrCalculatorParams p;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessor)
