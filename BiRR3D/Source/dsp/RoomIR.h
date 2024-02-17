@@ -15,51 +15,29 @@ using namespace std;
 #define OMEGASTART 125663.706f
 #define SIGMA_DELTAT 1e-3f
 
-// class IrDirectCalculator : public juce::Thread
-// {
-//   public:
-
-//     struct IrDirectCalculatorParams{
-//       float lx;
-//       float ly;
-//       float lz;
-//       float sx;
-//       float sy;
-//       float sz;
-//       int type;
-//       float headAzim;
-//       float sWidth;
-//       double sampleRate;
-//     };
-
-//   private:
-// };
+struct IrBoxCalculatorParams{
+  float rx;
+  float ry;
+  float rz;
+  float lx;
+  float ly;
+  float lz;
+  float sx;
+  float sy;
+  float sz;
+  float damp;
+  float hfDamp;
+  int type;
+  float headAzim;
+  float sWidth;
+  double sampleRate;
+};
 
 // ==================================================================
 class IrBoxCalculator : public juce::Thread
   {
 
   public:
-
-    struct IrBoxCalculatorParams{
-      float rx;
-      float ry;
-      float rz;
-      float lx;
-      float ly;
-      float lz;
-      float sx;
-      float sy;
-      float sz;
-      float damp;
-      float hfDamp;
-      int type;
-      float headAzim;
-      float sWidth;
-      float directLevel;
-      float reflectionsLevel;
-      double sampleRate;
-    };
 
     IrBoxCalculator(bool direct = true);
     void run() override ;
@@ -69,7 +47,9 @@ class IrBoxCalculator : public juce::Thread
     void setCalculatingBool(bool* cp);
     void setBuffer(juce::AudioBuffer<float>* b);
 
-    // min an max indices which iR is calculated in this thread
+    // min and max indices which iR is calculated in this thread
+    // If only the direct sound is needed, one has to select
+    // n=1, nxmin=0, nxmax=1
     int n, nxmin, nxmax;
     
   private:
@@ -116,21 +96,22 @@ class BoxRoomIR{
 public:
     BoxRoomIR();
     void prepare(juce::dsp::ProcessSpec spec);
-    void calculate(IrBoxCalculator::IrBoxCalculatorParams& p);
-    bool setIrCaclulatorsParams(IrBoxCalculator::IrBoxCalculatorParams& pa);
+    void calculate(IrBoxCalculatorParams& p);
+    bool setIrCaclulatorsParams(IrBoxCalculatorParams& pa);
     float getProgress();
     bool getCalculatingState();
     bool getBufferTransferState();
     void process(juce::AudioBuffer<float>& buffer);
 
-    juce::dsp::Convolution convolution;
-    IrBoxCalculator calculator[NPROC]{true};
-    bool isCalculating[NPROC];
-    juce::AudioBuffer<float> irBuffer[NPROC];
-    IrTransfer irTransfer;
+    juce::dsp::Convolution boxConvolution, directConvolution;
+    IrBoxCalculator boxCalculator[NPROC]{false}, directCalculator{true};
+    bool isCalculating[NPROC], isCalculatingDirect;
+    juce::AudioBuffer<float> boxIrBuffer[NPROC], directIrBuffer;
+    IrTransfer boxIrTransfer, directIrTransfer;
+    float directLevel, reflectionsLevel;
 
 private:
-    IrBoxCalculator::IrBoxCalculatorParams p;
+    IrBoxCalculatorParams p;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoxRoomIR)
 

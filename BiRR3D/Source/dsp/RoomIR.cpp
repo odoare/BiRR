@@ -40,7 +40,7 @@ void IrBoxCalculator::run()
             int indice = int(round((time+juce::Random::getSystemRandom().nextFloat()*SIGMA_DELTAT)*p.sampleRate));
             float r = pow(1-p.damp,abs(ix)+abs(iy)+abs(iz));
             // float gain = pow(-1,ix+iy+iz)*r/dist;
-            float gain = (r/dist) * ( (ix==0 && iy==0 && iz==0) ? p.directLevel : p.reflectionsLevel );
+            float gain = (r/dist) * float( !(ix==0 && iy==0 && iz==0) || calculateDirectPath ) ;
             
             float rp = sqrt((p.sx-p.lx)*(p.sx-p.lx)+(p.sy-p.ly)*(p.sy-p.ly));
             float elev = atan2f(p.sz-p.lz,rp)*EIGHTYOVERPI;
@@ -215,6 +215,9 @@ IrTransfer::IrTransfer() : juce::Thread("transfer")
 
 void IrTransfer::run()
 {
+
+  // A FAIRE
+
   // cout << "In IrTransfer::run()" << endl;
   hasTransferred = false;
   // First we must wait for the buffers to be ready
@@ -297,63 +300,97 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
 
     for (int i=0; i<NPROC; i++)
     {
-      calculator[i].setCalculatingBool(&isCalculating[i]);
-      calculator[i].setBuffer(&irBuffer[i]);
+      boxCalculator[i].setCalculatingBool(&isCalculating[i]);
+      boxCalculator[i].setBuffer(&boxIrBuffer[i]);
     }
-    irTransfer.setCalculatingBool(&isCalculating[0]);
-    irTransfer.setBuffer(&irBuffer[0]);
-    irTransfer.setIr(&convolution);
-    irTransfer.setSampleRate(spec.sampleRate);
+    boxIrTransfer.setCalculatingBool(&isCalculating[0]);
+    boxIrTransfer.setBuffer(&boxIrBuffer[0]);
+    boxIrTransfer.setIr(&boxConvolution);
+    boxIrTransfer.setSampleRate(spec.sampleRate);
 
-    convolution.reset();
-    convolution.prepare(spec);
+    boxConvolution.reset();
+    boxConvolution.prepare(spec);
+
+    directCalculator.setCalculatingBool(&isCalculatingDirect);
+    directCalculator.setBuffer(&directIrBuffer);
+    directIrTransfer.setCalculatingBool(&isCalculatingDirect);
+    directIrTransfer.setBuffer(&directIrBuffer);
+    directIrTransfer.setIr(&directConvolution);
+    directIrTransfer.setSampleRate(spec.sampleRate);
+
+    directConvolution.reset();
+    directConvolution.prepare(spec);
 
 }
-void BoxRoomIR::calculate(IrBoxCalculator::IrBoxCalculatorParams& p)
+
+void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
 {
     // std::cout << "In setIrLoader" << endl;
 
     if (setIrCaclulatorsParams(p))     // (We run the calculation only if a parameter has changed)
     {    
 
+      // We have to stop an eventual running thread (and next restart)
+
       for (int i=0;i<NPROC;i++)
       {
-        // We have to stop an eventual running thread (and next restart)
-        if (calculator[i].isThreadRunning())
+        if (boxCalculator[i].isThreadRunning())
           {
             std::cout << "Thread no " << i << " running" << endl;
-            if (calculator[i].stopThread(300))
+            if (boxCalculator[i].stopThread(300))
               std::cout << "Thread no " << i << " stopped" << endl;
           }
       }
-      
+      if (directCalculator.isThreadRunning())
+      {
+        std::cout << "Thread direct running" << endl;
+        if (directCalculator.stopThread(300))
+          std::cout << "Thread direct stopped" << endl;            
+      }
+
+      // Set the size of multithread loops parameters
+
       int n = int(log10(2e-2)/log10(1-p.damp));
       auto dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
       int longueur = int(ceil(dur*p.sampleRate)+NSAMP+int(p.sampleRate*SIGMA_DELTAT));
       int chunksize = floor(2*float(n)/NPROC);
-
-      // Set the size of multithread loops
+      
       for (int i=0;i<NPROC;i++)
       {
-          irBuffer[i].setSize (2, int(longueur),false,true);
-          calculator[i].n = n;
-          calculator[i].nxmin = -n+1 + i*chunksize;
-          calculator[i].nxmax = -n+1 + (i+1)*chunksize;
+          boxIrBuffer[i].setSize (2, int(longueur),false,true);
+          boxCalculator[i].n = n;
+          boxCalculator[i].nxmin = -n+1 + i*chunksize;
+          boxCalculator[i].nxmax = -n+1 + (i+1)*chunksize;
           if (i==NPROC-1)
-            calculator[i].nxmax = n;
-          calculator[i].resetProgress();
+            boxCalculator[i].nxmax = n;
+          boxCalculator[i].resetProgress();
       }
+
+      n = 1;
+      dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
+      longueur = int(ceil(dur*p.sampleRate)+NSAMP+int(p.sampleRate*SIGMA_DELTAT));
+
+      directIrBuffer.setSize(2, int(longueur),false,true);
+      directCalculator.n = n;
+      directCalculator.nxmin = 0;
+      directCalculator.nxmax = 0;
+      directCalculator.resetProgress();
+
+      // Start the threads
 
       for (int i=0;i<NPROC;i++)
       {
         std::cout << "Start thread no " << i << std::endl;
-        calculator[i].startThread();
+        boxCalculator[i].startThread();
       }
-      irTransfer.startThread();
+      directCalculator.startThread();
+
+      boxIrTransfer.startThread();
+      directIrTransfer.startThread();
     }
 }
 
-bool BoxRoomIR::setIrCaclulatorsParams(IrBoxCalculator::IrBoxCalculatorParams& pa)
+bool BoxRoomIR::setIrCaclulatorsParams(IrBoxCalculatorParams& pa)
 {
     // We check if a parameter has changed
     // If nothing has changed, we do nothing and return false
@@ -373,15 +410,16 @@ bool BoxRoomIR::setIrCaclulatorsParams(IrBoxCalculator::IrBoxCalculatorParams& p
       && juce::approximatelyEqual(p.type,pa.type)
       && juce::approximatelyEqual(p.headAzim,pa.headAzim)
       && juce::approximatelyEqual(p.sWidth,pa.sWidth)
-      && juce::approximatelyEqual(p.directLevel,pa.directLevel)
-      && juce::approximatelyEqual(p.reflectionsLevel,pa.reflectionsLevel)
       && juce::approximatelyEqual(p.sampleRate,pa.sampleRate))
-      return false;
+      {
+        return false;
+      }
     else
       {
         p = pa;
         for (int i=0;i<NPROC;i++)
-          calculator[i].setParams(pa);
+          boxCalculator[i].setParams(pa);
+        directCalculator.setParams(pa);
         return true;
       }
 }
@@ -394,7 +432,7 @@ float BoxRoomIR::getProgress()
   {
     float prog = 0;
     for (int i=0;i<NPROC;i++)
-      prog += calculator[i].getProgress();
+      prog += boxCalculator[i].getProgress();
     return prog/NPROC;
   }
 }
@@ -409,15 +447,16 @@ bool BoxRoomIR::getCalculatingState()
 
 bool BoxRoomIR::getBufferTransferState()
 {
-  return irTransfer.getBufferTransferState();
+  return boxIrTransfer.getBufferTransferState();
 }
 
 void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
 {
+    // A FAIRE
+    
     juce::dsp::AudioBlock<float> block {buffer};
-    if (convolution.getCurrentIRSize()>0)
+    if (boxConvolution.getCurrentIRSize()>0)
     {
-        convolution.process(juce::dsp::ProcessContextReplacing<float>(block));        
+        boxConvolution.process(juce::dsp::ProcessContextReplacing<float>(block));        
     }
 }
-
