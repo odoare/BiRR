@@ -11,8 +11,6 @@
 #include <JuceHeader.h>
 #include "dsp/RoomIR.h"
 
-#define NPROC 6
-
 //==============================================================================
 /**
 */
@@ -58,7 +56,7 @@ public:
 
     void setIrLoader();
 
-    RoomIR roomIR;
+    BoxRoomIR roomIR;
 
     juce::dsp::ProcessSpec spec;
 

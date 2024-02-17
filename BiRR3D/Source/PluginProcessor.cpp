@@ -222,7 +222,7 @@ void ReverbAudioProcessor::setIrLoader()
 {
     // std::cout << "In setIrLoader" << endl;
 
-    IrCalculator::IrCalculatorParams p;
+    IrBoxCalculator::IrBoxCalculatorParams p;
 
     // std::cout << "Set parameters" << endl;
 

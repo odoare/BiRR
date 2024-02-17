@@ -15,14 +15,33 @@ using namespace std;
 #define OMEGASTART 125663.706f
 #define SIGMA_DELTAT 1e-3f
 
+// class IrDirectCalculator : public juce::Thread
+// {
+//   public:
+
+//     struct IrDirectCalculatorParams{
+//       float lx;
+//       float ly;
+//       float lz;
+//       float sx;
+//       float sy;
+//       float sz;
+//       int type;
+//       float headAzim;
+//       float sWidth;
+//       double sampleRate;
+//     };
+
+//   private:
+// };
 
 // ==================================================================
-class IrCalculator : public juce::Thread
+class IrBoxCalculator : public juce::Thread
   {
 
   public:
 
-    struct IrCalculatorParams{
+    struct IrBoxCalculatorParams{
       float rx;
       float ry;
       float rz;
@@ -42,9 +61,9 @@ class IrCalculator : public juce::Thread
       double sampleRate;
     };
 
-    IrCalculator();
+    IrBoxCalculator(bool direct = true);
     void run() override ;
-    void setParams(IrCalculatorParams& pa);
+    void setParams(IrBoxCalculatorParams& pa);
     float getProgress();
     void resetProgress();
     void setCalculatingBool(bool* cp);
@@ -54,17 +73,18 @@ class IrCalculator : public juce::Thread
     int n, nxmin, nxmax;
     
   private:
-    IrCalculatorParams p;
+    IrBoxCalculatorParams p;
     float progress;
     bool* isCalculating;
     juce::AudioBuffer<float>* bp;
+    bool calculateDirectPath;
     
     void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
     int proximityIndex(const float *data, const int length, const float value, const bool wrap);
     void lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order);
     float max(const float* in);
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IrCalculator)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IrBoxCalculator)
   };
 
 // ==================================================================
@@ -91,27 +111,27 @@ private:
 };
 
 // ====================================================
-class RoomIR{
+class BoxRoomIR{
 
 public:
-    RoomIR();
+    BoxRoomIR();
     void prepare(juce::dsp::ProcessSpec spec);
-    void calculate(IrCalculator::IrCalculatorParams& p);
-    bool setIrCaclulatorsParams(IrCalculator::IrCalculatorParams& pa);
+    void calculate(IrBoxCalculator::IrBoxCalculatorParams& p);
+    bool setIrCaclulatorsParams(IrBoxCalculator::IrBoxCalculatorParams& pa);
     float getProgress();
     bool getCalculatingState();
     bool getBufferTransferState();
     void process(juce::AudioBuffer<float>& buffer);
 
     juce::dsp::Convolution convolution;
-    IrCalculator calculator[NPROC];
+    IrBoxCalculator calculator[NPROC]{true};
     bool isCalculating[NPROC];
     juce::AudioBuffer<float> irBuffer[NPROC];
     IrTransfer irTransfer;
 
 private:
-    IrCalculator::IrCalculatorParams p;
+    IrBoxCalculator::IrBoxCalculatorParams p;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RoomIR)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoxRoomIR)
 
 };

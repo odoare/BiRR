@@ -4,7 +4,7 @@
 // ======================================================================
 
 // This is the function where the impulse response is calculated
-void IrCalculator::run()
+void IrBoxCalculator::run()
 {
     isCalculating[0] = true;
 
@@ -108,7 +108,7 @@ void IrCalculator::run()
 }
 
 // Add a given array to a buffer
-void IrCalculator::addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain)
+void IrBoxCalculator::addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain)
 {
   for (int i=0; i<NSAMP; i++)
   {
@@ -117,7 +117,7 @@ void IrCalculator::addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const f
 }
 
 // Compares the values in data to a float prameter value and returns the nearest index
-int IrCalculator::proximityIndex(const float *data, const int length, const float value, const bool wrap)
+int IrBoxCalculator::proximityIndex(const float *data, const int length, const float value, const bool wrap)
 {
   int proxIndex = 0;
   float minDistance = BIGVALUE;
@@ -143,7 +143,7 @@ int IrCalculator::proximityIndex(const float *data, const int length, const floa
 }
 
 // Basic lowpass filter
-void IrCalculator::lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order)
+void IrBoxCalculator::lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order)
 {
     const float om = OMEGASTART*(exp(-hfDamping*nRebounds));
     const float alpha1 = exp(-om/sampleFreq);
@@ -164,7 +164,7 @@ void IrCalculator::lop(const float* in, float* out, const int sampleFreq, const 
 }
 
 // Get max
-float IrCalculator::max(const float* in)
+float IrBoxCalculator::max(const float* in)
 {
   float max = 0;
   for (int i=1;i<NSAMP;i++)
@@ -175,34 +175,34 @@ float IrCalculator::max(const float* in)
   return max;
 }
 
-void IrCalculator::setParams(IrCalculatorParams& pa)
+void IrBoxCalculator::setParams(IrBoxCalculatorParams& pa)
 {
   p = pa ;
 }
 
-float IrCalculator::getProgress()
+float IrBoxCalculator::getProgress()
 {
   return progress;
 }
 
-void IrCalculator::resetProgress()
+void IrBoxCalculator::resetProgress()
 {
   progress = 0.f;
 }
 
-void IrCalculator::setCalculatingBool(bool* cp)
+void IrBoxCalculator::setCalculatingBool(bool* cp)
 {
   isCalculating = cp;
 }
 
-void IrCalculator::setBuffer(juce::AudioBuffer<float>* b)
+void IrBoxCalculator::setBuffer(juce::AudioBuffer<float>* b)
 {
   bp = b;
 }
 
-IrCalculator::IrCalculator() : juce::Thread("test")
+IrBoxCalculator::IrBoxCalculator(bool direct) : juce::Thread("test")
 {
-
+  calculateDirectPath = direct;
 }
 
 
@@ -285,11 +285,11 @@ bool IrTransfer::getBufferTransferState()
 // ========================================================
 // This is the function where the impulse response is calculated
 
-RoomIR::RoomIR()
+BoxRoomIR::BoxRoomIR()
 {
 }
 
-void RoomIR::prepare(juce::dsp::ProcessSpec spec)
+void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
 {
 
     cout << "Number of CPUs : " << juce::SystemStats::getNumCpus() << endl;
@@ -309,7 +309,7 @@ void RoomIR::prepare(juce::dsp::ProcessSpec spec)
     convolution.prepare(spec);
 
 }
-void RoomIR::calculate(IrCalculator::IrCalculatorParams& p)
+void BoxRoomIR::calculate(IrBoxCalculator::IrBoxCalculatorParams& p)
 {
     // std::cout << "In setIrLoader" << endl;
 
@@ -353,7 +353,7 @@ void RoomIR::calculate(IrCalculator::IrCalculatorParams& p)
     }
 }
 
-bool RoomIR::setIrCaclulatorsParams(IrCalculator::IrCalculatorParams& pa)
+bool BoxRoomIR::setIrCaclulatorsParams(IrBoxCalculator::IrBoxCalculatorParams& pa)
 {
     // We check if a parameter has changed
     // If nothing has changed, we do nothing and return false
@@ -386,7 +386,7 @@ bool RoomIR::setIrCaclulatorsParams(IrCalculator::IrCalculatorParams& pa)
       }
 }
 
-float RoomIR::getProgress()
+float BoxRoomIR::getProgress()
 {
   if (!getCalculatingState() && getBufferTransferState() )
     return 1.0;
@@ -399,7 +399,7 @@ float RoomIR::getProgress()
   }
 }
 
-bool RoomIR::getCalculatingState()
+bool BoxRoomIR::getCalculatingState()
 {
   bool isCalc = false;
   for (int i=0;i<NPROC;i++)
@@ -407,12 +407,12 @@ bool RoomIR::getCalculatingState()
   return isCalc;
 }
 
-bool RoomIR::getBufferTransferState()
+bool BoxRoomIR::getBufferTransferState()
 {
   return irTransfer.getBufferTransferState();
 }
 
-void RoomIR::process(juce::AudioBuffer<float> &buffer)
+void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
 {
     juce::dsp::AudioBlock<float> block {buffer};
     if (convolution.getCurrentIRSize()>0)
