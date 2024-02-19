@@ -200,11 +200,20 @@ void IrBoxCalculator::setBuffer(juce::AudioBuffer<float>* b)
   bp = b;
 }
 
-IrBoxCalculator::IrBoxCalculator(bool direct) : juce::Thread("test")
+void IrBoxCalculator::setCalculateDirectPath(bool c)
 {
-  calculateDirectPath = direct;
+  calculateDirectPath = c;
 }
 
+// void IrBoxCalculator::setThreadsNum(int n)
+// {
+//   threadsNum = std::max<int>(n,MAXTHREADS);
+// }
+
+IrBoxCalculator::IrBoxCalculator() : juce::Thread("test")
+{
+
+}
 
 // ===============================================================
 // ===============================================================
@@ -218,14 +227,14 @@ void IrTransfer::run()
 
   // A FAIRE
 
-  // cout << "In IrTransfer::run()" << endl;
+  cout << "In IrTransfer::run()" << endl;
   hasTransferred = false;
   // First we must wait for the buffers to be ready
   bool isCalc = true;
   while (isCalc)
   {
     isCalc = false;
-    for (int i=0;i<NPROC;i++)
+    for (int i=0;i<threadsNum;i++)
       {
         isCalc = isCalc || isCalculating[i];
         //cout << i << " : " << isCalculating[i] << "    " << endl;
@@ -236,11 +245,11 @@ void IrTransfer::run()
     continue;
   }
 
-  // std::cout << "Start buffer filling" << endl; 
+  std::cout << "Start buffer filling" << endl; 
 
-  // std::cout << "Join..." << endl; 
+  std::cout << "Join... " << threadsNum << endl;; 
 
-  for (int i=1;i<NPROC;i++)
+  for (int i=1;i<threadsNum;i++)
     {
       bp[0].addFrom(0,0,bp[i],0,0,bp[i].getNumSamples());
       bp[0].addFrom(1,0,bp[i],1,0,bp[i].getNumSamples());
@@ -255,7 +264,7 @@ void IrTransfer::run()
 
   hasTransferred = true;
 
-  // std::cout << "Finished buffer filling" << endl; 
+  std::cout << "Finished buffer filling... " << threadsNum << endl; 
 }
 
 void IrTransfer::setBuffer(juce::AudioBuffer<float>* bufPointer)
@@ -283,6 +292,11 @@ bool IrTransfer::getBufferTransferState()
   return hasTransferred;
 }
 
+void IrTransfer::setThreadsNum(int n)
+{
+  threadsNum = std::min<int>(n,MAXTHREADS);
+}
+
 
 // ========================================================
 // ========================================================
@@ -290,37 +304,49 @@ bool IrTransfer::getBufferTransferState()
 
 BoxRoomIR::BoxRoomIR()
 {
+
 }
 
 void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
 {
 
+    int numCpus = juce::SystemStats::getNumPhysicalCpus();
+
     cout << "Number of CPUs : " << juce::SystemStats::getNumCpus() << endl;
     cout << "Number of physical CPUs : " << juce::SystemStats::getNumPhysicalCpus() << endl;
 
-    for (int i=0; i<NPROC; i++)
+    inputBufferCopy.setSize(2, spec.maximumBlockSize ,false,true);
+
+    threadsNum = numCpus;
+
+    for (int i=0; i<threadsNum; i++)
     {
       boxCalculator[i].setCalculatingBool(&isCalculating[i]);
       boxCalculator[i].setBuffer(&boxIrBuffer[i]);
+      boxCalculator[i].setCalculateDirectPath(false);
     }
+
     boxIrTransfer.setCalculatingBool(&isCalculating[0]);
     boxIrTransfer.setBuffer(&boxIrBuffer[0]);
     boxIrTransfer.setIr(&boxConvolution);
     boxIrTransfer.setSampleRate(spec.sampleRate);
+    boxIrTransfer.setThreadsNum(threadsNum);
 
     boxConvolution.reset();
     boxConvolution.prepare(spec);
 
     directCalculator.setCalculatingBool(&isCalculatingDirect);
     directCalculator.setBuffer(&directIrBuffer);
+    directCalculator.setCalculateDirectPath(true);
+
     directIrTransfer.setCalculatingBool(&isCalculatingDirect);
     directIrTransfer.setBuffer(&directIrBuffer);
     directIrTransfer.setIr(&directConvolution);
     directIrTransfer.setSampleRate(spec.sampleRate);
+    directIrTransfer.setThreadsNum(1);
 
     directConvolution.reset();
     directConvolution.prepare(spec);
-
 }
 
 void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
@@ -332,19 +358,19 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
 
       // We have to stop an eventual running thread (and next restart)
 
-      for (int i=0;i<NPROC;i++)
+      for (int i=0;i<threadsNum;i++)
       {
         if (boxCalculator[i].isThreadRunning())
           {
             std::cout << "Thread no " << i << " running" << endl;
-            if (boxCalculator[i].stopThread(300))
+            if (boxCalculator[i].stopThread(500))
               std::cout << "Thread no " << i << " stopped" << endl;
           }
       }
       if (directCalculator.isThreadRunning())
       {
         std::cout << "Thread direct running" << endl;
-        if (directCalculator.stopThread(300))
+        if (directCalculator.stopThread(500))
           std::cout << "Thread direct stopped" << endl;            
       }
 
@@ -353,15 +379,15 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
       int n = int(log10(2e-2)/log10(1-p.damp));
       auto dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
       int longueur = int(ceil(dur*p.sampleRate)+NSAMP+int(p.sampleRate*SIGMA_DELTAT));
-      int chunksize = floor(2*float(n)/NPROC);
+      int chunksize = floor(2*float(n)/threadsNum);
       
-      for (int i=0;i<NPROC;i++)
+      for (int i=0;i<threadsNum;i++)
       {
           boxIrBuffer[i].setSize (2, int(longueur),false,true);
           boxCalculator[i].n = n;
           boxCalculator[i].nxmin = -n+1 + i*chunksize;
           boxCalculator[i].nxmax = -n+1 + (i+1)*chunksize;
-          if (i==NPROC-1)
+          if (i==threadsNum-1)
             boxCalculator[i].nxmax = n;
           boxCalculator[i].resetProgress();
       }
@@ -373,12 +399,12 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
       directIrBuffer.setSize(2, int(longueur),false,true);
       directCalculator.n = n;
       directCalculator.nxmin = 0;
-      directCalculator.nxmax = 0;
+      directCalculator.nxmax = 1;
       directCalculator.resetProgress();
 
       // Start the threads
 
-      for (int i=0;i<NPROC;i++)
+      for (int i=0;i<threadsNum;i++)
       {
         std::cout << "Start thread no " << i << std::endl;
         boxCalculator[i].startThread();
@@ -417,7 +443,7 @@ bool BoxRoomIR::setIrCaclulatorsParams(IrBoxCalculatorParams& pa)
     else
       {
         p = pa;
-        for (int i=0;i<NPROC;i++)
+        for (int i=0;i<threadsNum;i++)
           boxCalculator[i].setParams(pa);
         directCalculator.setParams(pa);
         return true;
@@ -431,16 +457,16 @@ float BoxRoomIR::getProgress()
   else
   {
     float prog = 0;
-    for (int i=0;i<NPROC;i++)
+    for (int i=0;i<threadsNum;i++)
       prog += boxCalculator[i].getProgress();
-    return prog/NPROC;
+    return prog/threadsNum;
   }
 }
 
 bool BoxRoomIR::getCalculatingState()
 {
   bool isCalc = false;
-  for (int i=0;i<NPROC;i++)
+  for (int i=0;i<threadsNum;i++)
     isCalc = isCalc || isCalculating[i];
   return isCalc;
 }
@@ -452,11 +478,26 @@ bool BoxRoomIR::getBufferTransferState()
 
 void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
 {
-    // A FAIRE
+    inputBufferCopy.copyFrom(0,0,buffer,0,0,buffer.getNumSamples());
+    inputBufferCopy.copyFrom(1,0,buffer,1,0,buffer.getNumSamples());
+
     
     juce::dsp::AudioBlock<float> block {buffer};
+    juce::dsp::AudioBlock<float> blockCopy {inputBufferCopy};
+    
     if (boxConvolution.getCurrentIRSize()>0)
     {
         boxConvolution.process(juce::dsp::ProcessContextReplacing<float>(block));        
     }
+
+    buffer.applyGain(reflectionsLevel);
+
+    if (directConvolution.getCurrentIRSize()>0)
+    {
+        directConvolution.process(juce::dsp::ProcessContextReplacing<float>(blockCopy));        
+    }
+
+    buffer.addFrom(0,0,inputBufferCopy,0,0,inputBufferCopy.getNumSamples(),directLevel);
+    buffer.addFrom(1,0,inputBufferCopy,1,0,inputBufferCopy.getNumSamples(),directLevel);
+
 }

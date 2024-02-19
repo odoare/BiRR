@@ -8,6 +8,7 @@ using namespace std;
 #define CHOICES {"XY", "MS with Cardio", "MS with Omni", "Binaural"}
 
 #define NPROC 6
+#define MAXTHREADS 8
 
 #define INV_SOUNDSPEED 2.9412e-03f
 #define PIOVEREIGHTY 1.745329252e-02f
@@ -39,13 +40,14 @@ class IrBoxCalculator : public juce::Thread
 
   public:
 
-    IrBoxCalculator(bool direct = true);
+    IrBoxCalculator();
     void run() override ;
     void setParams(IrBoxCalculatorParams& pa);
     float getProgress();
     void resetProgress();
     void setCalculatingBool(bool* cp);
     void setBuffer(juce::AudioBuffer<float>* b);
+    void setCalculateDirectPath(bool c);
 
     // min and max indices which iR is calculated in this thread
     // If only the direct sound is needed, one has to select
@@ -58,6 +60,7 @@ class IrBoxCalculator : public juce::Thread
     bool* isCalculating;
     juce::AudioBuffer<float>* bp;
     bool calculateDirectPath;
+    // int threadsNum;
     
     void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
     int proximityIndex(const float *data, const int length, const float value, const bool wrap);
@@ -79,6 +82,7 @@ public:
     void setCalculatingBool(bool* ic);
     void setSampleRate(double sr);
     bool getBufferTransferState();
+    void setThreadsNum(int n);
 
 private:
     juce::AudioBuffer<float>* bp;
@@ -86,6 +90,7 @@ private:
     bool* isCalculating;
     bool hasTransferred;
     double sampleRate;
+    int threadsNum;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IrTransfer)
 };
@@ -103,15 +108,17 @@ public:
     bool getBufferTransferState();
     void process(juce::AudioBuffer<float>& buffer);
 
+    juce::AudioBuffer<float> inputBufferCopy;
     juce::dsp::Convolution boxConvolution, directConvolution;
-    IrBoxCalculator boxCalculator[NPROC]{false}, directCalculator{true};
-    bool isCalculating[NPROC], isCalculatingDirect;
-    juce::AudioBuffer<float> boxIrBuffer[NPROC], directIrBuffer;
+    IrBoxCalculator boxCalculator[MAXTHREADS], directCalculator;
+    bool isCalculating[MAXTHREADS], isCalculatingDirect;
+    juce::AudioBuffer<float> boxIrBuffer[MAXTHREADS], directIrBuffer;
     IrTransfer boxIrTransfer, directIrTransfer;
     float directLevel, reflectionsLevel;
 
 private:
     IrBoxCalculatorParams p;
+    int threadsNum;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoxRoomIR)
 
