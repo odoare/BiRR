@@ -1,5 +1,9 @@
 #include "RoomIR.h"
-#include "../hrtf.h"
+#include "hrtf.h"
+#include "hrtf44.h"
+#include "hrtf48.h"
+#include "hrtf88.h"
+#include "hrtf96.h"
 
 // ======================================================================
 
@@ -11,7 +15,7 @@ void IrBoxCalculator::run()
     // std::cout << "In irCalculator::run()" << endl;
 
     // inBuf is the buffer used for the non-binaural method
-    float outBuf[NSAMP]={0.f}, inBuf[NSAMP]={0.f};
+    float outBuf[NSAMP96]={0.f}, inBuf[NSAMP96]={0.f};
     inBuf[10] = 1.f;
     float x,y,z;
 
@@ -92,10 +96,46 @@ void IrBoxCalculator::run()
               int elevationIndex = proximityIndex(&elevations[0],NELEV,elev,false);
               int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta,true);
               // Apply lowpass filter and add grain to buffer
-              lop(&lhrtfn[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-              addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
-              lop(&rhrtfn[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-              addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+              if (p.sampleRate==44100)
+              {
+                lop(&lhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+                lop(&rhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+              }
+              else if (p.sampleRate==48000)
+              {
+                lop(&lhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+                lop(&rhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+
+              }
+              else if (p.sampleRate==88200)
+              {
+                lop(&lhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+                lop(&rhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+
+              }
+              else if (p.sampleRate==96000)
+              {
+                lop(&lhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+                lop(&rhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+
+              }
+              else
+              {
+                lop(&lhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+                lop(&rhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+              }
+
+              //lHrtf[elevationIndex][azimutalIndex][0];
             }
           }
         }
@@ -110,7 +150,7 @@ void IrBoxCalculator::run()
 // Add a given array to a buffer
 void IrBoxCalculator::addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain)
 {
-  for (int i=0; i<NSAMP; i++)
+  for (int i=0; i<nsamp[0]; i++)
   {
     bufPtr[i] += hrtfPtr[i]*gain;
   }
@@ -149,14 +189,14 @@ void IrBoxCalculator::lop(const float* in, float* out, const int sampleFreq, con
     const float alpha1 = exp(-om/sampleFreq);
     const float alpha = 1 - alpha1;
     out[0] = alpha*in[0];
-    for (int i=1;i<NSAMP;i++)
+    for (int i=1;i<nsamp[0];i++)
     {
       out[i] = alpha*in[i] + alpha1*out[i-1];
     }
     for (int j=0; j<order-1; j++)
     {
       out[0] *= alpha;
-      for (int i=1;i<NSAMP;i++)
+      for (int i=1;i<nsamp[0];i++)
       {
         out[i] = alpha*out[i] + alpha1*out[i-1];
       }
@@ -167,7 +207,7 @@ void IrBoxCalculator::lop(const float* in, float* out, const int sampleFreq, con
 float IrBoxCalculator::max(const float* in)
 {
   float max = 0;
-  for (int i=1;i<NSAMP;i++)
+  for (int i=1;i<nsamp[0];i++)
   {
     if (in[i]>max)
     max = in[i];
@@ -203,6 +243,11 @@ void IrBoxCalculator::setBuffer(juce::AudioBuffer<float>* b)
 void IrBoxCalculator::setCalculateDirectPath(bool c)
 {
   calculateDirectPath = c;
+}
+
+void IrBoxCalculator::setHrtfVars(int* ns)
+{
+  nsamp = ns;
 }
 
 // void IrBoxCalculator::setThreadsNum(int n)
@@ -324,6 +369,18 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
       boxCalculator[i].setCalculatingBool(&isCalculating[i]);
       boxCalculator[i].setBuffer(&boxIrBuffer[i]);
       boxCalculator[i].setCalculateDirectPath(false);
+      boxCalculator[i].setHrtfVars(&nsamp);
+      if (spec.sampleRate==44100)
+        nsamp = NSAMP44;
+      else if (spec.sampleRate==48000)
+        nsamp = NSAMP48;
+      else if (spec.sampleRate==88200)
+        nsamp = NSAMP88;
+      else if (spec.sampleRate==96000)
+        nsamp = NSAMP96;
+      else
+        cout << "Warning, no corresponding sample rate" << endl;
+        nsamp = NSAMP44;
     }
 
     boxIrTransfer.setCalculatingBool(&isCalculating[0]);
@@ -338,6 +395,7 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
     directCalculator.setCalculatingBool(&isCalculatingDirect);
     directCalculator.setBuffer(&directIrBuffer);
     directCalculator.setCalculateDirectPath(true);
+    directCalculator.setHrtfVars(&nsamp);
 
     directIrTransfer.setCalculatingBool(&isCalculatingDirect);
     directIrTransfer.setBuffer(&directIrBuffer);
@@ -378,7 +436,7 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
 
       int n = int(log10(2e-2)/log10(1-p.damp));
       auto dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
-      int longueur = int(ceil(dur*p.sampleRate)+NSAMP+int(p.sampleRate*SIGMA_DELTAT));
+      int longueur = int(ceil(dur*p.sampleRate)+nsamp+int(p.sampleRate*SIGMA_DELTAT));
       int chunksize = floor(2*float(n)/threadsNum);
       
       for (int i=0;i<threadsNum;i++)
@@ -394,7 +452,7 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
 
       n = 1;
       dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
-      longueur = int(ceil(dur*p.sampleRate)+NSAMP+int(p.sampleRate*SIGMA_DELTAT));
+      longueur = int(ceil(dur*p.sampleRate)+nsamp+int(p.sampleRate*SIGMA_DELTAT));
 
       directIrBuffer.setSize(2, int(longueur),false,true);
       directCalculator.n = n;

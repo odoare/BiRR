@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 
+
 #include <iostream>
 using namespace std;
 
@@ -48,6 +49,7 @@ class IrBoxCalculator : public juce::Thread
     void setCalculatingBool(bool* cp);
     void setBuffer(juce::AudioBuffer<float>* b);
     void setCalculateDirectPath(bool c);
+    void setHrtfVars(int* nsamp);
 
     // min and max indices which iR is calculated in this thread
     // If only the direct sound is needed, one has to select
@@ -60,6 +62,9 @@ class IrBoxCalculator : public juce::Thread
     bool* isCalculating;
     juce::AudioBuffer<float>* bp;
     bool calculateDirectPath;
+    // float* lHrtf[NELEV][NAZIM][NSAMP96];
+    // float* rHrtf[NELEV][NAZIM][NSAMP96];
+    int* nsamp;
     // int threadsNum;
     
     void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
@@ -119,6 +124,7 @@ public:
 private:
     IrBoxCalculatorParams p;
     int threadsNum;
+    int nsamp;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoxRoomIR)
 
