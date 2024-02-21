@@ -118,7 +118,7 @@ private:
 
     FxmeKnobLookAndFeel knobLookAndFeel;
 
-    Gui::HorizontalBar progressBar{[&]() { return audioProcessor.calculator.getProgress(); }};
+    Gui::HorizontalBar progressBar{[&]() { return audioProcessor.roomIR.getProgress(); }};
 
     juce::Image logo;
 

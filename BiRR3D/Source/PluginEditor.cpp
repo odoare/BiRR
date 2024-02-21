@@ -99,7 +99,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     hfDampingSlider.onDragEnd = updateFunc;
     hfDampingSlider.setLookAndFeel(&knobLookAndFeel);
 
-    addController(widthSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::orange,juce::Colours::black);
+    addController(widthSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::green,juce::Colours::black);
     addAndConnectLabel(widthSlider, widthLabel);
     widthSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"Stereo Width",widthSlider);
     widthSlider.onDragEnd = updateFunc;
@@ -108,13 +108,13 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     addController(directLevelSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::orange,juce::Colours::black);
     addAndConnectLabel(directLevelSlider, directLevelLabel);
     directLevelSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"Direct Level",directLevelSlider);
-    directLevelSlider.onDragEnd = updateFunc;
+    //directLevelSlider.onDragEnd = updateFunc;
     directLevelSlider.setLookAndFeel(&knobLookAndFeel);
 
     addController(reflectionsLevelSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::orange,juce::Colours::black);
     addAndConnectLabel(reflectionsLevelSlider, reflectionsLevelLabel);
     reflectionsLevelSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"Reflections Level",reflectionsLevelSlider);
-    reflectionsLevelSlider.onDragEnd = updateFunc;
+    //reflectionsLevelSlider.onDragEnd = updateFunc;
     reflectionsLevelSlider.setLookAndFeel(&knobLookAndFeel);
 
     // Reverb type combo box
@@ -241,10 +241,10 @@ void ReverbAudioProcessorEditor::resized()
     listenerYSlider.setBounds(uxb+11*ux,uyb+7*uy,ux,10*uy);
     listenerOSlider.setBounds(uxb+16.5*ux,uyb+9.5*uy,3*ux,3*uy);
 
-    widthSlider.setBounds(juce::Rectangle<int>(uxb+20*ux,uyb+11*uy,dux,duy).RED);
+    widthSlider.setBounds(juce::Rectangle<int>(uxb+20*ux,uyb+uy,dux,duy).RED);
 
-    directLevelSlider.setBounds(juce::Rectangle<int>(uxb+20*ux,uyb+uy,dux,duy).RED);
-    reflectionsLevelSlider.setBounds(juce::Rectangle<int>(uxb+20*ux,uyb+6*uy,dux,duy).RED);
+    directLevelSlider.setBounds(juce::Rectangle<int>(uxb+20*ux,uyb+6*uy,dux,duy).RED);
+    reflectionsLevelSlider.setBounds(juce::Rectangle<int>(uxb+20*ux,uyb+10.5*uy,dux,duy).RED);
 
     xyPad2.setBounds(uxb+ux,uyb+7*uy,10*ux,10*uy);
 

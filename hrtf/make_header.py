@@ -15,14 +15,17 @@ import wave as _wave
 import numpy as _np
 import scipy.fft as _fft
 from copy import deepcopy
-from scipy.signal import savgol_filter
+from scipy.signal import savgol_filter, resample
+import matplotlib.pyplot as plt
 
 BIGVALUE = '1e9'
 ELEVATIONS = np.array([-40,-30,-20,-10,0,10,20,30,40,50,60,70,80,90])
 AZIMUTHSTEPS = np.array([6.43,6,5,5,5,5,5,6,6.43,8,10,15,30,360])
 CHEMIN = os.path.dirname(os.path.realpath(__file__))+'/'
-L = 128
-
+L44 = 128
+L48 = 139
+L88 = 256
+L96 = 278
 
 def _wav2array(nchannels, sampwidth, data):
     """data must be the string containing the bytes from the wav file."""
@@ -156,6 +159,16 @@ def list2cpparray2(l,n,big_value):
     out += '}'
     return out
 
+def list2cpparray3(l):
+    out = '{ '
+    for i,e in enumerate(l):
+        if i==len(l)-1:
+            out +=  '{:.7e}'.format(e)   
+        else:
+            out += '{:.7e}'.format(e)+', '
+    out += '}'
+    return out
+
 def load():
     # location = os.path.dirname(os.path.realpath(__file__))
     # chemin = location+'/'
@@ -167,8 +180,8 @@ def load():
     #ELEVATION = 0
 
     NORM = 2**15
-    lhrtf = np.zeros((len(ELEVATIONS),lmax,L))
-    rhrtf = np.zeros((len(ELEVATIONS),lmax,L))
+    lhrtf = np.zeros((len(ELEVATIONS),lmax,L44))
+    rhrtf = np.zeros((len(ELEVATIONS),lmax,L44))
     for ind1,el in enumerate(ELEVATIONS):
         #print(ind1)
         for ind2,az in enumerate(np.arange(0,360,AZIMUTHSTEPS[ind1])):
@@ -202,12 +215,19 @@ def load():
 
     return lhrtf, rhrtf
 
-def normalize(lhrtf,rhrtf,elev_ref=4,azim_ref=0):
+def normalize(lhrtf,rhrtf,elev_ref=4,azim_ref=0, hf_correction=False):
     """ Filter all the RIRs relative to one reference RIR
     """
     lh = deepcopy(lhrtf)
     rh = deepcopy(rhrtf)
+    l = len(lhrtf[0][0][:])
     filt = (1/savgol_filter(_np.abs(_fft.rfft(lhrtf[elev_ref][azim_ref][:])),20,5))
+    if hf_correction:
+        correction = np.linspace(0.,1.,round(l/2+1))
+    else:
+        correction = np.zeros(round(l/2+1))
+    filt = (1-correction)*filt+correction
+
     #filt = 1/_np.abs(_fft.rfft(lhrtf[elev_ref][azim_ref][:]))
     for ind1,el in enumerate(ELEVATIONS):
         for ind2,az in enumerate(np.arange(0,360,AZIMUTHSTEPS[ind1])):
@@ -215,17 +235,39 @@ def normalize(lhrtf,rhrtf,elev_ref=4,azim_ref=0):
             rh[ind1][ind2][:] = _fft.irfft(_fft.rfft(rhrtf[ind1][ind2][:])*filt)
     return lh, rh
 
-def save(lhrtf,rhrtf):
+def resample_hrtf(lhrtf,rhrtf,fs1,fs2):
+
+    l = len(lhrtf[0][0][:])
+    # print("l="+str(l)+"\n")
+    lmax = len(range(0,360,5))
+
+    newlength = int(round(l*fs2/fs1))
+    lh = np.zeros((len(ELEVATIONS),lmax,newlength))
+    rh = np.zeros((len(ELEVATIONS),lmax,newlength))
+    for ind1,e in enumerate(ELEVATIONS):
+        azim = np.arange(0,360,AZIMUTHSTEPS[ind1])
+        for ind2,a in enumerate(azim):
+            lh[ind1][ind2] = _np.zeros(newlength)
+            rh[ind1][ind2] = _np.zeros(newlength)
+            lh[ind1][ind2][:] = resample(lhrtf[ind1][ind2][:],newlength)
+            rh[ind1][ind2][:] = resample(lhrtf[ind1][ind2][:],newlength)
+    
+    return lh,rh,newlength
+
+
+def save(lh,rh, ext='44'):
+
+    newlength = len(lh[0][0][:])
 
     azim_lengths = list()
     for i,a in enumerate(AZIMUTHSTEPS):
         azim_lengths.append(round(360/min(AZIMUTHSTEPS)))
     maxl = max(azim_lengths)
 
-    with open(CHEMIN+'hrtf.h',mode='w') as f:
+    with open(CHEMIN+'hrtf'+ext+'.h',mode='w') as f:
         f.write('#define NELEV '+str(len(ELEVATIONS))+'\n')
         f.write('#define NAZIM '+str(maxl)+'\n')
-        f.write('#define NSAMP '+str(L)+'\n')
+        f.write('#define NSAMP'+ext+' '+str(newlength)+'\n')
         f.write('#define BIGVALUE '+BIGVALUE+'\n')
         
         f.write('const float elevations[NELEV]=')
@@ -239,12 +281,12 @@ def save(lhrtf,rhrtf):
             f.write(',\n')
         f.write('};\n')
         
-        f.write('float lhrtf[NELEV][NAZIM][NSAMP]={')
+        f.write('float lhrtf'+ext+'[NELEV][NAZIM][NSAMP'+ext+']={')
         for i,e in enumerate(ELEVATIONS):
             f.write('{')
             azim = np.arange(0,360,AZIMUTHSTEPS[i])
             for j,a in enumerate(azim):
-                f.write(list2cpparray(lhrtf[i,j,:]))
+                f.write(list2cpparray3(lh[i,j,:]))
                 if j==len(azim)-1:
                     f.write('\n')
                 else:
@@ -256,48 +298,12 @@ def save(lhrtf,rhrtf):
                 f.write(',\n')
         f.write('};\n')
 
-        f.write('float rhrtf[NELEV][NAZIM][NSAMP]={')
+        f.write('float rhrtf'+ext+'[NELEV][NAZIM][NSAMP'+ext+']={')
         for i,e in enumerate(ELEVATIONS):
             f.write('{')
             azim = np.arange(0,360,AZIMUTHSTEPS[i])
             for j,a in enumerate(azim):
-                f.write(list2cpparray(rhrtf[i,j,:]))
-                if j==len(azim)-1:
-                    f.write('\n')
-                else:
-                    f.write(',\n')
-            f.write('}')
-            if i==len(ELEVATIONS)-1:
-                f.write('\n')
-            else:
-                f.write(',\n')
-        f.write('};\n')
-
-        lhrtf, rhrtf = normalize(lhrtf,rhrtf)
-
-        f.write('float lhrtfn[NELEV][NAZIM][NSAMP]={')
-        for i,e in enumerate(ELEVATIONS):
-            f.write('{')
-            azim = np.arange(0,360,AZIMUTHSTEPS[i])
-            for j,a in enumerate(azim):
-                f.write(list2cpparray(lhrtf[i,j,:]))
-                if j==len(azim)-1:
-                    f.write('\n')
-                else:
-                    f.write(',\n')
-            f.write('}')
-            if i==len(ELEVATIONS)-1:
-                f.write('\n')
-            else:
-                f.write(',\n')
-        f.write('};\n')
-
-        f.write('float rhrtfn[NELEV][NAZIM][NSAMP]={')
-        for i,e in enumerate(ELEVATIONS):
-            f.write('{')
-            azim = np.arange(0,360,AZIMUTHSTEPS[i])
-            for j,a in enumerate(azim):
-                f.write(list2cpparray(rhrtf[i,j,:]))
+                f.write(list2cpparray3(rh[i,j,:]))
                 if j==len(azim)-1:
                     f.write('\n')
                 else:
@@ -311,4 +317,32 @@ def save(lhrtf,rhrtf):
 
 if __name__ == '__main__':
     lhrtf, rhrtf = load()
-    save(lhrtf,rhrtf)
+    lhrtfn, rhrtfn = normalize(lhrtf,rhrtf,hf_correction=False)
+    lhrtfnc, rhrtfnc = normalize(lhrtf,rhrtf,hf_correction=True)
+
+    l44 = len(lhrtfnc[0][0][:])
+    save(lhrtfnc,rhrtfnc)
+
+    lhrtf48,rhrtf48,l48 = resample_hrtf(lhrtfnc,rhrtfnc,44100,48000)
+    save(lhrtf48,rhrtf48, ext='48')
+
+    lhrtf88,rhrtf88,l88 = resample_hrtf(lhrtfnc,rhrtfnc,44100,88200)
+    save(lhrtf88,rhrtf88, ext='88')
+
+    lhrtf96,rhrtf96,l96 = resample_hrtf(lhrtfnc,rhrtfnc,44100,96000)
+    save(lhrtf96,rhrtf96, ext='96')
+
+
+    # lhrtf48,rhrtf48,l48 = resample_hrtf(lhrtfnc,rhrtfnc,44100,48000)
+    # save(lhrtf48,rhrtf48, ext='48')
+
+
+    # lhrtf48,rhrtf48,l48 = resample_hrtf(lhrtfn,rhrtfn,44100,48000)
+    # save(lhrtf48,rhrtf48, ext='48')
+
+    # t44 = _np.arange(l44)/44100
+    # print(t44)
+    # t48 = _np.arange(l48)/48000
+    # plt.plot(t44,lhrtf[0][0][:],t44,lhrtfn[0][0][:],t44,lhrtfnc[0][0][:])
+    # # plt.plot(t48,lhrtf48[0][0][:],t48,lhrtf48c[0][0][:])
+    # plt.show()

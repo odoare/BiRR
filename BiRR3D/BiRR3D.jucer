@@ -7,6 +7,15 @@
               pluginAAXCategory="8" version="0.1" companyName="FX Mechanics"
               companyWebsite="www.fxmechanics.com">
   <MAINGROUP id="BIm9jF" name="BiRR3D">
+    <GROUP id="{ECC06303-726B-AA24-9400-D49E15802DEF}" name="dsp">
+      <FILE id="LTEScz" name="hrtf.h" compile="0" resource="0" file="Source/dsp/hrtf.h"/>
+      <FILE id="EyT5T6" name="hrtf44.h" compile="0" resource="0" file="Source/dsp/hrtf44.h"/>
+      <FILE id="rHjtTg" name="hrtf48.h" compile="0" resource="0" file="Source/dsp/hrtf48.h"/>
+      <FILE id="GxxUTe" name="hrtf88.h" compile="0" resource="0" file="Source/dsp/hrtf88.h"/>
+      <FILE id="vzJKZ6" name="hrtf96.h" compile="0" resource="0" file="Source/dsp/hrtf96.h"/>
+      <FILE id="yQ4IIS" name="RoomIR.cpp" compile="1" resource="0" file="Source/dsp/RoomIR.cpp"/>
+      <FILE id="BIruYS" name="RoomIR.h" compile="0" resource="0" file="Source/dsp/RoomIR.h"/>
+    </GROUP>
     <GROUP id="{C8F98279-7F49-5105-5D3E-5EA88F0C7230}" name="Assets">
       <FILE id="L5ddy9" name="logo.png" compile="0" resource="1" file="Assets/logo.png"/>
       <FILE id="xFWVa1" name="logo686.png" compile="0" resource="1" file="Assets/logo686.png"/>
@@ -25,7 +34,6 @@
             file="Source/PluginProcessor.h"/>
       <FILE id="Gv1BeC" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
-      <FILE id="qHbRc1" name="hrtf.h" compile="0" resource="0" file="Source/hrtf.h"/>
       <FILE id="eSzCgh" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
   </MAINGROUP>

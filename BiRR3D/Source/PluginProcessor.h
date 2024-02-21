@@ -9,56 +9,8 @@
 #pragma once
 
 #include <JuceHeader.h>
-
-#define CHOICES {"XY", "MS with Cardio", "MS with Omni", "Binaural"}
-
-// ==================================================================
-class irCalculator : public juce::Thread
-  {
-
-  public:
-
-    struct irCalculatorParams{
-      float rx;
-      float ry;
-      float rz;
-      float lx;
-      float ly;
-      float lz;
-      float sx;
-      float sy;
-      float sz;
-      float damp;
-      float hfDamp;
-      int type;
-      float headAzim;
-      float sWidth;
-      float directLevel;
-      float reflectionsLevel;
-      double sampleRate;
-    };
-
-    irCalculator();
-    void run() override ;
-    bool setParams(irCalculatorParams pa);
-    void setConvPointer(juce::dsp::Convolution* ip);
-    float getProgress();
-
-    juce::dsp::Convolution* irp;
-    
-    bool isCalculating;
-    bool bufferTransferred;
-    juce::AudioBuffer<float> buf;
-
-  private:
-    irCalculatorParams p;
-    float progress;
-
-    // juce::dsp::Convolution& irr;
-    void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
-    int proximityIndex(const float *data, const int length, const float value, const bool wrap);
-    void lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order);
-  };
+#include "dsp/RoomIR.h"
+// #include "dsp/hrtf.h"
 
 //==============================================================================
 /**
@@ -105,8 +57,7 @@ public:
 
     void setIrLoader();
 
-    juce::dsp::Convolution irLoader;
-    irCalculator calculator;
+    BoxRoomIR roomIR;
 
     juce::dsp::ProcessSpec spec;
 
@@ -115,13 +66,7 @@ public:
 
 private:
 
-    juce::AudioBuffer<float> buf;
-
-    void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
-    int proximityIndex(const float *data, const int length, const float value, const bool wrap);
-    void lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order);
-    // void alp(const float* in, float* out, int sampleFreq, float amount, int nRebounds);
-
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessor)
 };
+
