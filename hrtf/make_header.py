@@ -153,9 +153,9 @@ def list2cpparray2(l,n,big_value):
     out = '{ '
     for i in range(n):
         if i==n-1:
-            out += '{:.2f}'.format(l[i]) if i<len(l) else big_value   
+            out += '{:.2f}'.format(l[i])+'f' if i<len(l) else big_value   
         else:
-            out += '{:.2f}'.format(l[i])+', ' if i<len(l) else big_value+', '
+            out += '{:.2f}'.format(l[i])+'f'+', ' if i<len(l) else big_value+', '
     out += '}'
     return out
 
@@ -163,9 +163,9 @@ def list2cpparray3(l):
     out = '{ '
     for i,e in enumerate(l):
         if i==len(l)-1:
-            out +=  '{:.7e}'.format(e)   
+            out +=  '{:.7e}'.format(e)+'f'   
         else:
-            out += '{:.7e}'.format(e)+', '
+            out += '{:.7e}'.format(e)+'f'+', '
     out += '}'
     return out
 
