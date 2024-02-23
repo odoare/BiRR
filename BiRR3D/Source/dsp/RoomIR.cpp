@@ -406,8 +406,11 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
     directConvolution.reset();
     directConvolution.prepare(spec);
 
-    filterL.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(spec.sampleRate,15.f);
-    filterR.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(spec.sampleRate,15.f);
+    for (int i=0; i<2; i++)
+    {
+      filter[i].coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(spec.sampleRate,15.f);
+      filter[i].prepare(spec);  
+    }
 }
 
 void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
@@ -542,10 +545,11 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
     inputBufferCopy.copyFrom(0,0,buffer,0,0,buffer.getNumSamples());
     inputBufferCopy.copyFrom(1,0,buffer,1,0,buffer.getNumSamples());
 
-    
-    juce::dsp::AudioBlock<float> block {buffer};
-    juce::dsp::AudioBlock<float> blockCopy {inputBufferCopy};
-    
+    juce::dsp::AudioBlock<float> block (buffer);
+    juce::dsp::AudioBlock<float> blockCopy (inputBufferCopy);
+    juce::dsp::AudioBlock<float> blockL = block.getSingleChannelBlock(0);
+    juce::dsp::AudioBlock<float> blockR = block.getSingleChannelBlock(1);
+
     if (boxConvolution.getCurrentIRSize()>0)
     {
         boxConvolution.process(juce::dsp::ProcessContextReplacing<float>(block));        
@@ -561,7 +565,7 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
     buffer.addFrom(0,0,inputBufferCopy,0,0,inputBufferCopy.getNumSamples(),directLevel);
     buffer.addFrom(1,0,inputBufferCopy,1,0,inputBufferCopy.getNumSamples(),directLevel);
 
-    filterL.process(juce::dsp::ProcessContextReplacing<float>(block));
-    filterR.process(juce::dsp::ProcessContextReplacing<float>(block));
+    filter[0].process(juce::dsp::ProcessContextReplacing<float>(blockL));
+    filter[1].process(juce::dsp::ProcessContextReplacing<float>(blockR));
 
 }
