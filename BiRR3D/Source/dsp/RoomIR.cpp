@@ -405,6 +405,9 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
 
     directConvolution.reset();
     directConvolution.prepare(spec);
+
+    filterL.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(spec.sampleRate,15.f);
+    filterR.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(spec.sampleRate,15.f);
 }
 
 void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
@@ -557,5 +560,8 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
 
     buffer.addFrom(0,0,inputBufferCopy,0,0,inputBufferCopy.getNumSamples(),directLevel);
     buffer.addFrom(1,0,inputBufferCopy,1,0,inputBufferCopy.getNumSamples(),directLevel);
+
+    filterL.process(juce::dsp::ProcessContextReplacing<float>(block));
+    filterR.process(juce::dsp::ProcessContextReplacing<float>(block));
 
 }

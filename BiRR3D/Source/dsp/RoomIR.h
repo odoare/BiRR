@@ -126,6 +126,8 @@ private:
     int threadsNum;
     int nsamp;
 
+    juce::dsp::IIR::Filter<float> filterL, filterR;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoxRoomIR)
 
 };
