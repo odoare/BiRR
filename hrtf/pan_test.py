@@ -1,3 +1,4 @@
+#%%
 import numpy as np
 import matplotlib.pyplot as plt
 theta = np.linspace(-np.pi,np.pi,10000)
@@ -5,7 +6,7 @@ theta = np.linspace(-np.pi,np.pi,10000)
 ##plt.show()
 
 def cardio(theta):
-    return 1+np.cos(theta)
+    return 0.5*(1+np.cos(theta))
 
 def eight(theta):
     return np.sin(theta)
@@ -26,5 +27,7 @@ msr = mid-side
 
 
 #plt.plot(theta,sr, theta, xyl, theta, msl)
-plt.plot(theta, xyl/msl)
-plt.show()
+#plt.polar(theta, xyl, theta, xyr)
+#plt.show()
+plt.polar(theta,mid,theta,abs(side))
+# %%

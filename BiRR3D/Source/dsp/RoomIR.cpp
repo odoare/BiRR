@@ -12,6 +12,22 @@ void IrBoxCalculator::run()
 {
     isCalculating[0] = true;
 
+    float nearestSampleRate = 44100.f;
+    float distance = 200000.f;
+    for (float sr : possibleSampleRates)
+      if (abs(sr-p.sampleRate)<distance)
+      {
+        distance = abs(sr-p.sampleRate);
+        nearestSampleRate = sr;
+      };
+    
+    if (!juce::approximatelyEqual(distance,0.f))
+      cout << "Warning : sample rate of " << p.sampleRate
+            << " Hz not in possible sample rates, using HRTF at "
+            << nearestSampleRate << " Hz." << endl;
+    else
+      cout << "Sample rate : " << nearestSampleRate << " Hz." << endl;    
+
     // std::cout << "In irCalculator::run()" << endl;
 
     // inBuf is the buffer used for the non-binaural method
@@ -95,15 +111,16 @@ void IrBoxCalculator::run()
             if (p.type==3){      
               int elevationIndex = proximityIndex(&elevations[0],NELEV,elev,false);
               int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta,true);
+              gain = gain * .707107f;
               // Apply lowpass filter and add grain to buffer
-              if (p.sampleRate==44100)
+              if (juce::approximatelyEqual(nearestSampleRate,44100.f))
               {
                 lop(&lhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
                 addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
                 lop(&rhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
                 addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
               }
-              else if (p.sampleRate==48000)
+              else if (juce::approximatelyEqual(nearestSampleRate,48000.f))
               {
                 lop(&lhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
                 addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
@@ -111,7 +128,7 @@ void IrBoxCalculator::run()
                 addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
 
               }
-              else if (p.sampleRate==88200)
+              else if (juce::approximatelyEqual(nearestSampleRate,88200.f))
               {
                 lop(&lhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
                 addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
@@ -119,7 +136,7 @@ void IrBoxCalculator::run()
                 addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
 
               }
-              else if (p.sampleRate==96000)
+              else if (juce::approximatelyEqual(nearestSampleRate,96000.f))
               {
                 lop(&lhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
                 addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
