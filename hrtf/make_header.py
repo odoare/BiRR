@@ -249,8 +249,8 @@ def resample_hrtf(lhrtf,rhrtf,fs1,fs2):
         for ind2,a in enumerate(azim):
             lh[ind1][ind2] = _np.zeros(newlength)
             rh[ind1][ind2] = _np.zeros(newlength)
-            lh[ind1][ind2][:] = resample(lhrtf[ind1][ind2][:],newlength)
-            rh[ind1][ind2][:] = resample(lhrtf[ind1][ind2][:],newlength)
+            lh[ind1][ind2][:] = (fs1/fs2)*resample(lhrtf[ind1][ind2][:],newlength)
+            rh[ind1][ind2][:] = (fs1/fs2)*resample(rhrtf[ind1][ind2][:],newlength)
     
     return lh,rh,newlength
 

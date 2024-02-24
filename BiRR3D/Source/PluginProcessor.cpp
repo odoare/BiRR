@@ -17,7 +17,6 @@
 using namespace std;
 #endif
 
-
 //==============================================================================
 ReverbAudioProcessor::ReverbAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations

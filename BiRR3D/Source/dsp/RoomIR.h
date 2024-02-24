@@ -49,7 +49,7 @@ class IrBoxCalculator : public juce::Thread
     void setCalculatingBool(bool* cp);
     void setBuffer(juce::AudioBuffer<float>* b);
     void setCalculateDirectPath(bool c);
-    void setHrtfVars(int* nsamp);
+    void setHrtfVars(int* ns, float* nsr);
 
     // min and max indices which iR is calculated in this thread
     // If only the direct sound is needed, one has to select
@@ -62,9 +62,8 @@ class IrBoxCalculator : public juce::Thread
     bool* isCalculating;
     juce::AudioBuffer<float>* bp;
     bool calculateDirectPath;
-    // float* lHrtf[NELEV][NAZIM][NSAMP96];
-    // float* rHrtf[NELEV][NAZIM][NSAMP96];
     int* nsamp;
+    float* nearestSampleRate;
     // int threadsNum;
     
     void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
@@ -125,6 +124,7 @@ private:
     IrBoxCalculatorParams p;
     int threadsNum;
     int nsamp;
+    float nearestSampleRate;
 
     juce::dsp::IIR::Filter<float> filter[2];
     

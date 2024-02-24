@@ -12,22 +12,6 @@ void IrBoxCalculator::run()
 {
     isCalculating[0] = true;
 
-    float nearestSampleRate = 44100.f;
-    float distance = 200000.f;
-    for (float sr : possibleSampleRates)
-      if (abs(sr-p.sampleRate)<distance)
-      {
-        distance = abs(sr-p.sampleRate);
-        nearestSampleRate = sr;
-      };
-    
-    if (!juce::approximatelyEqual(distance,0.f))
-      cout << "Warning : sample rate of " << p.sampleRate
-            << " Hz not in possible sample rates, using HRTF at "
-            << nearestSampleRate << " Hz." << endl;
-    else
-      cout << "Sample rate : " << nearestSampleRate << " Hz." << endl;    
-
     // std::cout << "In irCalculator::run()" << endl;
 
     // inBuf is the buffer used for the non-binaural method
@@ -108,19 +92,19 @@ void IrBoxCalculator::run()
             }
 
             // Binaural
-            if (p.type==3){      
+            if (p.type==3){
               int elevationIndex = proximityIndex(&elevations[0],NELEV,elev,false);
               int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta,true);
               gain = gain * .707107f;
               // Apply lowpass filter and add grain to buffer
-              if (juce::approximatelyEqual(nearestSampleRate,44100.f))
+              if (juce::approximatelyEqual(nearestSampleRate[0],44100.f))
               {
                 lop(&lhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
                 addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
                 lop(&rhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
                 addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
               }
-              else if (juce::approximatelyEqual(nearestSampleRate,48000.f))
+              else if (juce::approximatelyEqual(nearestSampleRate[0],48000.f))
               {
                 lop(&lhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
                 addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
@@ -128,7 +112,7 @@ void IrBoxCalculator::run()
                 addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
 
               }
-              else if (juce::approximatelyEqual(nearestSampleRate,88200.f))
+              else if (juce::approximatelyEqual(nearestSampleRate[0],88200.f))
               {
                 lop(&lhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
                 addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
@@ -136,7 +120,7 @@ void IrBoxCalculator::run()
                 addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
 
               }
-              else if (juce::approximatelyEqual(nearestSampleRate,96000.f))
+              else if (juce::approximatelyEqual(nearestSampleRate[0],96000.f))
               {
                 lop(&lhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
                 addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
@@ -144,13 +128,13 @@ void IrBoxCalculator::run()
                 addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
 
               }
-              else
-              {
-                lop(&lhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
-                lop(&rhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
-              }
+              // else
+              // {
+              //   lop(&lhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+              //   addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+              //   lop(&rhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+              //   addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+              // }
 
               //lHrtf[elevationIndex][azimutalIndex][0];
             }
@@ -262,9 +246,11 @@ void IrBoxCalculator::setCalculateDirectPath(bool c)
   calculateDirectPath = c;
 }
 
-void IrBoxCalculator::setHrtfVars(int* ns)
+void IrBoxCalculator::setHrtfVars(int* ns, float* nsr)
 {
   nsamp = ns;
+  nearestSampleRate = nsr;
+  cout << "In setHrtfVars : nearest sample rate : " << nearestSampleRate[0] << " Hz" << endl;
 }
 
 // void IrBoxCalculator::setThreadsNum(int n)
@@ -289,7 +275,7 @@ void IrTransfer::run()
 
   // A FAIRE
 
-  cout << "In IrTransfer::run()" << endl;
+  // cout << "In IrTransfer::run()" << endl;
   hasTransferred = false;
   // First we must wait for the buffers to be ready
   bool isCalc = true;
@@ -307,9 +293,9 @@ void IrTransfer::run()
     continue;
   }
 
-  std::cout << "Start buffer filling" << endl; 
+  // std::cout << "Start buffer filling" << endl; 
 
-  std::cout << "Join... " << threadsNum << endl;; 
+  // std::cout << "Join... " << threadsNum << endl;
 
   for (int i=1;i<threadsNum;i++)
     {
@@ -326,7 +312,7 @@ void IrTransfer::run()
 
   hasTransferred = true;
 
-  std::cout << "Finished buffer filling... " << threadsNum << endl; 
+  // std::cout << "Finished buffer filling... " << threadsNum << endl;
 }
 
 void IrTransfer::setBuffer(juce::AudioBuffer<float>* bufPointer)
@@ -376,28 +362,52 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
 
     cout << "Number of CPUs : " << juce::SystemStats::getNumCpus() << endl;
     cout << "Number of physical CPUs : " << juce::SystemStats::getNumPhysicalCpus() << endl;
+    threadsNum = numCpus;
 
     inputBufferCopy.setSize(2, spec.maximumBlockSize ,false,true);
 
-    threadsNum = numCpus;
 
+    cout << "Actual sampleRate : " << spec.sampleRate << " Hz." << endl;
+
+    // We have hrtf only for a discrete set of samplerates
+    // (typically 44.1, 48, 88.2, 96)
+    nearestSampleRate = 44100.f;
+    float distance = 200000.f;
+    for (float sr : possibleSampleRates)
+      if (abs(sr-spec.sampleRate)<distance)
+      {
+        distance = abs(sr-spec.sampleRate);
+        nearestSampleRate = sr;
+      };
+
+      // distance = 0.f;
+      // nearestSampleRate = 44100.f;
+
+      if (juce::approximatelyEqual(nearestSampleRate, 44100.f))
+        nsamp = NSAMP44;
+      else if (juce::approximatelyEqual(nearestSampleRate, 48000.f))
+        nsamp = NSAMP48;
+      else if (juce::approximatelyEqual(nearestSampleRate, 88200.f))
+        nsamp = NSAMP88;
+      else if (juce::approximatelyEqual(nearestSampleRate, 96000.f))
+        nsamp = NSAMP96;
+    
+    if (!juce::approximatelyEqual(distance,0.f))
+      cout << "Warning : sample rate of " << p.sampleRate
+            << " Hz not in possible sample rates, using HRTF at "
+            << nearestSampleRate << " Hz." << endl;
+    else
+      {
+        cout << "Sample rate : " << nearestSampleRate << " Hz" << endl;
+        cout << "HRTF size : " << nsamp << endl;
+      }
+    
     for (int i=0; i<threadsNum; i++)
     {
       boxCalculator[i].setCalculatingBool(&isCalculating[i]);
       boxCalculator[i].setBuffer(&boxIrBuffer[i]);
       boxCalculator[i].setCalculateDirectPath(false);
-      boxCalculator[i].setHrtfVars(&nsamp);
-      if (spec.sampleRate==44100)
-        nsamp = NSAMP44;
-      else if (spec.sampleRate==48000)
-        nsamp = NSAMP48;
-      else if (spec.sampleRate==88200)
-        nsamp = NSAMP88;
-      else if (spec.sampleRate==96000)
-        nsamp = NSAMP96;
-      else
-        cout << "Warning, no corresponding sample rate" << endl;
-        nsamp = NSAMP44;
+      boxCalculator[i].setHrtfVars(&nsamp, &nearestSampleRate);
     }
 
     boxIrTransfer.setCalculatingBool(&isCalculating[0]);
@@ -412,7 +422,7 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
     directCalculator.setCalculatingBool(&isCalculatingDirect);
     directCalculator.setBuffer(&directIrBuffer);
     directCalculator.setCalculateDirectPath(true);
-    directCalculator.setHrtfVars(&nsamp);
+    directCalculator.setHrtfVars(&nsamp, &nearestSampleRate);
 
     directIrTransfer.setCalculatingBool(&isCalculatingDirect);
     directIrTransfer.setBuffer(&directIrBuffer);
