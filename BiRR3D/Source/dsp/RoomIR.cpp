@@ -12,20 +12,15 @@ void IrBoxCalculator::run()
 {
     isCalculating[0] = true;
 
-    // std::cout << "In irCalculator::run()" << endl;
-
-    // inBuf is the buffer used for the non-binaural method
+    // inBuf is the buffer used for the non-binaural methods
     float outBuf[NSAMP96]={0.f}, inBuf[NSAMP96]={0.f};
     inBuf[10] = 1.f;
     float x,y,z;
 
-    // cout << "Start buffer fill..." << endl;
-
-    bp[0].clear();
-    auto* dataL = bp[0].getWritePointer(0);
-    auto* dataR = bp[0].getWritePointer(1);
-    
-    // cout << "Start Loop ... " << endl;
+    bp->setSize(2,longueur,true,true);
+    bp->clear();
+    auto* dataL = bp->getWritePointer(0);
+    auto* dataR = bp->getWritePointer(1);
 
     for (int ix = nxmin; ix < nxmax ; ++ix)
     {
@@ -54,7 +49,7 @@ void IrBoxCalculator::run()
             
             // XY
             if (p.type==0){
-              // Apply lowpass filter and add grain to 
+              // Apply lowpass filter and add grain to buffer
               auto elevCardio = (1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev)));
               auto panGain = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta+45*p.sWidth)))
                               * elevCardio;
@@ -96,47 +91,35 @@ void IrBoxCalculator::run()
               int elevationIndex = proximityIndex(&elevations[0],NELEV,elev,false);
               int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta,true);
               gain = gain * .707107f;
-              // Apply lowpass filter and add grain to buffer
-              if (juce::approximatelyEqual(nearestSampleRate[0],44100.f))
-              {
-                lop(&lhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
-                lop(&rhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
-              }
-              else if (juce::approximatelyEqual(nearestSampleRate[0],48000.f))
-              {
-                lop(&lhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
-                lop(&rhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+              if (juce::approximatelyEqual(nearestSampleRate[0],48000.f))
+                {
+                  lop(&lhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+                  lop(&rhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
 
-              }
+                }
               else if (juce::approximatelyEqual(nearestSampleRate[0],88200.f))
-              {
-                lop(&lhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
-                lop(&rhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
-
-              }
+                {
+                  lop(&lhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+                  lop(&rhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+                }
               else if (juce::approximatelyEqual(nearestSampleRate[0],96000.f))
-              {
-                lop(&lhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
-                lop(&rhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
-
-              }
-              // else
-              // {
-              //   lop(&lhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-              //   addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
-              //   lop(&rhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
-              //   addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
-              // }
-
-              //lHrtf[elevationIndex][azimutalIndex][0];
+                {
+                  lop(&lhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+                  lop(&rhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+                }
+              else // if 44.1kHz or any other cases, we use 44.1kHz HRTF
+                {
+                  lop(&lhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+                  lop(&rhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+                }
             }
           }
         }
@@ -145,7 +128,7 @@ void IrBoxCalculator::run()
       else return;
     }
     isCalculating[0] = false;
-    // cout << "End Loop ... " << endl;
+    cout << "Done" << endl;
 }
 
 // Add a given array to a buffer
@@ -204,7 +187,7 @@ void IrBoxCalculator::lop(const float* in, float* out, const int sampleFreq, con
     }
 }
 
-// Get max
+// Get max (has been used for debugging puposes only)
 float IrBoxCalculator::max(const float* in)
 {
   float max = 0;
@@ -250,15 +233,9 @@ void IrBoxCalculator::setHrtfVars(int* ns, float* nsr)
 {
   nsamp = ns;
   nearestSampleRate = nsr;
-  cout << "In setHrtfVars : nearest sample rate : " << nearestSampleRate[0] << " Hz" << endl;
 }
 
-// void IrBoxCalculator::setThreadsNum(int n)
-// {
-//   threadsNum = std::max<int>(n,MAXTHREADS);
-// }
-
-IrBoxCalculator::IrBoxCalculator() : juce::Thread("test")
+IrBoxCalculator::IrBoxCalculator() : juce::Thread("calc")
 {
 
 }
@@ -273,28 +250,25 @@ IrTransfer::IrTransfer() : juce::Thread("transfer")
 void IrTransfer::run()
 {
 
-  // cout << "In IrTransfer::run()" << endl;
   hasTransferred = false;
   
   // First we must wait for the buffers to be ready
   bool isCalc = true;
   while (isCalc)
   {
-    isCalc = false;
-    for (int i=0;i<threadsNum;i++)
+    if (threadShouldExit())
+      return;
+    else
       {
-        isCalc = isCalc || isCalculating[i];
-        //cout << i << " : " << isCalculating[i] << "    " << endl;
+        isCalc = false;
+        for (int i=0;i<threadsNum;i++)
+          {
+            isCalc = isCalc || isCalculating[i];
+          }
+        sleep(200);
+        continue;
       }
-    //out << "isCalc : " << isCalc << endl;
-    //cout << "Waiting for buffer fill" << endl;
-    sleep(200);
-    continue;
   }
-
-  // std::cout << "Start buffer filling" << endl; 
-
-  // std::cout << "Join... " << threadsNum << endl;
 
   for (int i=1;i<threadsNum;i++)
     {
@@ -302,7 +276,6 @@ void IrTransfer::run()
       bp[0].addFrom(1,0,bp[i],1,0,bp[i].getNumSamples());
     }
 
-  // std::cout << "Convolution loader..." << endl; 
   irp->loadImpulseResponse(std::move (bp[0]),
                       sampleRate,
                       juce::dsp::Convolution::Stereo::yes,
@@ -310,8 +283,6 @@ void IrTransfer::run()
                       juce::dsp::Convolution::Normalise::no);
 
   hasTransferred = true;
-
-  // std::cout << "Finished buffer filling... " << threadsNum << endl;
 }
 
 void IrTransfer::setBuffer(juce::AudioBuffer<float>* bufPointer)
@@ -324,9 +295,9 @@ void IrTransfer::setIr(juce::dsp::Convolution* irPointer)
   irp = irPointer;
 }
 
-void IrTransfer::setCalculatingBool(bool* ic)
+void IrTransfer::setCalculatingBool(bool* cp)
 {
-  isCalculating = ic;
+  isCalculating = cp;
 }
 
 void IrTransfer::setSampleRate(double sr)
@@ -347,7 +318,6 @@ void IrTransfer::setThreadsNum(int n)
 
 // ========================================================
 // ========================================================
-// This is the function where the impulse response is calculated
 
 BoxRoomIR::BoxRoomIR()
 {
@@ -364,7 +334,6 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
     threadsNum = numCpus;
 
     inputBufferCopy.setSize(2, spec.maximumBlockSize ,false,true);
-
 
     cout << "Actual sampleRate : " << spec.sampleRate << " Hz." << endl;
 
@@ -397,7 +366,9 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
         cout << "Sample rate : " << nearestSampleRate << " Hz" << endl;
         cout << "HRTF size : " << nsamp << endl;
       }
-    
+
+    // Calculators for the room reflexions (box)
+
     for (int i=0; i<threadsNum; i++)
     {
       boxCalculator[i].setCalculatingBool(&isCalculating[i]);
@@ -415,6 +386,9 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
     boxConvolution.reset();
     boxConvolution.prepare(spec);
 
+
+    // Calculator for the direct path
+
     directCalculator.setCalculatingBool(&isCalculatingDirect);
     directCalculator.setBuffer(&directIrBuffer);
     directCalculator.setCalculateDirectPath(true);
@@ -429,17 +403,18 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
     directConvolution.reset();
     directConvolution.prepare(spec);
 
+
+    // Output highpass filter to cut everything below 15Hz
     for (int i=0; i<2; i++)
     {
       filter[i].coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(spec.sampleRate,15.f);
       filter[i].prepare(spec);  
     }
+
 }
 
 void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
 {
-    // std::cout << "In setIrLoader" << endl;
-
     if (setIrCaclulatorsParams(p))     // (We run the calculation only if a parameter has changed)
     {    
 
@@ -460,17 +435,33 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
         if (directCalculator.stopThread(500))
           std::cout << "Thread direct stopped" << endl;            
       }
+      
+      // We should also ask for any IR transfer to stop
 
-      // Set the size of multithread loops parameters
+      if (boxIrTransfer.isThreadRunning())
+        {
+          std::cout << "Box IR thread running" << endl;
+          if (boxIrTransfer.stopThread(500))
+            std::cout << "Thread box IR stopped" << endl;
+        }
+
+      if (directIrTransfer.isThreadRunning())
+      {
+        std::cout << "Thread direct running" << endl;
+        if (directIrTransfer.stopThread(500))
+          std::cout << "Thread direct IR stopped" << endl;            
+      }
+
+      // Set some multithread loops parameters
 
       int n = int(log10(2e-2)/log10(1-p.damp));
       auto dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
       int longueur = int(ceil(dur*p.sampleRate)+nsamp+int(p.sampleRate*SIGMA_DELTAT));
       int chunksize = floor(2*float(n)/threadsNum);
-      
+
       for (int i=0;i<threadsNum;i++)
       {
-          boxIrBuffer[i].setSize (2, int(longueur),false,true);
+          boxCalculator[i].longueur = longueur;
           boxCalculator[i].n = n;
           boxCalculator[i].nxmin = -n+1 + i*chunksize;
           boxCalculator[i].nxmax = -n+1 + (i+1)*chunksize;
@@ -483,7 +474,7 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
       dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
       longueur = int(ceil(dur*p.sampleRate)+nsamp+int(p.sampleRate*SIGMA_DELTAT));
 
-      directIrBuffer.setSize(2, int(longueur),false,true);
+      directCalculator.longueur = longueur;
       directCalculator.n = n;
       directCalculator.nxmin = 0;
       directCalculator.nxmax = 1;
@@ -493,9 +484,10 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
 
       for (int i=0;i<threadsNum;i++)
       {
-        std::cout << "Start thread no " << i << std::endl;
+        std::cout << "Start box thread no " << i << std::endl;
         boxCalculator[i].startThread();
       }
+      std::cout << "Start direct path thread" << std::endl;
       directCalculator.startThread();
 
       boxIrTransfer.startThread();

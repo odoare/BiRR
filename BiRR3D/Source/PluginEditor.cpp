@@ -188,7 +188,6 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
     auto length = diagonale.getDistanceFromOrigin();
     auto perpendicular = diagonale.rotatedAboutOrigin (juce::degreesToRadians (90.0f)) / length;
     auto height = float (getWidth() * getHeight()) / length;
-    // auto bluegreengrey = juce::Colour::fromFloatRGBA(0.17f,0.22f,0.27f,1.0f);
     auto bluegreengrey = juce::Colour::fromFloatRGBA (0.15f, 0.15f, 0.25f, 1.0f);
     juce::ColourGradient grad (bluegreengrey.darker().darker().darker(), perpendicular * height,
                            bluegreengrey, perpendicular * -height, false);
@@ -203,14 +202,31 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
 
     auto r = juce::Rectangle<float>(uxb+20.5*ux,uyb+15*uy,3*ux,3*ux);
     g.drawImage(logo, r);
+    
 
-    // g.setColour(juce::Colours::grey);
-    // g.setFont(28);
-    // g.drawSingleLineText("BiRR3D", uxb+14*ux, uyb+15.5*uy,juce::Justification::centred);
-    // g.setFont(12);
-    // g.drawMultiLineText("Binaural Room Reverb 3D", uxb+12*ux, uyb+16*uy, 4*ux, juce::Justification::centred);
-    // g.setFont(16);
-    // g.drawMultiLineText("v0.1", uxb+12*ux, uyb+17*uy, 4*ux, juce::Justification::centred);
+    // If the IR is being calculated, we disable room size sliders
+    // This prevents eventual crashes when increasing room size
+    // while calcultating, due to buffer resizing (I've not figured
+    // out why yet).
+    if (audioProcessor.roomIR.getCalculatingState())
+    {
+      roomXSlider.setEnabled(false);
+      roomYSlider.setEnabled(false);
+      roomZSlider.setEnabled(false);
+      roomXSlider.setColour(juce::Slider::thumbColourId, juce::Colours::darkgrey);
+      roomYSlider.setColour(juce::Slider::thumbColourId, juce::Colours::darkgrey);
+      roomZSlider.setColour(juce::Slider::thumbColourId, juce::Colours::darkgrey);
+    }
+    else
+    {
+      roomXSlider.setEnabled(true);
+      roomYSlider.setEnabled(true);
+      roomZSlider.setEnabled(true);
+      roomXSlider.setColour(juce::Slider::thumbColourId, juce::Colours::teal);
+      roomYSlider.setColour(juce::Slider::thumbColourId, juce::Colours::teal);
+      roomZSlider.setColour(juce::Slider::thumbColourId, juce::Colours::teal);
+    }
+      
 }
 
 #define RED reduced(DELTAX*dux,DELTAY*duy)

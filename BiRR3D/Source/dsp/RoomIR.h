@@ -17,6 +17,9 @@ using namespace std;
 #define OMEGASTART 125663.706f
 #define SIGMA_DELTAT 1e-3f
 
+#define MAXSIZE 10.f
+#define MINDAMPING 0.02f
+
 struct IrBoxCalculatorParams{
   float rx;
   float ry;
@@ -55,6 +58,7 @@ class IrBoxCalculator : public juce::Thread
     // If only the direct sound is needed, one has to select
     // n=1, nxmin=0, nxmax=1
     int n, nxmin, nxmax;
+    int longueur;
     
   private:
     IrBoxCalculatorParams p;
@@ -83,7 +87,7 @@ public:
     void run() override ;
     void setBuffer(juce::AudioBuffer<float>* bufPointer);
     void setIr(juce::dsp::Convolution* irPointer);
-    void setCalculatingBool(bool* ic);
+    void setCalculatingBool(bool* cp);
     void setSampleRate(double sr);
     bool getBufferTransferState();
     void setThreadsNum(int n);
