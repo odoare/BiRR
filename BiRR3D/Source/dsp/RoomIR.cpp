@@ -273,10 +273,9 @@ IrTransfer::IrTransfer() : juce::Thread("transfer")
 void IrTransfer::run()
 {
 
-  // A FAIRE
-
   // cout << "In IrTransfer::run()" << endl;
   hasTransferred = false;
+  
   // First we must wait for the buffers to be ready
   bool isCalc = true;
   while (isCalc)
@@ -380,9 +379,6 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
         nearestSampleRate = sr;
       };
 
-      // distance = 0.f;
-      // nearestSampleRate = 44100.f;
-
       if (juce::approximatelyEqual(nearestSampleRate, 44100.f))
         nsamp = NSAMP44;
       else if (juce::approximatelyEqual(nearestSampleRate, 48000.f))
@@ -454,7 +450,7 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
         if (boxCalculator[i].isThreadRunning())
           {
             std::cout << "Thread no " << i << " running" << endl;
-            if (boxCalculator[i].stopThread(500))
+            if (boxCalculator[i].stopThread(1000))
               std::cout << "Thread no " << i << " stopped" << endl;
           }
       }
