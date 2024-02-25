@@ -196,9 +196,9 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::createParameters()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
-    layout.add(std::make_unique<juce::AudioParameterFloat>("RoomX","RoomX",1.0f,10.0f,3.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("RoomY","RoomY",1.0f,10.0f,4.7f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("RoomZ","RoomZ",1.0f,10.0f,2.5f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("RoomX","RoomX",1.0f,MAXSIZE,3.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("RoomY","RoomY",1.0f,MAXSIZE,4.7f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("RoomZ","RoomZ",1.0f,MAXSIZE,2.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerX","ListenerX",0.01f,0.99f,0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerY","ListenerY",0.01f,0.99f,0.25f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerZ","ListenerZ",0.01f,0.99f,0.7f));
@@ -206,7 +206,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceX","SourceX",0.01f,0.99f,0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceY","SourceY",0.01f,0.99f,0.75f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceZ","SourceZ",0.01f,0.99f,0.7f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("D","D",juce::NormalisableRange<float>(0.02f,0.99f,0.001f,0.3f),0.1f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("D","D",juce::NormalisableRange<float>(MINDAMPING,0.99f,0.001f,0.3f),0.1f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("HFD","HFD",juce::NormalisableRange<float>(0.01f,0.3f,0.001f,0.3f),0.1f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Stereo Width","Stereo Width",juce::NormalisableRange<float>(0.0f,1.f,0.001f,1.f),0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Direct Level","Direct Level",juce::NormalisableRange<float>(-90.0f,6.f,0.1f,1.f),0.f));
