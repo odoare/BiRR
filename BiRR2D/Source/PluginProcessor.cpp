@@ -269,10 +269,10 @@ void ReverbAudioProcessor::setIrLoader()
     
     float x,y;
 
-    for (int ix = 0; ix < n ; ++ix)
+    for (int ix = -n+1; ix < n ; ++ix)
     {
     x = 2*float(ceil(float(ix)/2))*rx+pow(-1,ix)*sx;
-    for (int iy = 0; iy < n ; ++iy)
+    for (int iy = -n+1; iy < n ; ++iy)
     {
         y = 2*float(ceil(float(iy)/2))*ry+pow(-1,iy)*sy;
         float dist = sqrt((x-lx)*(x-lx)+(y-ly)*(y-ly));
