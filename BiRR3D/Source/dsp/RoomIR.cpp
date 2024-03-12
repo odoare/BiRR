@@ -331,7 +331,7 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
 
     cout << "Number of CPUs : " << juce::SystemStats::getNumCpus() << endl;
     cout << "Number of physical CPUs : " << juce::SystemStats::getNumPhysicalCpus() << endl;
-    threadsNum = numCpus;
+    threadsNum = std::min<int>(numCpus,MAXTHREADS);
 
     inputBufferCopy.setSize(2, spec.maximumBlockSize ,false,true);
 
