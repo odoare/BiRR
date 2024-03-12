@@ -139,7 +139,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (650, 480);
+    setSize (550, 480);
     setResizable(true,true);
 }
 
@@ -152,7 +152,7 @@ ReverbAudioProcessorEditor::~ReverbAudioProcessorEditor()
 }
 
 
-#define NX 24
+#define NX 20
 #define NY 18
 #define DELTAX 0.1f
 #define DELTAY 0.1f
@@ -178,11 +178,11 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setFont(18);
     g.setColour(listenerColour);
-    g.drawSingleLineText("O Listener", uxb+14*ux, uyb+8*uy,juce::Justification::centred);
+    g.drawSingleLineText("O Listener", uxb+7*ux, uyb+5.75*uy,juce::Justification::centred);
     g.setColour(sourceColour);
-    g.drawSingleLineText("O Source", uxb+14*ux, uyb+7*uy,juce::Justification::centred);
+    g.drawSingleLineText("O Source", uxb+2*ux, uyb+5.75*uy,juce::Justification::centred);
 
-    auto r = juce::Rectangle<float>(uxb+20.5*ux,uyb+15*uy,3*ux,3*ux);
+    auto r = juce::Rectangle<float>(uxb+16.25*ux,uyb+5.5*uy,3*ux,3*ux*227/269);
     g.drawImage(logo, r);
     
 
@@ -213,8 +213,8 @@ void ReverbAudioProcessorEditor::resized()
 {
     float uxb = BORDER*getWidth();
     float uyb =BORDER*getHeight();
-    auto ux = (1-2*BORDER)*getWidth()/24;
-    auto uy = (1-2*BORDER)*getHeight()/18;
+    auto ux = (1-2*BORDER)*getWidth()/NX;
+    auto uy = (1-2*BORDER)*getHeight()/NY;
     auto dux=4*ux;
     auto duy=4*uy;
     
@@ -229,11 +229,11 @@ void ReverbAudioProcessorEditor::resized()
 
     listenerXSlider.setBounds(uxb+ux,uyb+17*uy,10*ux,uy);
     listenerYSlider.setBounds(uxb+11*ux,uyb+7*uy,ux,10*uy);
-    listenerOSlider.setBounds(uxb+12.5*ux,uyb+9.5*uy,3*ux,3*uy);
+    listenerOSlider.setBounds(uxb+12.5*ux,uyb+5.5*uy,3*ux,3*uy);
 
     widthSlider.setBounds(juce::Rectangle<int>(uxb+16*ux,uyb+uy,dux,duy).RED);
 
-    directLevelSlider.setBounds(juce::Rectangle<int>(uxb+16*ux,uyb+5.5*uy,3*ux,3*uy));
+    directLevelSlider.setBounds(juce::Rectangle<int>(uxb+12.5*ux,uyb+9.5*uy,3*ux,3*uy));
     reflectionsLevelSlider.setBounds(juce::Rectangle<int>(uxb+16*ux,uyb+9.5*uy,3*ux,3*uy));
 
     xyPad2.setBounds(uxb+ux,uyb+7*uy,10*ux,10*uy);
