@@ -3,9 +3,9 @@
 <JUCERPROJECT id="SD3Wpk" name="BiRR2D" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               companyName="FX Mechanics" companyWebsite="www.fx-mechanics.com"
-              pluginFormats="buildVST3" pluginManufacturerCode="FXME" pluginCode="BRR2"
-              aaxIdentifier="http://www.odiomechanics.com/plugins/BiRR2D" pluginName="BiRR2D"
-              pluginDesc="Binaural room reverb, 2D" pluginVST3Category="Fx,Reverb,Spatial,Stereo"
+              pluginFormats="buildVST,buildVST3" pluginManufacturerCode="FXME"
+              pluginCode="BRR2" aaxIdentifier="http://www.fx-mechanics.com/plugins/BiRR2D"
+              pluginName="BiRR2D" pluginDesc="Binaural room reverb, 2D" pluginVST3Category="Fx,Reverb,Spatial,Stereo"
               pluginAAXCategory="8" lv2Uri="http://www.odiomechanics.com/plugins/BiRR2D">
   <MAINGROUP id="NKvv2q" name="BiRR2D">
     <GROUP id="{1DE6DEF3-95E7-6E92-E4F8-B1B7D70EF90E}" name="Source">
