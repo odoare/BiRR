@@ -2,10 +2,10 @@
 
 <JUCERPROJECT id="JVECeb" name="BiRR3D" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              pluginFormats="buildAU,buildVST,buildVST3" pluginManufacturer="FX Mechanics"
+              pluginFormats="buildVST,buildVST3" pluginManufacturer="FX Mechanics"
               pluginManufacturerCode="ODME" pluginCode="BRR3" lv2Uri="http://www.fxmechanics.com/plugins/BiRR3"
               pluginAAXCategory="8" version="0.1" companyName="FX Mechanics"
-              companyWebsite="www.fxmechanics.com">
+              companyWebsite="www.fx-mechanics.com">
   <MAINGROUP id="BIm9jF" name="BiRR3D">
     <GROUP id="{ECC06303-726B-AA24-9400-D49E15802DEF}" name="dsp">
       <FILE id="LTEScz" name="hrtf.h" compile="0" resource="0" file="Source/dsp/hrtf.h"/>

@@ -2,14 +2,29 @@
 
 <JUCERPROJECT id="SD3Wpk" name="BiRR2D" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              companyName="OdioMechanics" companyWebsite="www.OdioMechanics.com"
-              pluginFormats="buildLV2,buildVST3" pluginManufacturerCode="ODME"
-              pluginCode="BRR2" aaxIdentifier="http://www.odiomechanics.com/plugins/BiRR2D"
-              pluginName="BiRR2D" pluginDesc="Binaural room reverb, 2D" pluginVST3Category="Reverb,Spatial,Stereo"
+              companyName="FX Mechanics" companyWebsite="www.fx-mechanics.com"
+              pluginFormats="buildVST,buildVST3" pluginManufacturerCode="FXME"
+              pluginCode="BRR2" aaxIdentifier="http://www.fx-mechanics.com/plugins/BiRR2D"
+              pluginName="BiRR2D" pluginDesc="Binaural room reverb, 2D" pluginVST3Category="Fx,Reverb,Spatial,Stereo"
               pluginAAXCategory="8" lv2Uri="http://www.odiomechanics.com/plugins/BiRR2D">
   <MAINGROUP id="NKvv2q" name="BiRR2D">
     <GROUP id="{1DE6DEF3-95E7-6E92-E4F8-B1B7D70EF90E}" name="Source">
+      <GROUP id="{D38986F7-0993-9329-C857-837F298B0917}" name="Assets">
+        <FILE id="FQmySE" name="logo686.png" compile="0" resource="1" file="Source/Assets/logo686.png"/>
+      </GROUP>
+      <GROUP id="{44303C07-4B76-7060-054D-C600297C806A}" name="dsp">
+        <FILE id="SOLslN" name="hrtf.h" compile="0" resource="0" file="Source/dsp/hrtf.h"/>
+        <FILE id="ZCFMoW" name="hrtf44.h" compile="0" resource="0" file="Source/dsp/hrtf44.h"/>
+        <FILE id="tLfmpS" name="hrtf48.h" compile="0" resource="0" file="Source/dsp/hrtf48.h"/>
+        <FILE id="qj87aC" name="hrtf88.h" compile="0" resource="0" file="Source/dsp/hrtf88.h"/>
+        <FILE id="vj93Zj" name="hrtf96.h" compile="0" resource="0" file="Source/dsp/hrtf96.h"/>
+        <FILE id="FmtoHx" name="RoomIR.cpp" compile="1" resource="0" file="Source/dsp/RoomIR.cpp"/>
+        <FILE id="DWBwL5" name="RoomIR.h" compile="0" resource="0" file="Source/dsp/RoomIR.h"/>
+      </GROUP>
       <GROUP id="{948E793C-A2D4-0EFF-109F-624367E4B162}" name="Components">
+        <FILE id="Cey9Bw" name="FxmeLookAndFeel.h" compile="0" resource="0"
+              file="Source/Components/FxmeLookAndFeel.h"/>
+        <FILE id="Etmfpb" name="HorizontalBar.h" compile="0" resource="0" file="Source/Components/HorizontalBar.h"/>
         <FILE id="q1uBPG" name="XyPad2.h" compile="0" resource="0" file="Source/Components/XyPad2.h"/>
         <FILE id="ArxPbs" name="XyPad2.cpp" compile="1" resource="0" file="Source/Components/XyPad2.cpp"/>
       </GROUP>
@@ -20,7 +35,6 @@
       <FILE id="cV1ZEU" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="moBnb9" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-      <FILE id="vkuk2K" name="hrtf.h" compile="0" resource="0" file="Source/hrtf.h"/>
     </GROUP>
   </MAINGROUP>
   <MODULES>
@@ -44,7 +58,7 @@
   <EXPORTFORMATS>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraLinkerFlags="/usr/lib/x86_64-linux-gnu/libfftw3*.a&#10;">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR2D"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR2D" optimisation="6"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../JUCE/JUCE/modules"/>

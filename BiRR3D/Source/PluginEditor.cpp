@@ -200,7 +200,7 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
     g.setColour(sourceColour);
     g.drawSingleLineText("O Source", uxb+18*ux, uyb+7*uy,juce::Justification::centred);
 
-    auto r = juce::Rectangle<float>(uxb+20.5*ux,uyb+15*uy,3*ux,3*ux);
+    auto r = juce::Rectangle<float>(uxb+20.5*ux,uyb+15*uy,3*ux,3*ux*227/269);
     g.drawImage(logo, r);
     
 
