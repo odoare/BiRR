@@ -6,7 +6,8 @@
               pluginFormats="buildVST,buildVST3" pluginManufacturerCode="FXME"
               pluginCode="BRR2" aaxIdentifier="http://www.fx-mechanics.com/plugins/BiRR2D"
               pluginName="BiRR2D" pluginDesc="Binaural room reverb, 2D" pluginVST3Category="Fx,Reverb,Spatial,Stereo"
-              pluginAAXCategory="8" lv2Uri="http://www.odiomechanics.com/plugins/BiRR2D">
+              pluginAAXCategory="8" lv2Uri="http://www.odiomechanics.com/plugins/BiRR2D"
+              version="0.0.1">
   <MAINGROUP id="NKvv2q" name="BiRR2D">
     <GROUP id="{1DE6DEF3-95E7-6E92-E4F8-B1B7D70EF90E}" name="Source">
       <GROUP id="{D38986F7-0993-9329-C857-837F298B0917}" name="Assets">
