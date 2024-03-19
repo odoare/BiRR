@@ -3,7 +3,7 @@
 <JUCERPROJECT id="JVECeb" name="BiRR3D" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               pluginFormats="buildVST,buildVST3" pluginManufacturer="FX Mechanics"
-              pluginManufacturerCode="ODME" pluginCode="BRR3" lv2Uri="http://www.fxmechanics.com/plugins/BiRR3"
+              pluginManufacturerCode="FXME" pluginCode="BRR3" lv2Uri="http://www.fxmechanics.com/plugins/BiRR3"
               pluginAAXCategory="8" version="0.1" companyName="FX Mechanics"
               companyWebsite="www.fx-mechanics.com">
   <MAINGROUP id="BIm9jF" name="BiRR3D">
