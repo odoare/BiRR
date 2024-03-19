@@ -18,7 +18,7 @@ using namespace std;
 #define SIGMA_DELTAT 1e-3f
 
 #define MAXSIZE 10.f
-#define MINDAMPING 0.001f
+#define MINDAMPING 0.005f
 
 struct IrBoxCalculatorParams{
   float rx;
