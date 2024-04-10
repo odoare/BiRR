@@ -558,7 +558,10 @@ bool BoxRoomIR::getBufferTransferState()
 void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
 {
     inputBufferCopy.copyFrom(0,0,buffer,0,0,buffer.getNumSamples());
+    inputBufferCopy.addFrom(0,0,buffer,1,0,buffer.getNumSamples());    
     inputBufferCopy.copyFrom(1,0,buffer,1,0,buffer.getNumSamples());
+    inputBufferCopy.addFrom(1,0,buffer,0,0,buffer.getNumSamples());
+    inputBufferCopy.applyGain(0.5f);
 
     juce::dsp::AudioBlock<float> block (buffer);
     juce::dsp::AudioBlock<float> blockCopy (inputBufferCopy);
