@@ -60,4 +60,7 @@ A number of threads equal to the number of CPUs is employed for the impulse resp
 
 - multiple inputs (and ability to place multiple virtual source in the room in the same interface)
 
+## Contact
+
+olivier.doare@ensta-paris.fr
 
