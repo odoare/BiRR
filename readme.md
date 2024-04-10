@@ -38,3 +38,26 @@ The effect level of direct path and reflections can be adjusted separately. Thes
 
 ## Stereo width
 
+In the XY configuration, this parameter specifies the angle between the two cardioid microphones. At its minimum the angle is zero and the produced sound is mono. At its maximum value, the angle equals 180 degrees, the microphones being perpendicular to the head axis. In the standard XY configuration, the angle equals 90 degrees, which occurs when the width parameter equals 0.5.
+
+In the MS configurations the stereo with quantifies the amplitude of the figure eight microphone signal (between 0 and 1).
+
+The stereo width parameter has no effect in the binaural configuration.
+
+## Parameters updating
+
+At each parameter update (except reverb levels), the impulse response is calculated. As each acoustic path has to be calculated, the computation time can be high, in particular if the damping is small.
+
+A number of threads equal to the number of CPUs is employed for the impulse response calculation, which allows reasonable computation times.
+
+## Future improvements
+
+- Faster convolution (?)
+
+- Rooms not necessarly parallelepipedic
+
+- more microphones configurations
+
+- multiple inputs (and ability to place multiple virtual source in the room in the same interface)
+
+
