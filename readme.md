@@ -14,7 +14,7 @@ User can control $(x,y,z)$ dimensions of the room, and position of source and li
 
 - Wall absorbtion : a coefficient between 0 an 1, representing a reflection coefficient. The acoustic wave amplitude is multiplied by this coefficient at each wall rebound. Higher values produce a shorter reverb.
 
-- Wall high frequency absobtion : this parameter controls the high frequency absorbtion for each wall rebound. Higher values produce darker reberb sound.
+- Wall high frequency absobtion : this parameter controls the high frequency absorbtion for each wall rebound. Higher values produce darker reverb sound.
 
 The input is stereophonic and for now, left and right signal are mixed to one mono signal sent to the reverb. It is the same as if both input signals were placed at the same position in the virtual space. The output sound is a stereo reverberberated sound with one of the following configurations:
 
@@ -48,7 +48,9 @@ The stereo width parameter has no effect in the binaural configuration.
 
 At each parameter update (except reverb levels), the impulse response is calculated. As each acoustic path has to be calculated, the computation time can be high, in particular if the damping is small.
 
-A number of threads equal to the number of CPUs is employed for the impulse response calculation, which allows reasonable computation times.
+A number of threads equal to the number of CPUs is employed for the impulse response calculation, which allows reasonable computation times (At most a few seconds for largest reverberation times on recent CPUs).
+
+*Important note:* the fact that some calculation time is necessary after each parameter change prevents parameter automation, as they cannot be updated in real time. Consequently, this plugin is static and cannot be used to move sounds in the virtual space.
 
 ## Future improvements
 
@@ -56,11 +58,10 @@ A number of threads equal to the number of CPUs is employed for the impulse resp
 
 - Rooms not necessarly parallelepipedic
 
-- more microphones configurations
+- More microphones configurations
 
-- multiple inputs (and ability to place multiple virtual source in the room in the same interface)
+- Multiple inputs (and ability to place multiple virtual source in the room in the same UI)
 
 ## Contact
 
 olivier.doare@ensta-paris.fr
-
