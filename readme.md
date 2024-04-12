@@ -1,5 +1,7 @@
 # Binaural Room Reverb (BiRR) 2D and 3D
 
+A realistic room simulator based on a combination of a convolution processor and a virtual room impulse response calculator.
+
 ### BiRR3D
 ![image info](./doc/BiRR3D_screen.png)
 
@@ -57,6 +59,8 @@ A number of threads equal to the number of CPUs is employed for the impulse resp
 - Faster convolution (?)
 
 - Rooms not necessarly parallelepipedic
+
+- Absorption parameters for each wall
 
 - More microphones configurations
 
