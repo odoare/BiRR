@@ -26,7 +26,7 @@ The input is stereophonic and for now, left and right signal are mixed to one mo
 
 - One omni and one eight-pattern microphone, in MS configuration
 
-- Binaural receptor based on the HRTF provided by MIT medialab ().
+- Binaural receptor based on the HRTF provided by MIT medialab (https://sound.media.mit.edu/resources/KEMAR.html).
 
 ## Direct path and reflections paths
 
@@ -36,7 +36,7 @@ when a parameter is changed, two stereo impluse responses are calculted and sent
 
 - The impulse response due to multiple reflections on walls.
 
-The effect level of direct path and reflections can be adjusted separately. These can be sought as dry and wet parameters of the reverb, although the prodeuced sound is physically acurate when both parameters are equal.
+The effect level of direct path and reflections can be adjusted separately. These can be sought as dry and wet parameters of the reverb, although the produced sound is physically acurate when both parameters are equal.
 
 ## Stereo width
 
@@ -56,15 +56,17 @@ A number of threads equal to the number of CPUs is employed for the impulse resp
 
 ## Future improvements
 
-- Faster convolution (?)
+In priority order:
 
-- Rooms not necessarly parallelepipedic
+- Ambisonic output (FOA)
 
 - Absorption parameters for each wall
 
-- More microphones configurations
+- Multiple inputs (and ability to place multiple virtual sources in the room in the same UI)
 
-- Multiple inputs (and ability to place multiple virtual source in the room in the same UI)
+- Faster convolution (?)
+
+- Rooms not necessarly parallelepipedic
 
 ## Contact
 
