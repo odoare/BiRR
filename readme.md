@@ -52,7 +52,7 @@ At each parameter update (except reverb levels), the impulse response is calcula
 
 A number of threads equal to the number of CPUs is employed for the impulse response calculation, which allows reasonable computation times (At most a few seconds for largest reverberation times on recent CPUs).
 
-*Important note:* the fact that some calculation time is necessary after each parameter change prevents parameter automation, as they cannot be updated in real time. Consequently, this plugin is static and cannot be used to move sounds in the virtual space.
+*Important note:* the fact that some calculation time is necessary after each parameter change prevents parameter automation, as they cannot be updated in real time. Consequently, this plugin cannot be used to move sounds in the virtual space.
 
 ## Future improvements
 
