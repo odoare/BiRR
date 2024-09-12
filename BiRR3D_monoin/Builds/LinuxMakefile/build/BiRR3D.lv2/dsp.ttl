@@ -1,0 +1,333 @@
+@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
+@prefix bufs:  <http://lv2plug.in/ns/ext/buf-size#> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix midi:  <http://lv2plug.in/ns/ext/midi#> .
+@prefix opts:  <http://lv2plug.in/ns/ext/options#> .
+@prefix param: <http://lv2plug.in/ns/ext/parameters#> .
+@prefix patch: <http://lv2plug.in/ns/ext/patch#> .
+@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
+@prefix plug:  <http://www.fxmechanics.com/plugins/BiRR3:> .
+@prefix pprop: <http://lv2plug.in/ns/ext/port-props#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rsz:   <http://lv2plug.in/ns/ext/resize-port#> .
+@prefix state: <http://lv2plug.in/ns/ext/state#> .
+@prefix time:  <http://lv2plug.in/ns/ext/time#> .
+@prefix ui:    <http://lv2plug.in/ns/extensions/ui#> .
+@prefix units: <http://lv2plug.in/ns/extensions/units#> .
+@prefix urid:  <http://lv2plug.in/ns/ext/urid#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+plug:RoomX
+	a lv2:Parameter ;
+	rdfs:label "RoomX" ;
+	rdfs:range atom:Float ;
+	lv2:default 3 ;
+	lv2:minimum 1 ;
+	lv2:maximum 10 .
+
+plug:RoomY
+	a lv2:Parameter ;
+	rdfs:label "RoomY" ;
+	rdfs:range atom:Float ;
+	lv2:default 4.7 ;
+	lv2:minimum 1 ;
+	lv2:maximum 10 .
+
+plug:RoomZ
+	a lv2:Parameter ;
+	rdfs:label "RoomZ" ;
+	rdfs:range atom:Float ;
+	lv2:default 2.5 ;
+	lv2:minimum 1 ;
+	lv2:maximum 10 .
+
+plug:ListenerX
+	a lv2:Parameter ;
+	rdfs:label "ListenerX" ;
+	rdfs:range atom:Float ;
+	lv2:default 0.5 ;
+	lv2:minimum 0.01 ;
+	lv2:maximum 0.99 .
+
+plug:ListenerY
+	a lv2:Parameter ;
+	rdfs:label "ListenerY" ;
+	rdfs:range atom:Float ;
+	lv2:default 0.25 ;
+	lv2:minimum 0.01 ;
+	lv2:maximum 0.99 .
+
+plug:ListenerZ
+	a lv2:Parameter ;
+	rdfs:label "ListenerZ" ;
+	rdfs:range atom:Float ;
+	lv2:default 0.7 ;
+	lv2:minimum 0.01 ;
+	lv2:maximum 0.99 .
+
+plug:ListenerO
+	a lv2:Parameter ;
+	rdfs:label "ListenerO" ;
+	rdfs:range atom:Float ;
+	lv2:default 0 ;
+	lv2:minimum -180 ;
+	lv2:maximum 180 .
+
+plug:SourceX
+	a lv2:Parameter ;
+	rdfs:label "SourceX" ;
+	rdfs:range atom:Float ;
+	lv2:default 0.5 ;
+	lv2:minimum 0.01 ;
+	lv2:maximum 0.99 .
+
+plug:SourceY
+	a lv2:Parameter ;
+	rdfs:label "SourceY" ;
+	rdfs:range atom:Float ;
+	lv2:default 0.75 ;
+	lv2:minimum 0.01 ;
+	lv2:maximum 0.99 .
+
+plug:SourceZ
+	a lv2:Parameter ;
+	rdfs:label "SourceZ" ;
+	rdfs:range atom:Float ;
+	lv2:default 0.7 ;
+	lv2:minimum 0.01 ;
+	lv2:maximum 0.99 .
+
+plug:D
+	a lv2:Parameter ;
+	rdfs:label "D" ;
+	rdfs:range atom:Float ;
+	lv2:default 0.1 ;
+	lv2:minimum 0.02 ;
+	lv2:maximum 0.99 .
+
+plug:HFD
+	a lv2:Parameter ;
+	rdfs:label "HFD" ;
+	rdfs:range atom:Float ;
+	lv2:default 0.1 ;
+	lv2:minimum 0.01 ;
+	lv2:maximum 0.3 .
+
+plug:Stereo_20Width
+	a lv2:Parameter ;
+	rdfs:label "Stereo Width" ;
+	rdfs:range atom:Float ;
+	lv2:default 0.5 ;
+	lv2:minimum 0 ;
+	lv2:maximum 1 .
+
+plug:Direct_20Level
+	a lv2:Parameter ;
+	rdfs:label "Direct Level" ;
+	rdfs:range atom:Float ;
+	lv2:default 0 ;
+	lv2:minimum -90 ;
+	lv2:maximum 6 .
+
+plug:Reflections_20Level
+	a lv2:Parameter ;
+	rdfs:label "Reflections Level" ;
+	rdfs:range atom:Float ;
+	lv2:default 0 ;
+	lv2:minimum -90 ;
+	lv2:maximum 6 .
+
+plug:Reverb_20type
+	a lv2:Parameter ;
+	rdfs:label "Reverb type" ;
+	rdfs:range atom:Float ;
+	lv2:default 1 ;
+	lv2:minimum 0 ;
+	lv2:maximum 3	 ;
+	lv2:portProperty lv2:enumeration ;
+	lv2:scalePoint [
+		rdfs:label "XY" ;
+		rdf:value 0 ;
+	], [
+		rdfs:label "MS with Cardio" ;
+		rdf:value 1 ;
+	], [
+		rdfs:label "MS with Omni" ;
+		rdf:value 2 ;
+	], [
+		rdfs:label "Binaural" ;
+		rdf:value 3 ;
+	] .
+
+plug:Auto_20update
+	a lv2:Parameter ;
+	rdfs:label "Auto update" ;
+	rdfs:range atom:Float ;
+	lv2:default 1 ;
+	lv2:minimum 0 ;
+	lv2:maximum 1	 ;
+	lv2:portProperty lv2:enumeration , lv2:toggled ;
+	lv2:scalePoint [
+		rdfs:label "Off" ;
+		rdf:value 0 ;
+	], [
+		rdfs:label "On" ;
+		rdf:value 1 ;
+	] .
+
+plug:input_group_1
+	a pg:InputGroup ;
+	lv2:name "Input" ;
+	lv2:symbol "input_group_1" .
+
+plug:output_group_1
+	a pg:OutputGroup ;
+	lv2:name "Output" ;
+	lv2:symbol "output_group_1" .
+
+<http://www.fxmechanics.com/plugins/BiRR3>
+	ui:ui <http://www.fxmechanics.com/plugins/BiRR3:UI> ;
+	a lv2:Plugin ;
+	doap:name "BiRR3D" ;
+	doap:description "BiRR3D" ;
+	lv2:minorVersion 0 ;
+	lv2:microVersion 1 ;
+	doap:maintainer [
+		a foaf:Person ;
+		foaf:name "FX Mechanics" ;
+		foaf:homepage <www.fxmechanics.com> ;
+		foaf:mbox <> ;
+	] ;
+	doap:release [
+		a doap:Version ;
+		doap:revision "0.1" ;
+	] ;
+	lv2:optionalFeature
+		lv2:hardRTCapable ;
+	lv2:extensionData
+		state:interface ;
+	lv2:requiredFeature
+		urid:map ,
+		opts:options ,
+		bufs:boundedBlockLength ;
+	pg:mainInput plug:input_group_1 ;
+	pg:mainOutput plug:output_group_1 ;
+	patch:writable
+		plug:RoomX ,
+		plug:RoomY ,
+		plug:RoomZ ,
+		plug:ListenerX ,
+		plug:ListenerY ,
+		plug:ListenerZ ,
+		plug:ListenerO ,
+		plug:SourceX ,
+		plug:SourceY ,
+		plug:SourceZ ,
+		plug:D ,
+		plug:HFD ,
+		plug:Stereo_20Width ,
+		plug:Direct_20Level ,
+		plug:Reflections_20Level ,
+		plug:Reverb_20type ,
+		plug:Auto_20update ;
+	patch:readable
+		plug:RoomX ,
+		plug:RoomY ,
+		plug:RoomZ ,
+		plug:ListenerX ,
+		plug:ListenerY ,
+		plug:ListenerZ ,
+		plug:ListenerO ,
+		plug:SourceX ,
+		plug:SourceY ,
+		plug:SourceZ ,
+		plug:D ,
+		plug:HFD ,
+		plug:Stereo_20Width ,
+		plug:Direct_20Level ,
+		plug:Reflections_20Level ,
+		plug:Reverb_20type ,
+		plug:Auto_20update ;
+	lv2:port [
+		a lv2:InputPort , lv2:AudioPort ;
+		lv2:index 0 ;
+		lv2:symbol "audio_in_1" ;
+		lv2:name "Audio In 1" ;
+		pg:group plug:input_group_1 ;
+		lv2:designation <http://lv2plug.in/ns/ext/port-groups#left> ;
+	] , [
+		a lv2:InputPort , lv2:AudioPort ;
+		lv2:index 1 ;
+		lv2:symbol "audio_in_2" ;
+		lv2:name "Audio In 2" ;
+		pg:group plug:input_group_1 ;
+		lv2:designation <http://lv2plug.in/ns/ext/port-groups#right> ;
+	] , [
+		a lv2:OutputPort , lv2:AudioPort ;
+		lv2:index 2 ;
+		lv2:symbol "audio_out_1" ;
+		lv2:name "Audio Out 1" ;
+		pg:group plug:output_group_1 ;
+		lv2:designation <http://lv2plug.in/ns/ext/port-groups#left> ;
+	] , [
+		a lv2:OutputPort , lv2:AudioPort ;
+		lv2:index 3 ;
+		lv2:symbol "audio_out_2" ;
+		lv2:name "Audio Out 2" ;
+		pg:group plug:output_group_1 ;
+		lv2:designation <http://lv2plug.in/ns/ext/port-groups#right> ;
+	] , [
+		a lv2:InputPort , atom:AtomPort ;
+		rsz:minimumSize 9416 ;
+		atom:bufferType atom:Sequence ;
+		atom:supports
+			patch:Message ,
+			time:Position ;
+		lv2:designation lv2:control ;
+		lv2:index 4 ;
+		lv2:symbol "in" ;
+		lv2:name "In" ;
+	] , [
+		a lv2:OutputPort , atom:AtomPort ;
+		rsz:minimumSize 9416 ;
+		atom:bufferType atom:Sequence ;
+		atom:supports
+			patch:Message ;
+		lv2:designation lv2:control ;
+		lv2:index 5 ;
+		lv2:symbol "out" ;
+		lv2:name "Out" ;
+	] , [
+		a lv2:OutputPort , lv2:ControlPort ;
+		lv2:designation lv2:latency ;
+		lv2:symbol "latency" ;
+		lv2:name "Latency" ;
+		lv2:index 6 ;
+		lv2:portProperty lv2:reportsLatency , lv2:integer , lv2:connectionOptional , pprop:notOnGUI ;
+		units:unit units:frame ;
+	] , [
+		a lv2:InputPort , lv2:ControlPort ;
+		lv2:designation lv2:freeWheeling ;
+		lv2:symbol "freeWheeling" ;
+		lv2:name "Free Wheeling" ;
+		lv2:default 0.0 ;
+		lv2:minimum 0.0 ;
+		lv2:maximum 1.0 ;
+		lv2:index 7 ;
+		lv2:portProperty lv2:toggled , lv2:connectionOptional , pprop:notOnGUI ;
+	] , [
+		a lv2:InputPort , lv2:ControlPort ;
+		lv2:designation lv2:enabled ;
+		lv2:symbol "enabled" ;
+		lv2:name "Enabled" ;
+		lv2:default 1.0 ;
+		lv2:minimum 0.0 ;
+		lv2:maximum 1.0 ;
+		lv2:index 8 ;
+		lv2:portProperty lv2:toggled , lv2:connectionOptional , pprop:notOnGUI ;
+	] ;
+	opts:supportedOption
+		bufs:maxBlockLength .
