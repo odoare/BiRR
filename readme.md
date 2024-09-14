@@ -16,9 +16,9 @@ User can control $(x,y,z)$ dimensions of the room, and position of source and li
 
 - Wall absorbtion : a coefficient between 0 an 1, representing a reflection coefficient. The acoustic wave amplitude is multiplied by this coefficient at each wall rebound. Higher values produce a shorter reverb.
 
-- Wall high frequency absobtion : this parameter controls the high frequency absorbtion for each wall rebound. Higher values produce darker reverb sound.
+- Wall high frequency absobtion : this parameter controls the high frequency absorbtion wall rebounds. Higher values produce darker reverb sound.
 
-The input is stereophonic and for now, left and right signal are mixed to one mono signal sent to the reverb. It is the same as if both input signals were placed at the same position in the virtual space. The output sound is a stereo reverberberated sound with one of the following configurations:
+The input is mono or stereo, depending on the chosen version (mono in or stereo in). The output sound is a stereo reverberberated sound with one of the following configurations:
 
 - Two cardioid microphones in XY configuration
 
@@ -27,6 +27,8 @@ The input is stereophonic and for now, left and right signal are mixed to one mo
 - One omni and one eight-pattern microphone, in MS configuration
 
 - Binaural receptor based on the HRTF provided by MIT medialab (https://sound.media.mit.edu/resources/KEMAR.html).
+
+The 2D version simulates a 2D rectangular flat domain. Consequently, the produced binaural sound doesn't consider height information for sources and listener. The 3D version simmulates a parallelepipedic room, height position of the sources and listener. The latter hence involves more cpu computations for the impulse responses calculations.
 
 ## Direct path and reflections paths
 
@@ -53,6 +55,12 @@ At each parameter update (except reverb levels), the impulse response is calcula
 A number of threads equal to the number of CPUs is employed for the impulse response calculation, which allows reasonable computation times (At most a few seconds for largest reverberation times on recent CPUs).
 
 *Important note:* the fact that some calculation time is necessary after each parameter change prevents parameter automation, as they cannot be updated in real time. Consequently, this plugin cannot be used to move sounds in the virtual space.
+
+## History
+
+- v0.0.1: First version
+
+- v0.0.2: Introduction of mono and stereo input version
 
 ## Future improvements
 
