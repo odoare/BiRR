@@ -3,7 +3,7 @@
   "Version": "0.0.2",
   "Factory Info": {
     "Vendor": "FX-Mechanics",
-    "URL": "www.fx-mechanics.com",
+    "URL": "fx-mechanics.com",
     "E-Mail": "",
     "Flags": {
       "Unicode": true,
@@ -15,10 +15,10 @@
     {
       "CID": "ABCDEF019182FAEB46584D4542523332",
       "Category": "Audio Module Class",
-      "Name": "BiRR3D  stereo in",
+      "Name": "BiRR3D stereo in",
       "Vendor": "FX-Mechanics",
       "Version": "0.0.2",
-      "SDKVersion": "VST 3.7.8",
+      "SDKVersion": "VST 3.7.12",
       "Sub Categories": [
         "Fx",
         "Reverb",
@@ -32,10 +32,10 @@
     {
       "CID": "ABCDEF011234ABCD46584D4542523332",
       "Category": "Component Controller Class",
-      "Name": "BiRR3D  stereo in",
+      "Name": "BiRR3D stereo in",
       "Vendor": "FX-Mechanics",
       "Version": "0.0.2",
-      "SDKVersion": "VST 3.7.8",
+      "SDKVersion": "VST 3.7.12",
       "Sub Categories": [
         "Fx",
         "Reverb",
@@ -49,10 +49,10 @@
     {
       "CID": "ABCDEF01C0DEF00D46584D4542523332",
       "Category": "Plugin Compatibility Class",
-      "Name": "BiRR3D  stereo in",
+      "Name": "BiRR3D stereo in",
       "Vendor": "FX-Mechanics",
       "Version": "0.0.2",
-      "SDKVersion": "VST 3.7.8",
+      "SDKVersion": "VST 3.7.12",
       "Class Flags": 0,
       "Cardinality": 2147483647,
       "Snapshots": [

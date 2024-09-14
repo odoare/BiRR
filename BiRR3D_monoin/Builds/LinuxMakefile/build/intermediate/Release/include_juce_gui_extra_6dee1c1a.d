@@ -28,6 +28,7 @@ build/intermediate/Release/include_juce_gui_extra_6dee1c1a.o: \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ContainerDeletePolicy.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_HeapBlock.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_MemoryBlock.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_CopyableHeapBlock.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ReferenceCountedObject.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ScopedPointer.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_OptionalScopedPointer.h \
@@ -139,6 +140,7 @@ build/intermediate/Release/include_juce_gui_extra_6dee1c1a.o: \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_Reservoir.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/files/juce_AndroidDocument.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/streams/juce_AndroidDocumentInputSource.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/misc/juce_OptionsHelpers.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/detail/juce_CallbackListenerList.h \
  /home/od/src/JUCE/JUCE/modules/juce_events/juce_events.h \
  /home/od/src/JUCE/JUCE/modules/juce_events/messages/juce_MessageManager.h \
@@ -186,20 +188,21 @@ build/intermediate/Release/include_juce_gui_extra_6dee1c1a.o: \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_ImageCache.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_ImageConvolutionKernel.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_ImageFileFormat.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_GraphicsContext.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_Image.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/colour/juce_FillType.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_Typeface.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_FontOptions.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_Font.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/detail/juce_Ranges.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_AttributedString.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_GlyphArrangement.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_TextLayout.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_CustomTypeface.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_GraphicsContext.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_LowLevelGraphicsContext.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_Image.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_ScaledImage.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/colour/juce_FillType.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_LruCache.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/native/juce_RenderingHelpers.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_LowLevelGraphicsSoftwareRenderer.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_LowLevelGraphicsPostScriptRenderer.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/effects/juce_ImageEffectFilter.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/effects/juce_DropShadowEffect.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/effects/juce_GlowEffect.h \
@@ -272,6 +275,16 @@ build/intermediate/Release/include_juce_gui_extra_6dee1c1a.o: \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/layout/juce_StretchableObjectResizer.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/layout/juce_TabbedButtonBar.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/layout/juce_TabbedComponent.h \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/interfaces/juce_AccessibilityCellInterface.h \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/interfaces/juce_AccessibilityTableInterface.h \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/interfaces/juce_AccessibilityTextInterface.h \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/interfaces/juce_AccessibilityValueInterface.h \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/enums/juce_AccessibilityActions.h \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/enums/juce_AccessibilityEvent.h \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/enums/juce_AccessibilityRole.h \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/juce_AccessibilityState.h \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/juce_AccessibilityHandler.h \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_basics/drawables/juce_Drawable.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/layout/juce_Viewport.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/menus/juce_PopupMenu.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/menus/juce_MenuBarModel.h \
@@ -283,7 +296,6 @@ build/intermediate/Release/include_juce_gui_extra_6dee1c1a.o: \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/positioning/juce_RelativeCoordinatePositioner.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/positioning/juce_RelativeParallelogram.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/positioning/juce_RelativePointPath.h \
- /home/od/src/JUCE/JUCE/modules/juce_gui_basics/drawables/juce_Drawable.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/drawables/juce_DrawableShape.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/drawables/juce_DrawableComposite.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/drawables/juce_DrawableImage.h \
@@ -307,7 +319,6 @@ build/intermediate/Release/include_juce_gui_extra_6dee1c1a.o: \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/buttons/juce_ToolbarButton.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/misc/juce_DropShadower.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/misc/juce_FocusOutline.h \
- /home/od/src/JUCE/JUCE/modules/juce_gui_basics/misc/juce_JUCESplashScreen.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/widgets/juce_TreeView.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/windows/juce_TopLevelWindow.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/windows/juce_MessageBoxOptions.h \
@@ -355,15 +366,6 @@ build/intermediate/Release/include_juce_gui_extra_6dee1c1a.o: \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/lookandfeel/juce_LookAndFeel_V3.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/lookandfeel/juce_LookAndFeel_V4.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/mouse/juce_LassoComponent.h \
- /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/interfaces/juce_AccessibilityCellInterface.h \
- /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/interfaces/juce_AccessibilityTableInterface.h \
- /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/interfaces/juce_AccessibilityTextInterface.h \
- /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/interfaces/juce_AccessibilityValueInterface.h \
- /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/enums/juce_AccessibilityActions.h \
- /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/enums/juce_AccessibilityEvent.h \
- /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/enums/juce_AccessibilityRole.h \
- /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/juce_AccessibilityState.h \
- /home/od/src/JUCE/JUCE/modules/juce_gui_basics/accessibility/juce_AccessibilityHandler.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/native/juce_XWindowSystem_linux.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/native/juce_XSymbols_linux.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/layout/juce_FlexItem.h \
@@ -397,6 +399,9 @@ build/intermediate/Release/include_juce_gui_extra_6dee1c1a.o: \
  /home/od/src/JUCE/JUCE/modules/juce_gui_extra/misc/juce_WebBrowserComponent.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_extra/misc/juce_LiveConstantEditor.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_extra/misc/juce_AnimatedAppComponent.h \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_extra/detail/juce_WebControlRelayEvents.h \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_extra/misc/juce_WebControlRelays.h \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_extra/misc/juce_WebControlParameterIndexReceiver.h \
  /usr/include/gtk-3.0/gtk/gtk.h /usr/include/gtk-3.0/gdk/gdk.h \
  /usr/include/gtk-3.0/gdk/gdkconfig.h /usr/include/glib-2.0/glib.h \
  /usr/include/glib-2.0/glib/galloca.h /usr/include/glib-2.0/glib/gtypes.h \
@@ -1206,12 +1211,13 @@ build/intermediate/Release/include_juce_gui_extra_6dee1c1a.o: \
  /home/od/src/JUCE/JUCE/modules/juce_gui_extra/misc/juce_PushNotifications.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_gui_extra/misc/juce_RecentlyOpenedFilesList.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_gui_extra/misc/juce_SplashScreen.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_extra/native/juce_SystemTrayIcon_linux.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_gui_extra/misc/juce_SystemTrayIconComponent.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_gui_extra/misc/juce_LiveConstantEditor.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_gui_extra/misc/juce_AnimatedAppComponent.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_gui_extra/misc/juce_WebBrowserComponent.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_gui_extra/misc/juce_WebControlRelays.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_gui_basics/native/juce_ScopedWindowAssociation_linux.h \
  /home/od/src/JUCE/JUCE/modules/juce_gui_extra/native/juce_XEmbedComponent_linux.cpp \
  pre_build/juce_LinuxSubprocessHelperBinaryData.h \
- /home/od/src/JUCE/JUCE/modules/juce_gui_extra/native/juce_WebBrowserComponent_linux.cpp \
- /home/od/src/JUCE/JUCE/modules/juce_gui_extra/native/juce_SystemTrayIcon_linux.cpp
+ /home/od/src/JUCE/JUCE/modules/juce_gui_extra/native/juce_WebBrowserComponent_linux.cpp

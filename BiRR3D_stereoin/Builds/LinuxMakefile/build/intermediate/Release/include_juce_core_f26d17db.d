@@ -25,6 +25,7 @@ build/intermediate/Release/include_juce_core_f26d17db.o: \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ContainerDeletePolicy.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_HeapBlock.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_MemoryBlock.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_CopyableHeapBlock.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ReferenceCountedObject.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ScopedPointer.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_OptionalScopedPointer.h \
@@ -136,10 +137,10 @@ build/intermediate/Release/include_juce_core_f26d17db.o: \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_Reservoir.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/files/juce_AndroidDocument.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/streams/juce_AndroidDocumentInputSource.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/misc/juce_OptionsHelpers.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/detail/juce_CallbackListenerList.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/containers/juce_AbstractFifo.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/containers/juce_ArrayBase.cpp \
- /home/od/src/JUCE/JUCE/modules/juce_core/containers/juce_ListenerList.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/containers/juce_NamedValueSet.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/containers/juce_OwnedArray.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/containers/juce_PropertySet.cpp \
@@ -165,6 +166,8 @@ build/intermediate/Release/include_juce_core_f26d17db.o: \
  /home/od/src/JUCE/JUCE/modules/juce_core/misc/juce_ConsoleApplication.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/misc/juce_ScopeGuard.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/network/juce_MACAddress.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_core/native/juce_SharedCode_posix.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/native/juce_NamedPipe_posix.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/network/juce_NamedPipe.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/network/juce_Socket.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/network/juce_IPAddress.cpp \
@@ -197,6 +200,20 @@ build/intermediate/Release/include_juce_core_f26d17db.o: \
  /home/od/src/JUCE/JUCE/modules/juce_core/javascript/juce_JSON.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/javascript/juce_JSONUtils.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/javascript/juce_Javascript.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/choc_javascript_QuickJS.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/choc_javascript.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/../containers/choc_Value.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/../containers/../platform/choc_Assert.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/../text/choc_JSON.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/../text/choc_UTF8.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/../text/choc_StringUtilities.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/../text/../platform/choc_Assert.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/../text/choc_FloatToString.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/../text/../math/choc_MathHelpers.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/../text/../containers/choc_Value.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/../platform/choc_DisableAllWarnings.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/../platform/choc_ReenableAllWarnings.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/javascript/choc/javascript/choc_javascript.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/containers/juce_DynamicObject.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/xml/juce_XmlDocument.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/xml/juce_XmlElement.cpp \
@@ -227,8 +244,6 @@ build/intermediate/Release/include_juce_core_f26d17db.o: \
  /home/od/src/JUCE/JUCE/modules/juce_core/files/juce_WildcardFileFilter.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/native/juce_ThreadPriorities_native.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/native/juce_PlatformTimerListener.h \
- /home/od/src/JUCE/JUCE/modules/juce_core/native/juce_SharedCode_posix.h \
- /home/od/src/JUCE/JUCE/modules/juce_core/native/juce_NamedPipe_posix.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/native/juce_IPAddress_posix.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/native/juce_CommonFile_linux.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/native/juce_Files_linux.cpp \

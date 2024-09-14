@@ -26,6 +26,7 @@ build/intermediate/Release/include_juce_dsp_aeb2060f.o: \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ContainerDeletePolicy.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_HeapBlock.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_MemoryBlock.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_CopyableHeapBlock.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ReferenceCountedObject.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ScopedPointer.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_OptionalScopedPointer.h \
@@ -137,6 +138,7 @@ build/intermediate/Release/include_juce_dsp_aeb2060f.o: \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_Reservoir.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/files/juce_AndroidDocument.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/streams/juce_AndroidDocumentInputSource.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/misc/juce_OptionsHelpers.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/detail/juce_CallbackListenerList.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_basics/buffers/juce_AudioDataConverters.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_basics/buffers/juce_FloatVectorOperations.h \

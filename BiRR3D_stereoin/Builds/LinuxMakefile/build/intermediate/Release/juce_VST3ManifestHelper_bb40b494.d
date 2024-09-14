@@ -2,31 +2,35 @@ build/intermediate/Release/juce_VST3ManifestHelper_bb40b494.o: \
  /home/od/src/JUCE/JUCE/modules/juce_audio_plugin_client/VST3/juce_VST3ManifestHelper.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_core/system/juce_CompilerWarnings.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/system/juce_TargetPlatform.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/system/juce_CompilerSupport.h \
+ /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/fplatform.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/vst/hosting/module_linux.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/vst/hosting/module.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/vst/hosting/../utility/uid.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/vst/hosting/../utility/optional.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/funknown.h \
- /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/fplatform.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/ftypes.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/smartpointer.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/ipluginbase.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/fstrdefs.h \
- /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/vst/hosting/../utility/stringconvert.h \
+ /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/vst/utility/stringconvert.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/vsttypes.h \
+ /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/funknownimpl.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/coreiids.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/ibstream.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/icloneable.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/iupdatehandler.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/funknown.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/samples/vst-utilities/moduleinfotool/source/main.cpp \
- /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/base/source/fcommandline.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/iplugincompatibility.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/common/memorystream.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/common/readfile.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/vst/moduleinfo/moduleinfocreator.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/vst/moduleinfo/moduleinfo.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/vst/moduleinfo/moduleinfoparser.h \
+ /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/base/source/fcommandline.h \
+ /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/common/commonstringconvert.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/common/commonstringconvert.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/common/memorystream.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/futils.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/public.sdk/source/common/readfile.cpp \
@@ -46,6 +50,7 @@ build/intermediate/Release/juce_VST3ManifestHelper_bb40b494.o: \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/ivstchannelcontextinfo.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/ivstattributes.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/ivstcontextmenu.h \
+ /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/ivstdataexchange.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/ivsteditcontroller.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/ivstevents.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/ivstprocesscontext.h \
@@ -60,6 +65,7 @@ build/intermediate/Release/juce_VST3ManifestHelper_bb40b494.o: \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/ivstpluginterfacesupport.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/ivstplugview.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/ivstprefetchablesupport.h \
+ /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/ivstremapparamid.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/ivstrepresentation.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/vst/ivsttestplugprovider.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK/pluginterfaces/base/istringresult.h \

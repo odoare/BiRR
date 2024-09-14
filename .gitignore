@@ -1,7 +1,10 @@
-**/BiRR2D/Builds
-**/BiRR2D/JuceLibraryCode
-**/BiRR3D/Builds
-**/BiRR3D/JuceLibraryCode
+**/BiRR2D_monoin/Builds
+**/BiRR2D_monoin/JuceLibraryCode
+**/BiRR3D_monoin/Builds
+**/BiRR3D_monoin/JuceLibraryCode
+**/BiRR2D_stereoin/Builds
+**/BiRR2D_stereoin/JuceLibraryCode
+**/BiRR3D_stereoin/Builds
+**/BiRR3D_stereoin/JuceLibraryCode
 **/.vscode
 **/tests
-

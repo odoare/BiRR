@@ -26,6 +26,7 @@ build/intermediate/Release/include_juce_graphics_f817e147.o: \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ContainerDeletePolicy.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_HeapBlock.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_MemoryBlock.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_CopyableHeapBlock.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ReferenceCountedObject.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ScopedPointer.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_OptionalScopedPointer.h \
@@ -137,6 +138,7 @@ build/intermediate/Release/include_juce_graphics_f817e147.o: \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_Reservoir.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/files/juce_AndroidDocument.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/streams/juce_AndroidDocumentInputSource.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/misc/juce_OptionsHelpers.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/detail/juce_CallbackListenerList.h \
  /home/od/src/JUCE/JUCE/modules/juce_events/juce_events.h \
  /home/od/src/JUCE/JUCE/modules/juce_events/messages/juce_MessageManager.h \
@@ -184,20 +186,21 @@ build/intermediate/Release/include_juce_graphics_f817e147.o: \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_ImageCache.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_ImageConvolutionKernel.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_ImageFileFormat.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_GraphicsContext.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_Image.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/colour/juce_FillType.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_Typeface.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_FontOptions.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_Font.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/detail/juce_Ranges.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_AttributedString.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_GlyphArrangement.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_TextLayout.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_CustomTypeface.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_GraphicsContext.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_LowLevelGraphicsContext.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_Image.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_ScaledImage.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/colour/juce_FillType.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_LruCache.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/native/juce_RenderingHelpers.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_LowLevelGraphicsSoftwareRenderer.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_LowLevelGraphicsPostScriptRenderer.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/effects/juce_ImageEffectFilter.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/effects/juce_DropShadowEffect.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/effects/juce_GlowEffect.h \
@@ -216,6 +219,44 @@ build/intermediate/Release/include_juce_graphics_f817e147.o: \
  /usr/include/freetype2/freetype/fterrors.h \
  /usr/include/freetype2/freetype/ftmoderr.h \
  /usr/include/freetype2/freetype/fterrdef.h \
+ /usr/include/freetype2/freetype/ftadvanc.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-ft.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-blob.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-common.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-buffer.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-unicode.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-font.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-face.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-map.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-set.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-draw.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-paint.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-deprecated.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-shape.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-shape-plan.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-style.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-version.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-ot.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-ot-color.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-ot-name.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-ot-deprecated.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-ot-font.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-ot-layout.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-ot-math.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-ot-meta.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-ot-metrics.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-ot-shape.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/harfbuzz/hb-ot-var.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_FunctionPointerDestructor.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/native/juce_EventTracing.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/unicode/juce_UnicodeGenerated.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/unicode/juce_UnicodeUtils.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/unicode/juce_UnicodeLine.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/unicode/juce_UnicodeScript.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/unicode/juce_UnicodeBrackets.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/unicode/juce_UnicodeBidi.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/unicode/juce_Unicode.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/colour/juce_Colour.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/colour/juce_ColourGradient.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/colour/juce_Colours.cpp \
@@ -227,7 +268,6 @@ build/intermediate/Release/include_juce_graphics_f817e147.o: \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/geometry/juce_PathStrokeType.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/placement/juce_RectanglePlacement.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_GraphicsContext.cpp \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_LowLevelGraphicsPostScriptRenderer.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_LowLevelGraphicsSoftwareRenderer.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_Image.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_ImageCache.cpp \
@@ -320,12 +360,20 @@ build/intermediate/Release/include_juce_graphics_f817e147.o: \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/image_formats/pnglib/pngwutil.c \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_AttributedString.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_Typeface.cpp \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_CustomTypeface.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_FontOptions.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_Font.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/detail/juce_Ranges.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_SimpleShapedText.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_JustifiedText.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_ShapedText.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_GlyphArrangement.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_TextLayout.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/effects/juce_DropShadowEffect.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/effects/juce_GlowEffect.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_TypefaceFileCache.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/native/juce_Fonts_freetype.cpp \
+ /usr/include/freetype2/freetype/tttables.h \
+ /usr/include/freetype2/freetype/ftglyph.h \
+ /usr/include/freetype2/freetype/ftcolor.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/native/juce_Fonts_linux.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/native/juce_IconHelpers_linux.cpp

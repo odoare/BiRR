@@ -2,13 +2,15 @@
 
 <JUCERPROJECT id="JVECeb" name="BiRR3D mono input" projectType="audioplug"
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" displaySplashScreen="1"
-              jucerFormatVersion="1" pluginFormats="buildStandalone,buildVST,buildVST3"
-              pluginManufacturer="FX-Mechanics" pluginManufacturerCode="FXME"
-              pluginCode="BR31" lv2Uri="http://fx-mechanics.com/plugins/BiRR3D2"
+              jucerFormatVersion="1" pluginFormats="buildVST3" pluginManufacturer="FX-Mechanics"
+              pluginManufacturerCode="FXME" pluginCode="BR31" lv2Uri="http://fx-mechanics.com/plugins/BiRR3D2"
               pluginAAXCategory="8" version="0.0.2" companyName="FX-Mechanics"
               companyWebsite="www.fx-mechanics.com" pluginVST3Category="Fx,Reverb,Spatial"
               pluginName="BiRR3D mono in" pluginDesc="Binaural room reverb, mono input">
   <MAINGROUP id="BIm9jF" name="BiRR3D mono input">
+    <GROUP id="{73833252-B5AF-B4C1-E839-2064ACA9F25A}" name="assets">
+      <FILE id="O8mLNt" name="logo686.png" compile="0" resource="1" file="../lib/assets/logo686.png"/>
+    </GROUP>
     <GROUP id="{ECC06303-726B-AA24-9400-D49E15802DEF}" name="components">
       <FILE id="R5uhO2" name="FxmeLookAndFeel.h" compile="0" resource="0"
             file="../lib/components/FxmeLookAndFeel.h"/>
@@ -24,10 +26,6 @@
       <FILE id="mSVtqR" name="hrtf96.h" compile="0" resource="0" file="../lib/dsp/hrtf96.h"/>
       <FILE id="qfvOq3" name="RoomIR.cpp" compile="1" resource="0" file="../lib/dsp/RoomIR.cpp"/>
       <FILE id="adFKfz" name="RoomIR.h" compile="0" resource="0" file="../lib/dsp/RoomIR.h"/>
-    </GROUP>
-    <GROUP id="{C8F98279-7F49-5105-5D3E-5EA88F0C7230}" name="Assets">
-      <FILE id="L5ddy9" name="logo.png" compile="0" resource="1" file="Assets/logo.png"/>
-      <FILE id="xFWVa1" name="logo686.png" compile="0" resource="1" file="Assets/logo686.png"/>
     </GROUP>
     <GROUP id="{06E13A3E-246C-4F43-EBED-8C65CF204F5E}" name="Source">
       <FILE id="BU4rMX" name="PluginEditor.cpp" compile="1" resource="0"
@@ -80,7 +78,7 @@
     </LINUX_MAKE>
     <VS2022 targetFolder="Builds/VisualStudio2022" IPP1ALibrary="true" MKL1ALibrary="Parallel">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR3D"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR3D_monoin"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../JUCE/JUCE/modules"/>
@@ -100,7 +98,7 @@
     </VS2022>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR3D"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR3D_monoin"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../JUCE/JUCE/modules"/>

@@ -18,7 +18,7 @@
       "Name": "BiRR3D mono in",
       "Vendor": "FX-Mechanics",
       "Version": "0.0.2",
-      "SDKVersion": "VST 3.7.8",
+      "SDKVersion": "VST 3.7.12",
       "Sub Categories": [
         "Fx",
         "Reverb",
@@ -35,7 +35,7 @@
       "Name": "BiRR3D mono in",
       "Vendor": "FX-Mechanics",
       "Version": "0.0.2",
-      "SDKVersion": "VST 3.7.8",
+      "SDKVersion": "VST 3.7.12",
       "Sub Categories": [
         "Fx",
         "Reverb",
@@ -52,7 +52,7 @@
       "Name": "BiRR3D mono in",
       "Vendor": "FX-Mechanics",
       "Version": "0.0.2",
-      "SDKVersion": "VST 3.7.8",
+      "SDKVersion": "VST 3.7.12",
       "Class Flags": 0,
       "Cardinality": 2147483647,
       "Snapshots": [

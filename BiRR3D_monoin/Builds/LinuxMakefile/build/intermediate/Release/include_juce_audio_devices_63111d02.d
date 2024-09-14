@@ -27,6 +27,7 @@ build/intermediate/Release/include_juce_audio_devices_63111d02.o: \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ContainerDeletePolicy.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_HeapBlock.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_MemoryBlock.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_CopyableHeapBlock.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ReferenceCountedObject.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_ScopedPointer.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_OptionalScopedPointer.h \
@@ -138,6 +139,7 @@ build/intermediate/Release/include_juce_audio_devices_63111d02.o: \
  /home/od/src/JUCE/JUCE/modules/juce_core/memory/juce_Reservoir.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/files/juce_AndroidDocument.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/streams/juce_AndroidDocumentInputSource.h \
+ /home/od/src/JUCE/JUCE/modules/juce_core/misc/juce_OptionsHelpers.h \
  /home/od/src/JUCE/JUCE/modules/juce_core/detail/juce_CallbackListenerList.h \
  /home/od/src/JUCE/JUCE/modules/juce_events/messages/juce_MessageManager.h \
  /home/od/src/JUCE/JUCE/modules/juce_events/messages/juce_Message.h \
@@ -228,20 +230,21 @@ build/intermediate/Release/include_juce_audio_devices_63111d02.o: \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_ImageCache.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_ImageConvolutionKernel.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_ImageFileFormat.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_GraphicsContext.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_Image.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/colour/juce_FillType.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_Typeface.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_FontOptions.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_Font.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/detail/juce_Ranges.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_AttributedString.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_GlyphArrangement.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_TextLayout.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_CustomTypeface.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_GraphicsContext.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_LowLevelGraphicsContext.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_Image.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/images/juce_ScaledImage.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/colour/juce_FillType.h \
+ /home/od/src/JUCE/JUCE/modules/juce_graphics/fonts/juce_LruCache.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/native/juce_RenderingHelpers.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_LowLevelGraphicsSoftwareRenderer.h \
- /home/od/src/JUCE/JUCE/modules/juce_graphics/contexts/juce_LowLevelGraphicsPostScriptRenderer.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/effects/juce_ImageEffectFilter.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/effects/juce_DropShadowEffect.h \
  /home/od/src/JUCE/JUCE/modules/juce_graphics/effects/juce_GlowEffect.h \
@@ -254,10 +257,11 @@ build/intermediate/Release/include_juce_audio_devices_63111d02.o: \
  /home/od/src/JUCE/JUCE/modules/juce_audio_devices/sources/juce_AudioTransportSource.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_devices/audio_io/juce_AudioDeviceManager.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_devices/audio_io/juce_SampleRateHelpers.cpp \
- /home/od/src/JUCE/JUCE/modules/juce_audio_devices/midi_io/juce_MidiDevices.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_audio_devices/midi_io/juce_MidiDeviceListConnectionBroadcaster.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_audio_devices/native/juce_ALSA_linux.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_audio_basics/midi/juce_MidiDataConcatenator.h \
  /home/od/src/JUCE/JUCE/modules/juce_audio_devices/native/juce_Midi_linux.cpp \
+ /home/od/src/JUCE/JUCE/modules/juce_audio_devices/midi_io/juce_MidiDevices.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_audio_devices/audio_io/juce_AudioDeviceManager.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_audio_devices/audio_io/juce_AudioIODevice.cpp \
  /home/od/src/JUCE/JUCE/modules/juce_audio_devices/audio_io/juce_AudioIODeviceType.cpp \
