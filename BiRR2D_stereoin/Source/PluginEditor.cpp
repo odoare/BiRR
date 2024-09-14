@@ -199,9 +199,11 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setFont(18);
     g.setColour(listenerColour);
-    g.drawSingleLineText("O Listener", uxb+7*ux, uyb+5.75*uy,juce::Justification::centred);
+    g.drawSingleLineText("O Listener", uxb+9*ux, uyb+5.75*uy,juce::Justification::centred);
     g.setColour(sourceLColour);
-    g.drawSingleLineText("O Source", uxb+2*ux, uyb+5.75*uy,juce::Justification::centred);
+    g.drawSingleLineText("O L", uxb+2*ux, uyb+5.75*uy,juce::Justification::centred);
+    g.setColour(sourceRColour);
+    g.drawSingleLineText("O R", uxb+4*ux, uyb+5.75*uy,juce::Justification::centred);
     g.setColour(sourceRColour);
 
     auto r = juce::Rectangle<float>(uxb+16.25*ux,uyb+5.5*uy,3*ux,3*ux*227/269);
