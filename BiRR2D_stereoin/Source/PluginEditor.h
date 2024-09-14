@@ -93,7 +93,7 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> autoButtonAttachment;
     juce::Label autoLabel{"autoLabel", "Auto update"};
     
-    const juce::Colour listenerColour = juce::Colours::green;
+    const juce::Colour listenerColour = juce::Colours::darkviolet;
     const juce::Colour sourceLColour = juce::Colours::blue;
     const juce::Colour sourceRColour = juce::Colours::red;
 

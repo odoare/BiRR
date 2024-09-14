@@ -123,13 +123,13 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     widthSlider.onDragEnd = updateFunc;
     widthSlider.setLookAndFeel(&knobLookAndFeel);
 
-    addController(directLevelSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::orange,juce::Colours::black);
+    addController(directLevelSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::darkorange,juce::Colours::black);
     addAndConnectLabel(directLevelSlider, directLevelLabel);
     directLevelSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"Direct Level",directLevelSlider);
     //directLevelSlider.onDragEnd = updateFunc;
     directLevelSlider.setLookAndFeel(&knobLookAndFeel);
 
-    addController(reflectionsLevelSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::orange,juce::Colours::black);
+    addController(reflectionsLevelSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::darkorange,juce::Colours::black);
     addAndConnectLabel(reflectionsLevelSlider, reflectionsLevelLabel);
     reflectionsLevelSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"Reflections Level",reflectionsLevelSlider);
     //reflectionsLevelSlider.onDragEnd = updateFunc;
