@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="SD3Wpk" name="BiRR2D mono input" projectType="audioplug"
+              useAppConfig="0" addUsingNamespaceToJuceHeader="0" displaySplashScreen="1"
+              jucerFormatVersion="1" companyName="FX-Mechanics" companyWebsite="fx-mechanics.com"
+              pluginFormats="buildVST3" pluginManufacturerCode="FXME" pluginCode="BR21"
+              aaxIdentifier="http://fx-mechanics.com/plugins/BiRR2D" pluginName="BiRR2D mono in"
+              pluginDesc="Binaural room reverb, 2D, mono input" pluginVST3Category="Fx,Reverb,Spatial,Stereo"
+              pluginAAXCategory="8" lv2Uri="http://fx-mechanics.com/plugins/BiRR2D_monoin"
+              version="0.0.2">
+  <MAINGROUP id="NKvv2q" name="BiRR2D mono input">
+    <GROUP id="{34CC12DF-A955-ACD4-757D-70767BB2B363}" name="assets">
+      <FILE id="iZuoZy" name="logo686.png" compile="0" resource="1" file="../lib/assets/logo686.png"/>
+    </GROUP>
+    <GROUP id="{3D4C5986-A695-4E8F-6CFF-D0F05628E305}" name="dsp">
+      <FILE id="w5AGTD" name="hrtf.h" compile="0" resource="0" file="../lib/dsp/hrtf.h"/>
+      <FILE id="KYAWkn" name="hrtf44.h" compile="0" resource="0" file="../lib/dsp/hrtf44.h"/>
+      <FILE id="bJTcbp" name="hrtf48.h" compile="0" resource="0" file="../lib/dsp/hrtf48.h"/>
+      <FILE id="i1gh4V" name="hrtf88.h" compile="0" resource="0" file="../lib/dsp/hrtf88.h"/>
+      <FILE id="cbOcSH" name="hrtf96.h" compile="0" resource="0" file="../lib/dsp/hrtf96.h"/>
+      <FILE id="kbirF2" name="RoomIR2D.cpp" compile="1" resource="0" file="../lib/dsp/RoomIR2D.cpp"/>
+      <FILE id="o7403J" name="RoomIR2D.h" compile="0" resource="0" file="../lib/dsp/RoomIR2D.h"/>
+    </GROUP>
+    <GROUP id="{948E793C-A2D4-0EFF-109F-624367E4B162}" name="components">
+      <FILE id="SzNRkN" name="FxmeLookAndFeel.h" compile="0" resource="0"
+            file="../lib/components/FxmeLookAndFeel.h"/>
+      <FILE id="soqlOy" name="HorizontalBar.h" compile="0" resource="0" file="../lib/components/HorizontalBar.h"/>
+      <FILE id="cYKGg4" name="XyPad.cpp" compile="1" resource="0" file="../lib/components/XyPad.cpp"/>
+      <FILE id="vmsuUh" name="XyPad.h" compile="0" resource="0" file="../lib/components/XyPad.h"/>
+    </GROUP>
+    <GROUP id="{1DE6DEF3-95E7-6E92-E4F8-B1B7D70EF90E}" name="Source">
+      <FILE id="wigs0B" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="bbEdrX" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+      <FILE id="cV1ZEU" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="moBnb9" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+    </GROUP>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"
+               JUCE_DSP_USE_STATIC_FFTW="1"/>
+  <EXPORTFORMATS>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraLinkerFlags="/usr/lib/x86_64-linux-gnu/libfftw3*.a&#10;">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR2D_monoin" optimisation="6"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../JUCE/JUCE/modules"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+    <VS2022 targetFolder="Builds/VisualStudio2022">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR2D_monoin"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../JUCE/JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2022>
+    <XCODE_MAC targetFolder="Builds/MacOSX">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR2D_monoin"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../JUCE/JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+  </EXPORTFORMATS>
+</JUCERPROJECT>
