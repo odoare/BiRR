@@ -5,8 +5,8 @@ A realistic room simulator based on a combination of a convolution processor and
 ### BiRR3D
 ![image info](./doc/BiRR3D_screen.png)
 
-### BiRR2D
-![image info](./doc/BiRR2D_screen.png)
+<!-- ### BiRR2D
+![image info](./doc/BiRR2D_screen.png) -->
 
 ## Info
 
