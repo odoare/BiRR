@@ -1,3 +1,0 @@
-build/intermediate/Release/juce_LinuxSubprocessHelperBinaryData_e1db7dc.o: \
- pre_build/juce_LinuxSubprocessHelperBinaryData.cpp \
- pre_build/juce_LinuxSubprocessHelperBinaryData.h
