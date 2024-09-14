@@ -6,5 +6,6 @@
 **/BiRR2D_stereoin/JuceLibraryCode
 **/BiRR3D_stereoin/Builds
 **/BiRR3D_stereoin/JuceLibraryCode
+**/lib/dsp/hrtf_header_maker
 **/.vscode
 **/tests
