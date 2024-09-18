@@ -4,7 +4,7 @@
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" displaySplashScreen="1"
               jucerFormatVersion="1" pluginFormats="buildVST3" pluginManufacturer="FX-Mechanics"
               pluginManufacturerCode="FXME" pluginCode="BR32" lv2Uri="http://fx-mechanics.com/plugins/BiRR3D1"
-              pluginAAXCategory="8" version="0.0.2" companyName="FX-Mechanics"
+              pluginAAXCategory="8" version="0.0.3" companyName="FX-Mechanics"
               companyWebsite="fx-mechanics.com" pluginVST3Category="Fx,Reverb,Spatial"
               pluginName="BiRR3D stereo in" pluginDesc="Binaural room reverb, stereo input">
   <MAINGROUP id="BIm9jF" name="BiRR3D stereo input">

@@ -7,7 +7,7 @@
               aaxIdentifier="http://fx-mechanics.com/plugins/BiRR2D" pluginName="BiRR2D mono in"
               pluginDesc="Binaural room reverb, 2D, mono input" pluginVST3Category="Fx,Reverb,Spatial,Stereo"
               pluginAAXCategory="8" lv2Uri="http://fx-mechanics.com/plugins/BiRR2D_monoin"
-              version="0.0.2">
+              version="0.0.3">
   <MAINGROUP id="NKvv2q" name="BiRR2D mono input">
     <GROUP id="{34CC12DF-A955-ACD4-757D-70767BB2B363}" name="assets">
       <FILE id="iZuoZy" name="logo686.png" compile="0" resource="1" file="../lib/assets/logo686.png"/>
