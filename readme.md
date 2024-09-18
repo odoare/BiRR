@@ -61,6 +61,8 @@ A number of threads equal to the number of CPUs is employed for the impulse resp
 
 - v0.0.2: Introduction of mono and stereo input version
 
+- v0.0.3: Fix bug that prevented direct path to be computed
+
 ## Future improvements
 
 In priority order:
