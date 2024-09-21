@@ -107,7 +107,7 @@ void ReverbAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
 
     roomIR.prepare(spec);
 
-    setIrLoader();
+    // setIrLoader(); (removed to prevent crash at project loading)
 
 }
 

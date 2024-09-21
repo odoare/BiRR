@@ -410,6 +410,8 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
       filter[i].prepare(spec);  
     }
 
+    std::cout << "BoxRoomIR::prepare has finished. \n";
+
 }
 
 void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
