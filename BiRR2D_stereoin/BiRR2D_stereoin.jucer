@@ -7,7 +7,7 @@
               aaxIdentifier="http://fx-mechanics.com/plugins/BiRR2D_stereoin"
               pluginName="BiRR2D stereo in" pluginDesc="Binaural room reverb, 2D, stereo input"
               pluginVST3Category="Fx,Reverb,Spatial,Stereo" pluginAAXCategory="8"
-              lv2Uri="http://fx-mechanics.com/plugins/BiRR2D_stereoin" version="0.0.3">
+              lv2Uri="http://fx-mechanics.com/plugins/BiRR2D_stereoin" version="0.0.4">
   <MAINGROUP id="NKvv2q" name="BiRR2D stereo input">
     <GROUP id="{34CC12DF-A955-ACD4-757D-70767BB2B363}" name="assets">
       <FILE id="FdMEYI" name="logo686.png" compile="0" resource="1" file="../lib/assets/logo686.png"/>
@@ -77,7 +77,7 @@
         <MODULEPATH id="juce_dsp" path="../../JUCE/JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
-    <VS2022 targetFolder="Builds/VisualStudio2022">
+    <VS2022 targetFolder="Builds/VisualStudio2022" IPP1ALibrary="true" MKL1ALibrary="Parallel">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="0" name="Release" targetName="BiRR2D_stereoin"/>
       </CONFIGURATIONS>

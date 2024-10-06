@@ -107,8 +107,15 @@ void ReverbAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
 
     roomIR.prepare(spec);
 
-    // setIrLoader(); (removed to prevent crash at project loading)
+    // We start loading of IRs
+    // This is necessary when the plugin is newly loaded
+    setIrLoader();
 
+    // In case of project loading, if the host loads the parameters
+    // too fast, the system can crash. A temporary dirty workaround
+    // is to wait a little bit before going the next steps.
+    // TODO : find a better solution
+    sleep(2);
 }
 
 void ReverbAudioProcessor::releaseResources()
