@@ -117,7 +117,7 @@ void ReverbAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     // too fast, the system can crash. A temporary dirty workaround
     // is to wait a little bit before going the next steps.
     // TODO : find a better solution
-    sleep(2);
+    juce::Time::waitForMillisecondCounter(2000);
 
 }
 
