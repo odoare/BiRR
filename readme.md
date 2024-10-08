@@ -63,6 +63,8 @@ A number of threads equal to the number of CPUs is employed for the impulse resp
 
 - v0.0.3: Fix bug that prevented direct path to be computed
 
+- v0.0.4: Fix crash occuring when parameters are updated, binaries now distributed as VST3
+
 ## Future improvements
 
 In priority order:
