@@ -86,12 +86,12 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> reflectionsLevelSliderAttachment;
     juce::Label reflectionsLevelLabel{"reflectionsLevelLabel", "Reflections Level"};
 
-    Gui::XyPad3h xyPad2;
+    Gui::XyPad3h xyPad3;
 
     juce::TextButton calculateButton;
     juce::ToggleButton autoButton;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> autoButtonAttachment;
-    juce::Label autoLabel{"autoLabel", "Auto update"};
+    juce::Label autoLabel{"autoLabel", "Update"};
     
     const juce::Colour listenerColour = juce::Colours::darkviolet;
     const juce::Colour sourceLColour = juce::Colours::blue;

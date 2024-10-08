@@ -22,6 +22,7 @@ void IrBoxCalculator::run()
     auto* dataL = bp->getWritePointer(0);
     auto* dataR = bp->getWritePointer(1);
 
+    if (!threadShouldExit())
     for (int ix = nxmin; ix < nxmax ; ++ix)
     {
       x = 2*float(ceil(float(ix)/2))*p.rx+pow(-1,ix)*p.sx;
@@ -122,7 +123,11 @@ void IrBoxCalculator::run()
         }
         progress = float(ix-nxmin)/float(nxmax-nxmin);
       }
-      else return;
+      else
+      {
+        isCalculating[0] = false;
+        return;
+      }
     }
     isCalculating[0] = false;
     cout << "Done" << endl;
@@ -321,14 +326,46 @@ BoxRoomIR::BoxRoomIR()
 
 }
 
-void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
+void BoxRoomIR::initialize()
 {
-
     int numCpus = juce::SystemStats::getNumPhysicalCpus();
 
     cout << "Number of CPUs : " << juce::SystemStats::getNumCpus() << endl;
     cout << "Number of physical CPUs : " << juce::SystemStats::getNumPhysicalCpus() << endl;
     threadsNum = std::min<int>(numCpus,MAXTHREADS);
+
+    for (int i=0; i<threadsNum; i++)
+    {
+      boxCalculator[i].setCalculatingBool(&isCalculating[i]);
+      boxCalculator[i].setBuffer(&boxIrBuffer[i]);
+      boxCalculator[i].setCalculateDirectPath(false);
+      boxCalculator[i].setHrtfVars(&nsamp, &nearestSampleRate);
+    }
+
+    boxIrTransfer.setCalculatingBool(&isCalculating[0]);
+    boxIrTransfer.setBuffer(&boxIrBuffer[0]);
+    boxIrTransfer.setIr(&boxConvolution);
+    boxIrTransfer.setThreadsNum(threadsNum);
+
+    // Calculator for the direct path
+
+    directCalculator.setCalculatingBool(&isCalculatingDirect);
+    directCalculator.setBuffer(&directIrBuffer);
+    directCalculator.setCalculateDirectPath(true);
+    directCalculator.setHrtfVars(&nsamp, &nearestSampleRate);
+
+    directIrTransfer.setCalculatingBool(&isCalculatingDirect);
+    directIrTransfer.setBuffer(&directIrBuffer);
+    directIrTransfer.setIr(&directConvolution);
+    directIrTransfer.setThreadsNum(1);
+
+    directConvolution.reset();
+
+}
+
+void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
+{
+
 
     inputBufferCopy.setSize(2, spec.maximumBlockSize ,false,true);
 
@@ -366,19 +403,7 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
 
     // Calculators for the room reflexions (box)
 
-    for (int i=0; i<threadsNum; i++)
-    {
-      boxCalculator[i].setCalculatingBool(&isCalculating[i]);
-      boxCalculator[i].setBuffer(&boxIrBuffer[i]);
-      boxCalculator[i].setCalculateDirectPath(false);
-      boxCalculator[i].setHrtfVars(&nsamp, &nearestSampleRate);
-    }
-
-    boxIrTransfer.setCalculatingBool(&isCalculating[0]);
-    boxIrTransfer.setBuffer(&boxIrBuffer[0]);
-    boxIrTransfer.setIr(&boxConvolution);
     boxIrTransfer.setSampleRate(spec.sampleRate);
-    boxIrTransfer.setThreadsNum(threadsNum);
 
     boxConvolution.reset();
     boxConvolution.prepare(spec);
@@ -386,16 +411,7 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
 
     // Calculator for the direct path
 
-    directCalculator.setCalculatingBool(&isCalculatingDirect);
-    directCalculator.setBuffer(&directIrBuffer);
-    directCalculator.setCalculateDirectPath(true);
-    directCalculator.setHrtfVars(&nsamp, &nearestSampleRate);
-
-    directIrTransfer.setCalculatingBool(&isCalculatingDirect);
-    directIrTransfer.setBuffer(&directIrBuffer);
-    directIrTransfer.setIr(&directConvolution);
     directIrTransfer.setSampleRate(spec.sampleRate);
-    directIrTransfer.setThreadsNum(1);
 
     directConvolution.reset();
     directConvolution.prepare(spec);
@@ -414,6 +430,7 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
 
 void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
 {
+    hasStartedCalculation = true;
     if (setIrCaclulatorsParams(p))     // (We run the calculation only if a parameter has changed)
     {    
 
@@ -454,7 +471,7 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
       // Set some multithread loops parameters
 
       int n = int(log10(2e-2)/log10(1-p.damp));
-      auto dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
+      auto dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry)/340;
       int longueur = int(ceil(dur*p.sampleRate)+nsamp+int(p.sampleRate*SIGMA_DELTAT));
       int chunksize = floor(2*float(n)/threadsNum);
 
@@ -470,7 +487,7 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
       }
 
       n = 1;
-      dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
+      dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry)/340;
       longueur = int(ceil(dur*p.sampleRate)+nsamp+int(p.sampleRate*SIGMA_DELTAT));
 
       directCalculator.longueur = longueur;
@@ -502,13 +519,10 @@ bool BoxRoomIR::setIrCaclulatorsParams(IrBoxCalculatorParams& pa)
     // of each threaded calculator
     if (juce::approximatelyEqual(p.rx,pa.rx)
       && juce::approximatelyEqual(p.ry,pa.ry)
-      && juce::approximatelyEqual(p.rz,pa.rz)
       && juce::approximatelyEqual(p.lx,pa.lx)
       && juce::approximatelyEqual(p.ly,pa.ly)
-      && juce::approximatelyEqual(p.lz,pa.lz)
       && juce::approximatelyEqual(p.sx,pa.sx)
       && juce::approximatelyEqual(p.sy,pa.sy)
-      && juce::approximatelyEqual(p.sz,pa.sz)
       && juce::approximatelyEqual(p.damp,pa.damp)
       && juce::approximatelyEqual(p.hfDamp,pa.hfDamp)
       && juce::approximatelyEqual(p.type,pa.type)

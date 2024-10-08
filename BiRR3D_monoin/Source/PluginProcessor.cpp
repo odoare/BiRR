@@ -30,6 +30,7 @@ ReverbAudioProcessor::ReverbAudioProcessor()
                        )
 #endif
 {
+    startTimerHz(5);
 }
 
 ReverbAudioProcessor::~ReverbAudioProcessor()
@@ -105,18 +106,9 @@ void ReverbAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     spec.sampleRate = sampleRate;
     spec.numChannels = getTotalNumOutputChannels();
 
+    roomIR.initialize();
     roomIR.prepare(spec);
 
-
-    // We start loading of IRs
-    // This is necessary when the plugin is newly loaded
-    setIrLoader();
-
-    // In case of project loading, if the host loads the parameters
-    // too fast, the system can crash. A temporary dirty workaround
-    // is to wait a little bit before going the next steps.
-    // TODO : find a better solution
-    juce::Time::waitForMillisecondCounter(2000);
 }
 
 void ReverbAudioProcessor::releaseResources()
@@ -211,7 +203,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
     juce::StringArray choices;
     choices.addArray(CHOICES);
     layout.add(std::make_unique<juce::AudioParameterChoice>("Reverb type", "Reverb type", choices, 1));
-    layout.add(std::make_unique<juce::AudioParameterBool>("Auto update","Auto update", true));
+    layout.add(std::make_unique<juce::AudioParameterBool>("Update","Update", true));
 
     return layout;
 }
@@ -242,4 +234,12 @@ void ReverbAudioProcessor::setIrLoader()
     p.sampleRate = spec.sampleRate;
 
     roomIR.calculate(p);
+}
+
+void ReverbAudioProcessor::timerCallback()
+{
+    if (autoUpdate)
+    {
+        setIrLoader();
+    }
 }

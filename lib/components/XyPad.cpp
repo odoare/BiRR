@@ -17,6 +17,7 @@ namespace Gui
     void Thumb::mouseDown(const juce::MouseEvent& event)
     {
         dragger.startDraggingComponent(this, event);
+        mouseDownCallback();
     }
 
     void Thumb::mouseDrag(const juce::MouseEvent& event)
@@ -59,6 +60,7 @@ namespace Gui
     void Head::mouseDown(const juce::MouseEvent& event)
     {
         dragger.startDraggingComponent(this, event);
+        mouseDownCallback();
     }
 
     void Head::mouseDoubleClick(const juce::MouseEvent& event)
@@ -488,6 +490,7 @@ namespace Gui
         const auto isY1AxisSlider = std::find(y1Sliders.begin(), y1Sliders.end(), slider) != y1Sliders.end();
         const auto isY2AxisSlider = std::find(y2Sliders.begin(), y2Sliders.end(), slider) != y2Sliders.end();
         const auto isY3AxisSlider = std::find(y3Sliders.begin(), y3Sliders.end(), slider) != y3Sliders.end();
+        const auto isO1AxisSlider = std::find(o1Sliders.begin(), o1Sliders.end(), slider) != o1Sliders.end();
         
         const auto bounds = getLocalBounds().toDouble();
         const auto w1 = static_cast<double>(thumb1.thumbSize);

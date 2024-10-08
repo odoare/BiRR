@@ -14,7 +14,6 @@
 #include "../../lib/components/FxmeLookAndFeel.h"
 #include "../../lib/components/HorizontalBar.h"
 
-
 //==============================================================================
 /**
 */
@@ -115,7 +114,7 @@ private:
     juce::TextButton calculateButton;
     juce::ToggleButton autoButton;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> autoButtonAttachment;
-    juce::Label autoLabel{"autoLabel", "Auto update"};
+    juce::Label autoLabel{"autoLabel", "Update"};
     
     const juce::Colour listenerColour = juce::Colours::darkviolet;
     const juce::Colour sourceLColour = juce::Colours::blue;
