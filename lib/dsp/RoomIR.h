@@ -108,6 +108,7 @@ class BoxRoomIR{
 
 public:
     BoxRoomIR();
+    void initialize();
     void prepare(juce::dsp::ProcessSpec spec);
     void calculate(IrBoxCalculatorParams& p);
     bool setIrCaclulatorsParams(IrBoxCalculatorParams& pa);

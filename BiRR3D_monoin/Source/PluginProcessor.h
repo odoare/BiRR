@@ -14,7 +14,7 @@
 //==============================================================================
 /**
 */
-class ReverbAudioProcessor  : public juce::AudioProcessor
+class ReverbAudioProcessor  : public juce::AudioProcessor, public juce::Timer
 {
 public:
     //==============================================================================
@@ -55,6 +55,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     void setIrLoader();
+    bool autoUpdate{true};
 
     BoxRoomIR roomIR;
 
@@ -64,6 +65,8 @@ public:
     juce::AudioProcessorValueTreeState apvts{*this,nullptr,"Parameters",createParameters()};
 
 private:
+
+    void timerCallback() override;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessor)

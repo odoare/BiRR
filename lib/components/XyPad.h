@@ -14,6 +14,7 @@ namespace Gui
         void mouseUp(const juce::MouseEvent& event) override;
         std::function<void(juce::Point<double>)> moveCallback;
         std::function<void()> mouseUpCallback;
+        std::function<void()> mouseDownCallback;
         void setColour(juce::Colour newColour);
         int thumbSize;
 
@@ -37,6 +38,7 @@ namespace Gui
         void mouseWheelMove(const juce::MouseEvent& e, const juce::MouseWheelDetails& wheel) override;
         std::function<void(juce::Point<double>)> moveCallback;
         std::function<void()> mouseUpCallback;
+        std::function<void()> mouseDownCallback;
         void setColour(juce::Colour newColour);
         void setOrientation(float o);
         int thumbSize;

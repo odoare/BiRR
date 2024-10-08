@@ -324,14 +324,47 @@ BoxRoomIR::BoxRoomIR()
 
 }
 
-void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
+void BoxRoomIR::initialize()
 {
-
     int numCpus = juce::SystemStats::getNumPhysicalCpus();
 
     cout << "Number of CPUs : " << juce::SystemStats::getNumCpus() << endl;
     cout << "Number of physical CPUs : " << juce::SystemStats::getNumPhysicalCpus() << endl;
     threadsNum = std::min<int>(numCpus,MAXTHREADS);
+
+    // Calculators for the room reflexions (box)
+
+    for (int i=0; i<threadsNum; i++)
+    {
+      boxCalculator[i].setCalculatingBool(&isCalculating[i]);
+      boxCalculator[i].setBuffer(&boxIrBuffer[i]);
+      boxCalculator[i].setCalculateDirectPath(false);
+      boxCalculator[i].setHrtfVars(&nsamp, &nearestSampleRate);
+    }
+
+    boxIrTransfer.setCalculatingBool(&isCalculating[0]);
+    boxIrTransfer.setBuffer(&boxIrBuffer[0]);
+    boxIrTransfer.setIr(&boxConvolution);
+    boxIrTransfer.setThreadsNum(threadsNum);
+
+
+    // Calculator for the direct path
+
+    directCalculator.setCalculatingBool(&isCalculatingDirect);
+    directCalculator.setBuffer(&directIrBuffer);
+    directCalculator.setCalculateDirectPath(true);
+    directCalculator.setHrtfVars(&nsamp, &nearestSampleRate);
+
+    directIrTransfer.setCalculatingBool(&isCalculatingDirect);
+    directIrTransfer.setBuffer(&directIrBuffer);
+    directIrTransfer.setIr(&directConvolution);
+    directIrTransfer.setThreadsNum(1);
+
+}
+
+void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
+{
+
 
     inputBufferCopy.setSize(2, spec.maximumBlockSize ,false,true);
 
@@ -367,39 +400,11 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
         cout << "HRTF size : " << nsamp << endl;
       }
 
-    // Calculators for the room reflexions (box)
-
-    for (int i=0; i<threadsNum; i++)
-    {
-      boxCalculator[i].setCalculatingBool(&isCalculating[i]);
-      boxCalculator[i].setBuffer(&boxIrBuffer[i]);
-      boxCalculator[i].setCalculateDirectPath(false);
-      boxCalculator[i].setHrtfVars(&nsamp, &nearestSampleRate);
-    }
-
-    boxIrTransfer.setCalculatingBool(&isCalculating[0]);
-    boxIrTransfer.setBuffer(&boxIrBuffer[0]);
-    boxIrTransfer.setIr(&boxConvolution);
     boxIrTransfer.setSampleRate(spec.sampleRate);
-    boxIrTransfer.setThreadsNum(threadsNum);
-
     boxConvolution.reset();
     boxConvolution.prepare(spec);
 
-
-    // Calculator for the direct path
-
-    directCalculator.setCalculatingBool(&isCalculatingDirect);
-    directCalculator.setBuffer(&directIrBuffer);
-    directCalculator.setCalculateDirectPath(true);
-    directCalculator.setHrtfVars(&nsamp, &nearestSampleRate);
-
-    directIrTransfer.setCalculatingBool(&isCalculatingDirect);
-    directIrTransfer.setBuffer(&directIrBuffer);
-    directIrTransfer.setIr(&directConvolution);
     directIrTransfer.setSampleRate(spec.sampleRate);
-    directIrTransfer.setThreadsNum(1);
-
     directConvolution.reset();
     directConvolution.prepare(spec);
 

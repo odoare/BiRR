@@ -23,13 +23,10 @@ using namespace std;
 struct IrBoxCalculatorParams{
   float rx;
   float ry;
-  float rz;
   float lx;
   float ly;
-  float lz;
   float sx;
   float sy;
-  float sz;
   float damp;
   float hfDamp;
   int type;
@@ -108,6 +105,7 @@ class BoxRoomIR{
 
 public:
     BoxRoomIR();
+    void initialize();
     void prepare(juce::dsp::ProcessSpec spec);
     void calculate(IrBoxCalculatorParams& p);
     bool setIrCaclulatorsParams(IrBoxCalculatorParams& pa);
@@ -129,6 +127,7 @@ private:
     int threadsNum;
     int nsamp;
     float nearestSampleRate;
+
 
     juce::dsp::IIR::Filter<float> filter[2];
     
