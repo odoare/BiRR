@@ -121,7 +121,6 @@ public:
     juce::AudioBuffer<float> boxIrBuffer[MAXTHREADS], directIrBuffer;
     IrTransfer boxIrTransfer, directIrTransfer;
     float directLevel, reflectionsLevel;
-    bool hasStartedCalculation{false};
 
 private:
     IrBoxCalculatorParams p;

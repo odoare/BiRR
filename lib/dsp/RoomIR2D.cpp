@@ -430,7 +430,7 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
 
 void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
 {
-    hasStartedCalculation = true;
+
     if (setIrCaclulatorsParams(p))     // (We run the calculation only if a parameter has changed)
     {    
 
