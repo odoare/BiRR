@@ -207,9 +207,9 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::createParameters()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
-    layout.add(std::make_unique<juce::AudioParameterFloat>("RoomX","RoomX",1.0f,MAXSIZE,3.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("RoomY","RoomY",1.0f,MAXSIZE,4.7f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("RoomZ","RoomZ",1.0f,MAXSIZE,2.5f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Room Size X","Room Size X",1.0f,MAXSIZE,3.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Room Size Y","Room Size Y",1.0f,MAXSIZE,4.7f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Room Size Z","Room Size Z",1.0f,MAXSIZE,2.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerX","ListenerX",0.01f,0.99f,0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerY","ListenerY",0.01f,0.99f,0.25f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerZ","ListenerZ",0.01f,0.99f,0.7f));
@@ -220,8 +220,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceRX","SourceRX",0.01f,0.99f,0.75f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceRY","SourceRY",0.01f,0.99f,0.75f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceRZ","SourceRZ",0.01f,0.99f,0.7f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("D","D",juce::NormalisableRange<float>(MINDAMPING,0.99f,0.001f,0.3f),0.25f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("HFD","HFD",juce::NormalisableRange<float>(0.01f,0.3f,0.001f,0.3f),0.1f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Damping","Damping",juce::NormalisableRange<float>(MINDAMPING,0.99f,0.001f,0.3f),0.25f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("HF Damping","HF Damping",juce::NormalisableRange<float>(0.01f,0.3f,0.001f,0.3f),0.1f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Stereo Width","Stereo Width",juce::NormalisableRange<float>(0.0f,1.f,0.001f,1.f),0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Direct Level","Direct Level",juce::NormalisableRange<float>(-90.0f,6.f,0.1f,1.f),0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Reflections Level","Reflections Level",juce::NormalisableRange<float>(-90.0f,6.f,0.1f,1.f),0.f));
@@ -243,17 +243,17 @@ void ReverbAudioProcessor::setIrLoaderL()
 
     std::cout << "Set parameters" << endl;
 
-    p.rx = apvts.getRawParameterValue("RoomX")->load();
-    p.ry = apvts.getRawParameterValue("RoomY")->load();
-    p.rz = apvts.getRawParameterValue("RoomZ")->load();
+    p.rx = apvts.getRawParameterValue("Room Size X")->load();
+    p.ry = apvts.getRawParameterValue("Room Size Y")->load();
+    p.rz = apvts.getRawParameterValue("Room Size Z")->load();
     p.lx = p.rx*(apvts.getRawParameterValue("ListenerX")->load());
     p.ly = p.ry*(apvts.getRawParameterValue("ListenerY")->load());
     p.lz = p.rz*(apvts.getRawParameterValue("ListenerZ")->load());
     p.sx = p.rx*(apvts.getRawParameterValue("SourceLX")->load());
     p.sy = p.ry*(apvts.getRawParameterValue("SourceLY")->load());
     p.sz = p.rz*(apvts.getRawParameterValue("SourceLZ")->load());
-    p.damp = apvts.getRawParameterValue("D")->load();
-    p.hfDamp = apvts.getRawParameterValue("HFD")->load();
+    p.damp = apvts.getRawParameterValue("Damping")->load();
+    p.hfDamp = apvts.getRawParameterValue("HF Damping")->load();
     p.type = apvts.getRawParameterValue("Reverb type")->load();
     p.headAzim = apvts.getRawParameterValue("ListenerO")->load();
     p.sWidth = apvts.getRawParameterValue("Stereo Width")->load();
@@ -273,17 +273,17 @@ void ReverbAudioProcessor::setIrLoaderR()
 
     std::cout << "Set parameters" << endl;
 
-    p.rx = apvts.getRawParameterValue("RoomX")->load();
-    p.ry = apvts.getRawParameterValue("RoomY")->load();
-    p.rz = apvts.getRawParameterValue("RoomZ")->load();
+    p.rx = apvts.getRawParameterValue("Room Size X")->load();
+    p.ry = apvts.getRawParameterValue("Room Size Y")->load();
+    p.rz = apvts.getRawParameterValue("Room Size Z")->load();
     p.lx = p.rx*(apvts.getRawParameterValue("ListenerX")->load());
     p.ly = p.ry*(apvts.getRawParameterValue("ListenerY")->load());
     p.lz = p.rz*(apvts.getRawParameterValue("ListenerZ")->load());
     p.sx = p.rx*(apvts.getRawParameterValue("SourceRX")->load());
     p.sy = p.ry*(apvts.getRawParameterValue("SourceRY")->load());
     p.sz = p.rz*(apvts.getRawParameterValue("SourceRZ")->load());
-    p.damp = apvts.getRawParameterValue("D")->load();
-    p.hfDamp = apvts.getRawParameterValue("HFD")->load();
+    p.damp = apvts.getRawParameterValue("Damping")->load();
+    p.hfDamp = apvts.getRawParameterValue("HF Damping")->load();
     p.type = apvts.getRawParameterValue("Reverb type")->load();
     p.headAzim = apvts.getRawParameterValue("ListenerO")->load();
     p.sWidth = apvts.getRawParameterValue("Stereo Width")->load();

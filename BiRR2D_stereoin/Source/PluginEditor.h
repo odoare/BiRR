@@ -13,6 +13,15 @@
 #include "../../lib/components/XyPad.h"
 #include "../../lib/components/FxmeLookAndFeel.h"
 #include "../../lib/components/HorizontalBar.h"
+#include "../../lib/components/FxmeLogo.h"
+
+#define ROOMCOLOUR juce::Colours::teal
+#define LISTENERCOLOUR juce::Colours::darkviolet
+#define SOURCELCOLOUR juce::Colours::blue
+#define SOURCECOLOUR juce::Colours::red
+#define DAMPINGCOLOUR juce::Colours::green
+#define VOLCOLOUR juce::Colours::darkorange
+#define FXMECOLOUR juce::Colours::cyan
 
 //==============================================================================
 /**
@@ -32,26 +41,33 @@ private:
     // access the processor object that created it.
     ReverbAudioProcessor& audioProcessor;
 
+    fxme::FxmeLookAndFeel fxmeLookAndFeel;
+
     juce::TextButton addButton;
     juce::TextButton removeButton;
 
-    juce::Slider roomXSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> roomXSliderAttachment;
-    juce::Label roomXLabel{"roomXLabel", "X Size (m)"};
+    // juce::Slider roomXSlider;
+    // std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> roomXSliderAttachment;
+    // juce::Label roomXLabel{"roomXLabel", "X Size (m)"};
 
-    juce::Slider roomYSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> roomYSliderAttachment;
-    juce::Label roomYLabel{"roomYLabel", "Y Size (m)"};
+    // juce::Slider roomYSlider;
+    // std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> roomYSliderAttachment;
+    // juce::Label roomYLabel{"roomYLabel", "Y Size (m)"};
+    fxme::FxmeKnob roomXKnob{audioProcessor.apvts,"Room Size X",ROOMCOLOUR};
+    fxme::FxmeKnob roomYKnob{audioProcessor.apvts,"Room Size Y",ROOMCOLOUR};
+    fxme::FxmeKnob roomZKnob{audioProcessor.apvts,"Room Size Z",ROOMCOLOUR};
+    fxme::FxmeKnob dampingKnob{audioProcessor.apvts,"Damping",DAMPINGCOLOUR};
+    fxme::FxmeKnob hfDampingKnob{audioProcessor.apvts,"HF Damping",DAMPINGCOLOUR};
+    fxme::FxmeKnob widthKnob{audioProcessor.apvts,"Stereo Width",DAMPINGCOLOUR};
+    fxme::FxmeKnob directLevelKnob{audioProcessor.apvts,"Direct Level",VOLCOLOUR};
+    fxme::FxmeKnob reflectionsLevelKnob{audioProcessor.apvts,"Reflections Level",VOLCOLOUR};
+    fxme::FxmeKnob listenerOKnob{audioProcessor.apvts,"ListenerO",LISTENERCOLOUR};
 
     juce::Slider listenerXSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerXSliderAttachment;
     juce::Slider listenerYSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerYSliderAttachment;
     
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerOSliderAttachment;
-    juce::Slider listenerOSlider;
-    juce::Label listenerOLabel{"listenerOLabel", "Head azimuth"};
-
     juce::Slider sourceLXSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sourceLXSliderAttachment;
     juce::Slider sourceLYSlider;
@@ -62,37 +78,18 @@ private:
     juce::Slider sourceRYSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sourceRYSliderAttachment;
 
-    juce::Slider dampingSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dampingSliderAttachment;
-    juce::Label dampingLabel{"dampingLabel", "Wall absorbtion"};
-
-    juce::Slider hfDampingSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> hfDampingSliderAttachment;
-    juce::Label hfDampingLabel{"hfDampingLabel", "HF Wall absorbtion"};
-
     juce::ComboBox typeComboBox;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> typeComboBoxAttachment;
     juce::Label typeLabel{"typeLabel", "Microphones"};
     
-    juce::Slider widthSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> widthSliderAttachment;
-    juce::Label widthLabel{"widthLabel", "Stereo Width"};
-
-    juce::Slider directLevelSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> directLevelSliderAttachment;
-    juce::Label directLevelLabel{"directLevelLabel", "Direct Level"};
-
-    juce::Slider reflectionsLevelSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> reflectionsLevelSliderAttachment;
-    juce::Label reflectionsLevelLabel{"reflectionsLevelLabel", "Reflections Level"};
-
     Gui::XyPad3h xyPad3;
 
     juce::TextButton calculateButton;
-    juce::ToggleButton autoButton;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> autoButtonAttachment;
-    juce::Label autoLabel{"autoLabel", "Update"};
-    
+ 
+    fxme::FxmeButton autoButton{audioProcessor.apvts,"Update",FXMECOLOUR};
+
+    FxmeLogo logo{"", false};
+
     const juce::Colour listenerColour = juce::Colours::darkviolet;
     const juce::Colour sourceLColour = juce::Colours::blue;
     const juce::Colour sourceRColour = juce::Colours::red;
@@ -104,8 +101,6 @@ private:
 
     Gui::HorizontalBar progressBarL{[&]() { return audioProcessor.roomIRL.getProgress(); }};
     Gui::HorizontalBar progressBarR{[&]() { return audioProcessor.roomIRR.getProgress(); }};
-
-    juce::Image logo;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessorEditor)
 };
