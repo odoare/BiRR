@@ -72,19 +72,19 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     reflectionsLevelKnob.slider.onDragStart = startDrag;
 
     // Listener position controllers
-    addController(listenerXSlider, juce::Slider::SliderStyle::LinearHorizontal, listenerColour, juce::Colours::black);
+    addController(listenerXSlider, juce::Slider::SliderStyle::LinearHorizontal, LISTENERCOLOUR, juce::Colours::black);
     listenerXSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     listenerXSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"ListenerX",listenerXSlider);
     listenerXSlider.onDragStart = startDrag;
     listenerXSlider.onDragEnd = stopDrag;
 
-    addController(listenerYSlider, juce::Slider::SliderStyle::LinearVertical, listenerColour, juce::Colours::black);
+    addController(listenerYSlider, juce::Slider::SliderStyle::LinearVertical, LISTENERCOLOUR, juce::Colours::black);
     listenerYSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     listenerYSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"ListenerY",listenerYSlider);
     listenerYSlider.onDragStart = startDrag;
     listenerYSlider.onDragEnd = stopDrag;
 
-    addController(listenerZSlider, juce::Slider::SliderStyle::LinearVertical, listenerColour, juce::Colours::black);
+    addController(listenerZSlider, juce::Slider::SliderStyle::LinearVertical, LISTENERCOLOUR, juce::Colours::black);
     listenerZSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     listenerZSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"ListenerZ",listenerZSlider);
     addAndConnectLabel(listenerZSlider, listenerZLabel);
@@ -102,19 +102,19 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     listenerOKnob.slider.setRotaryParameters(par);
 
     // Left source position controllers
-    addController(sourceLXSlider, juce::Slider::SliderStyle::LinearHorizontal, sourceLColour, juce::Colours::black);
+    addController(sourceLXSlider, juce::Slider::SliderStyle::LinearHorizontal, SOURCELCOLOUR, juce::Colours::black);
     sourceLXSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     sourceLXSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceLX",sourceLXSlider);
     sourceLXSlider.onDragStart = startDrag;
     sourceLXSlider.onDragEnd = stopDrag;
 
-    addController(sourceLYSlider, juce::Slider::SliderStyle::LinearVertical, sourceLColour, juce::Colours::black);
+    addController(sourceLYSlider, juce::Slider::SliderStyle::LinearVertical, SOURCELCOLOUR, juce::Colours::black);
     sourceLYSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     sourceLYSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceLY",sourceLYSlider);
     sourceLYSlider.onDragStart = startDrag;
     sourceLYSlider.onDragEnd = stopDrag;
 
-    addController(sourceLZSlider, juce::Slider::SliderStyle::LinearVertical, sourceLColour, juce::Colours::black);
+    addController(sourceLZSlider, juce::Slider::SliderStyle::LinearVertical, SOURCELCOLOUR, juce::Colours::black);
     sourceLZSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     sourceLZSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceLZ",sourceLZSlider);
     addAndConnectLabel(sourceLZSlider, sourceLZLabel);
@@ -122,19 +122,19 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     sourceLZSlider.onDragEnd = stopDrag;
 
     // Right source position controllers
-    addController(sourceRXSlider, juce::Slider::SliderStyle::LinearHorizontal, sourceRColour, juce::Colours::black);
+    addController(sourceRXSlider, juce::Slider::SliderStyle::LinearHorizontal, SOURCERCOLOUR, juce::Colours::black);
     sourceRXSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     sourceRXSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceRX",sourceRXSlider);
     sourceRXSlider.onDragStart = startDrag;
     sourceRXSlider.onDragEnd = stopDrag;
 
-    addController(sourceRYSlider, juce::Slider::SliderStyle::LinearVertical, sourceRColour, juce::Colours::black);
+    addController(sourceRYSlider, juce::Slider::SliderStyle::LinearVertical, SOURCERCOLOUR, juce::Colours::black);
     sourceRYSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     sourceRYSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceRY",sourceRYSlider);
     sourceRYSlider.onDragStart = startDrag;
     sourceRYSlider.onDragEnd = stopDrag;
 
-    addController(sourceRZSlider, juce::Slider::SliderStyle::LinearVertical, sourceRColour, juce::Colours::black);
+    addController(sourceRZSlider, juce::Slider::SliderStyle::LinearVertical, SOURCERCOLOUR, juce::Colours::black);
     sourceRZSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     sourceRZSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceRZ",sourceRZSlider);
     sourceRZSlider.onDragStart = startDrag;
@@ -159,9 +159,9 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     xyPad3.registerSlider(&sourceRXSlider, Gui::XyPad3h::Axis::X3);
     xyPad3.registerSlider(&sourceRYSlider, Gui::XyPad3h::Axis::Y3);
     xyPad3.registerSlider(&listenerOKnob.slider, Gui::XyPad3h::Axis::O1);
-    xyPad3.thumb1.setColour(listenerColour);
-    xyPad3.thumb2.setColour(sourceLColour);
-    xyPad3.thumb3.setColour(sourceRColour);
+    xyPad3.thumb1.setColour(LISTENERCOLOUR);
+    xyPad3.thumb2.setColour(SOURCELCOLOUR);
+    xyPad3.thumb3.setColour(SOURCERCOLOUR);
     xyPad3.thumb1.mouseUpCallback = stopDrag;
     xyPad3.thumb2.mouseUpCallback = stopDrag;
     xyPad3.thumb3.mouseUpCallback = stopDrag;
@@ -174,8 +174,6 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     autoButton.button.onClick = stopDrag;
 
     // Progress bar
-    progressBarL.setColour(juce::Colours::green);
-    progressBarR.setColour(juce::Colours::green);
     addAndMakeVisible(progressBarL);
     addAndMakeVisible(progressBarR);
 
@@ -197,17 +195,9 @@ ReverbAudioProcessorEditor::~ReverbAudioProcessorEditor()
   xyPad3.deregisterSlider(&sourceRYSlider);
 }
 
-
-#define NX 24
-#define NY 18
-#define DELTAX 0.1f
-#define DELTAY 0.1f
-#define BORDER 0.01f
-
 //==============================================================================
 void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
 {
-
     auto diagonale = (getLocalBounds().getTopLeft() - getLocalBounds().getBottomRight()).toFloat();
     auto length = diagonale.getDistanceFromOrigin();
     auto perpendicular = diagonale.rotatedAboutOrigin (juce::degreesToRadians (90.0f)) / length;
@@ -236,9 +226,9 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
       roomXKnob.slider.setEnabled(true);
       roomYKnob.slider.setEnabled(true);
       roomZKnob.slider.setEnabled(true);
-      roomXKnob.slider.setColour(juce::Slider::thumbColourId, juce::Colours::teal);
-      roomYKnob.slider.setColour(juce::Slider::thumbColourId, juce::Colours::teal);
-      roomZKnob.slider.setColour(juce::Slider::thumbColourId, juce::Colours::teal);
+      roomXKnob.slider.setColour(juce::Slider::thumbColourId, FXMECOLOUR);
+      roomYKnob.slider.setColour(juce::Slider::thumbColourId, FXMECOLOUR);
+      roomZKnob.slider.setColour(juce::Slider::thumbColourId, FXMECOLOUR);
     }
       
 }

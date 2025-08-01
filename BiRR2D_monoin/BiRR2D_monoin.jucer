@@ -10,6 +10,7 @@
               lv2Uri="http://fx-mechanics.com/plugins/BiRR2D_monoin" version="0.0.4">
   <MAINGROUP id="NKvv2q" name="BiRR2D mono input">
     <GROUP id="{34CC12DF-A955-ACD4-757D-70767BB2B363}" name="assets">
+      <FILE id="aD4EjX" name="defines.h" compile="0" resource="0" file="../lib/assets/defines.h"/>
       <FILE id="iZuoZy" name="logo686.png" compile="0" resource="1" file="../lib/assets/logo686.png"/>
     </GROUP>
     <GROUP id="{3D4C5986-A695-4E8F-6CFF-D0F05628E305}" name="dsp">

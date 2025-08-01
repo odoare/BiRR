@@ -17,14 +17,7 @@
 #include "../../lib/components/FxmeLookAndFeel.h"
 #include "../../lib/components/HorizontalBar.h"
 #include "../../lib/components/FxmeLogo.h"
-
-#define ROOMCOLOUR juce::Colours::teal
-#define LISTENERCOLOUR juce::Colours::darkviolet
-#define SOURCELCOLOUR juce::Colours::blue
-#define SOURCECOLOUR juce::Colours::red
-#define DAMPINGCOLOUR juce::Colours::green
-#define VOLCOLOUR juce::Colours::darkorange
-#define FXMECOLOUR juce::Colours::cyan
+#include "../../lib/assets/defines.h"
 
 //==============================================================================
 /**
@@ -95,10 +88,6 @@ private:
     fxme::FxmeButton autoButton{audioProcessor.apvts,"Update",FXMECOLOUR};
 
     FxmeLogo logo{"", false};
-
-    const juce::Colour listenerColour = juce::Colours::darkviolet;
-    const juce::Colour sourceLColour = juce::Colours::blue;
-    const juce::Colour sourceRColour = juce::Colours::red;
 
     void addController(juce::Slider&, juce::Slider::SliderStyle, juce::Colour, juce::Colour);
     void addAndConnectLabel(juce::Slider&, juce::Label&);

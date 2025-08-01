@@ -10,6 +10,7 @@
               pluginName="BiRR3D mono in" pluginDesc="Binaural room reverb, mono input">
   <MAINGROUP id="BIm9jF" name="BiRR3D mono input">
     <GROUP id="{73833252-B5AF-B4C1-E839-2064ACA9F25A}" name="assets">
+      <FILE id="cveZBd" name="defines.h" compile="0" resource="0" file="../lib/assets/defines.h"/>
       <FILE id="O8mLNt" name="logo686.png" compile="0" resource="1" file="../lib/assets/logo686.png"/>
     </GROUP>
     <GROUP id="{ECC06303-726B-AA24-9400-D49E15802DEF}" name="components">

@@ -66,13 +66,13 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     reflectionsLevelKnob.slider.onDragStart = startDrag;
 
     // Listener position controllers
-    addController(listenerXSlider, juce::Slider::SliderStyle::LinearHorizontal, listenerColour, juce::Colours::black);
+    addController(listenerXSlider, juce::Slider::SliderStyle::LinearHorizontal, LISTENERCOLOUR, juce::Colours::black);
     listenerXSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     listenerXSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"ListenerX",listenerXSlider);
     listenerXSlider.onDragStart = startDrag;
     listenerXSlider.onDragEnd = stopDrag;
 
-    addController(listenerYSlider, juce::Slider::SliderStyle::LinearVertical, listenerColour, juce::Colours::black);
+    addController(listenerYSlider, juce::Slider::SliderStyle::LinearVertical, LISTENERCOLOUR, juce::Colours::black);
     listenerYSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     listenerYSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"ListenerY",listenerYSlider);
     listenerYSlider.onDragStart = startDrag;
@@ -89,13 +89,13 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     listenerOKnob.slider.setRotaryParameters(par);
 
     // Source position controllers
-    addController(sourceXSlider, juce::Slider::SliderStyle::LinearHorizontal, sourceColour, juce::Colours::black);
+    addController(sourceXSlider, juce::Slider::SliderStyle::LinearHorizontal, SOURCECOLOUR, juce::Colours::black);
     sourceXSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     sourceXSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceX",sourceXSlider);
     sourceXSlider.onDragStart = startDrag;
     sourceXSlider.onDragEnd = stopDrag;
 
-    addController(sourceYSlider, juce::Slider::SliderStyle::LinearVertical, sourceColour, juce::Colours::black);
+    addController(sourceYSlider, juce::Slider::SliderStyle::LinearVertical, SOURCECOLOUR, juce::Colours::black);
     sourceYSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     sourceYSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"SourceY",sourceYSlider);
     sourceXSlider.onDragStart = startDrag;
@@ -117,8 +117,8 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     xyPad2.registerSlider(&sourceXSlider, Gui::XyPad2h::Axis::X2);
     xyPad2.registerSlider(&sourceYSlider, Gui::XyPad2h::Axis::Y2);
     xyPad2.registerSlider(&listenerOKnob.slider, Gui::XyPad2h::Axis::O1);
-    xyPad2.thumb1.setColour(listenerColour);
-    xyPad2.thumb2.setColour(sourceColour);
+    xyPad2.thumb1.setColour(LISTENERCOLOUR);
+    xyPad2.thumb2.setColour(SOURCECOLOUR);
     xyPad2.thumb1.mouseUpCallback = stopDrag;
     xyPad2.thumb2.mouseUpCallback = stopDrag;
     xyPad2.thumb1.mouseDownCallback = startDrag;
@@ -129,7 +129,6 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     autoButton.button.onClick = stopDrag;
 
     // Progress bar
-    progressBar.setColour(juce::Colours::green);
     addAndMakeVisible(progressBar);
 
     addAndMakeVisible(logo);
@@ -183,8 +182,8 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
     {
       roomXKnob.slider.setEnabled(true);
       roomYKnob.slider.setEnabled(true);
-      roomXKnob.slider.setColour(juce::Slider::thumbColourId, juce::Colours::teal);
-      roomYKnob.slider.setColour(juce::Slider::thumbColourId, juce::Colours::teal);
+      roomXKnob.slider.setColour(juce::Slider::thumbColourId, FXMECOLOUR);
+      roomYKnob.slider.setColour(juce::Slider::thumbColourId, FXMECOLOUR);
     }      
 }
 

@@ -1,4 +1,4 @@
-PROJUCER= /home/od/bin/Projucer
+PROJUCER= ~/bin/Projucer
 
 all: projects birr2dm birr2ds birr3dm birr3ds
 
