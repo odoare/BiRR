@@ -1,7 +1,9 @@
 /*
   ==============================================================================
 
-    This file contains the basic framework code for a JUCE plugin processor.
+    Binaural Room Reverb 3D, mono input - PluginProcessor.cpp
+
+    (c) Olivier Doaré, 2022-2025
 
   ==============================================================================
 */

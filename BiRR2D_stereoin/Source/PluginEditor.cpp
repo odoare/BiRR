@@ -1,7 +1,9 @@
 /*
   ==============================================================================
 
-    This file contains the basic framework code for a JUCE plugin editor.
+    Binaural Room Reverb 2D - PluginEditor.cpp
+
+    (c) Olivier Doaré, 2022-2025
 
   ==============================================================================
 */
@@ -148,7 +150,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     addAndMakeVisible(progressBarR);
 
     addAndMakeVisible(logo);
-    
+
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (550, 480);

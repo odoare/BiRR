@@ -1,7 +1,9 @@
 /*
   ==============================================================================
 
-    This file contains the basic framework code for a JUCE plugin processor.
+    Binaural Room Reverb 2D, mono input - PluginProcessor.h
+
+    (c) Olivier Doaré, 2022-2025
 
   ==============================================================================
 */
@@ -10,7 +12,6 @@
 
 #include <JuceHeader.h>
 #include "../../lib/dsp/RoomIR2D.h"
-// #include "dsp/hrtf.h"
 
 //==============================================================================
 /**

@@ -1,7 +1,9 @@
 /*
   ==============================================================================
 
-    This file contains the basic framework code for a JUCE plugin editor.
+    Binaural Room Reverb 2D - PluginEditor.h
+
+    (c) Olivier Doaré, 2022-2025
 
   ==============================================================================
 */
@@ -46,13 +48,6 @@ private:
     juce::TextButton addButton;
     juce::TextButton removeButton;
 
-    // juce::Slider roomXSlider;
-    // std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> roomXSliderAttachment;
-    // juce::Label roomXLabel{"roomXLabel", "X Size (m)"};
-
-    // juce::Slider roomYSlider;
-    // std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> roomYSliderAttachment;
-    // juce::Label roomYLabel{"roomYLabel", "Y Size (m)"};
     fxme::FxmeKnob roomXKnob{audioProcessor.apvts,"Room Size X",ROOMCOLOUR};
     fxme::FxmeKnob roomYKnob{audioProcessor.apvts,"Room Size Y",ROOMCOLOUR};
     fxme::FxmeKnob roomZKnob{audioProcessor.apvts,"Room Size Z",ROOMCOLOUR};

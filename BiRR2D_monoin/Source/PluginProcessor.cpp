@@ -1,7 +1,9 @@
 /*
   ==============================================================================
 
-    This file contains the basic framework code for a JUCE plugin processor.
+    Binaural Room Reverb 2D, mono input - PluginProcessor.cpp
+
+    (c) Olivier Doaré, 2022-2025
 
   ==============================================================================
 */
@@ -182,15 +184,15 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::createParameters()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
-    layout.add(std::make_unique<juce::AudioParameterFloat>("RoomX","RoomX",1.0f,MAXSIZE,3.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("RoomY","RoomY",1.0f,MAXSIZE,4.7f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Room Size X","Room Size X",1.0f,MAXSIZE,3.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Room Size Y","Room Size Y",1.0f,MAXSIZE,4.7f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerX","ListenerX",0.01f,0.99f,0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerY","ListenerY",0.01f,0.99f,0.25f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("ListenerO","ListenerO",juce::NormalisableRange<float>(-180.f,180.f,1.f,1.f),0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceX","SourceX",0.01f,0.99f,0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceY","SourceY",0.01f,0.99f,0.75f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("D","D",juce::NormalisableRange<float>(MINDAMPING,0.99f,0.001f,0.3f),0.1f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("HFD","HFD",juce::NormalisableRange<float>(0.01f,0.3f,0.001f,0.3f),0.1f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Damping","Damping",juce::NormalisableRange<float>(MINDAMPING,0.99f,0.001f,0.3f),0.1f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("HF Damping","HF Damping",juce::NormalisableRange<float>(0.01f,0.3f,0.001f,0.3f),0.1f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Stereo Width","Stereo Width",juce::NormalisableRange<float>(0.0f,1.f,0.001f,1.f),0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Direct Level","Direct Level",juce::NormalisableRange<float>(-90.0f,6.f,0.1f,1.f),0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Reflections Level","Reflections Level",juce::NormalisableRange<float>(-90.0f,6.f,0.1f,1.f),0.f));
@@ -212,14 +214,14 @@ void ReverbAudioProcessor::setIrLoader()
 
     // std::cout << "Set parameters" << endl;
 
-    p.rx = apvts.getRawParameterValue("RoomX")->load();
-    p.ry = apvts.getRawParameterValue("RoomY")->load();
+    p.rx = apvts.getRawParameterValue("Room Size X")->load();
+    p.ry = apvts.getRawParameterValue("Room Size Y")->load();
     p.lx = p.rx*(apvts.getRawParameterValue("ListenerX")->load());
     p.ly = p.ry*(apvts.getRawParameterValue("ListenerY")->load());
     p.sx = p.rx*(apvts.getRawParameterValue("SourceX")->load());
     p.sy = p.ry*(apvts.getRawParameterValue("SourceY")->load());
-    p.damp = apvts.getRawParameterValue("D")->load();
-    p.hfDamp = apvts.getRawParameterValue("HFD")->load();
+    p.damp = apvts.getRawParameterValue("Damping")->load();
+    p.hfDamp = apvts.getRawParameterValue("HF Damping")->load();
     p.type = apvts.getRawParameterValue("Reverb type")->load();
     p.headAzim = apvts.getRawParameterValue("ListenerO")->load();
     p.sWidth = apvts.getRawParameterValue("Stereo Width")->load();

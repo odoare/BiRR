@@ -1,10 +1,13 @@
 /*
   ==============================================================================
 
-    This file contains the basic framework code for a JUCE plugin editor.
+    Binaural Room Reverb 3D - PluginEditor.h
+
+    (c) Olivier Doaré, 2022-2025
 
   ==============================================================================
 */
+
 
 #pragma once
 
@@ -55,9 +58,6 @@ private:
     fxme::FxmeKnob directLevelKnob{audioProcessor.apvts,"Direct Level",VOLCOLOUR};
     fxme::FxmeKnob reflectionsLevelKnob{audioProcessor.apvts,"Reflections Level",VOLCOLOUR};
 
-    // std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> listenerOSliderAttachment;
-    // juce::Slider listenerOSlider;
-    // juce::Label listenerOLabel{"listenerOLabel", "Head azimuth"};
     fxme::FxmeKnob listenerOKnob{audioProcessor.apvts,"ListenerO",LISTENERCOLOUR};
 
     juce::Slider listenerXSlider;

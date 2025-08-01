@@ -1,7 +1,9 @@
 /*
   ==============================================================================
 
-    This file contains the basic framework code for a JUCE plugin editor.
+    Binaural Room Reverb 3D - PluginEditor.cpp
+
+    (c) Olivier Doaré, 2022-2025
 
   ==============================================================================
 */
@@ -41,12 +43,6 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     roomZKnob.slider.onDragStart = startDrag;
 
     // Damping sliders
-    // addController(dampingSlider, juce::Slider::SliderStyle::RotaryVerticalDrag, juce::Colours::green,juce::Colours::black);
-    // addAndConnectLabel(dampingSlider, dampingLabel);
-    // dampingSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"D",dampingSlider);
-    // dampingSlider.setLookAndFeel(&knobLookAndFeel);
-    // dampingSlider.onDragStart = startDrag;
-    // dampingSlider.onDragEnd = stopDrag;
 
     addAndMakeVisible(dampingKnob.slider);
     dampingKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
@@ -58,11 +54,13 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     hfDampingKnob.slider.onDragEnd = stopDrag;
     hfDampingKnob.slider.onDragStart = startDrag;
 
+    // Width slider (not effective with binaural mode)
     addAndMakeVisible(widthKnob.slider);
     widthKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     widthKnob.slider.onDragEnd = stopDrag;
     widthKnob.slider.onDragStart = startDrag;
 
+    // Level sliders
     addAndMakeVisible(directLevelKnob.slider);
     directLevelKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     directLevelKnob.slider.onDragEnd = stopDrag;
@@ -92,19 +90,6 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     addAndConnectLabel(listenerZSlider, listenerZLabel);
     listenerZSlider.onDragStart = startDrag;
     listenerZSlider.onDragEnd = stopDrag;
-
-    // addController(listenerOSlider, juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag, listenerColour, juce::Colours::black);
-    // listenerOSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    // listenerOSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,"ListenerO",listenerOSlider);
-    // listenerOSlider.onDragStart = startDrag;
-    // listenerOSlider.onDragEnd = stopDrag;
-    // addAndConnectLabel(listenerOSlider, listenerOLabel);
-    // juce::Slider::RotaryParameters par;
-    // par.startAngleRadians = -juce::MathConstants<float>::pi;
-    // par.endAngleRadians = juce::MathConstants<float>::pi;
-    // par.stopAtEnd = true;
-    // listenerOSlider.setRotaryParameters(par);
-    // listenerOSlider.setLookAndFeel(&knobLookAndFeel);
 
     addAndMakeVisible(listenerOKnob.slider);
     listenerOKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
@@ -232,8 +217,6 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
                            bluegreengrey, perpendicular * -height, false);
     g.setGradientFill(grad);
     g.fillAll();
-
-    // auto r = juce::Rectangle<float>(uxb+20.5*ux,uyb+15*uy,3*ux,3*ux*227/269);
     
     // If the IR is being calculated, we disable room size sliders
     // This prevents eventual crashes when increasing room size

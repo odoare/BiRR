@@ -3,11 +3,11 @@
 <JUCERPROJECT id="SD3Wpk" name="BiRR2D mono input" projectType="audioplug"
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" displaySplashScreen="1"
               jucerFormatVersion="1" companyName="FX-Mechanics" companyWebsite="fx-mechanics.com"
-              pluginFormats="buildVST3" pluginManufacturerCode="FXME" pluginCode="BR21"
-              aaxIdentifier="http://fx-mechanics.com/plugins/BiRR2D" pluginName="BiRR2D mono in"
-              pluginDesc="Binaural room reverb, 2D, mono input" pluginVST3Category="Fx,Reverb,Spatial,Stereo"
-              pluginAAXCategory="8" lv2Uri="http://fx-mechanics.com/plugins/BiRR2D_monoin"
-              version="0.0.4">
+              pluginFormats="buildStandalone,buildVST,buildVST3" pluginManufacturerCode="FXME"
+              pluginCode="BR21" aaxIdentifier="http://fx-mechanics.com/plugins/BiRR2D"
+              pluginName="BiRR2D mono in" pluginDesc="Binaural room reverb, 2D, mono input"
+              pluginVST3Category="Fx,Reverb,Spatial,Stereo" pluginAAXCategory="8"
+              lv2Uri="http://fx-mechanics.com/plugins/BiRR2D_monoin" version="0.0.4">
   <MAINGROUP id="NKvv2q" name="BiRR2D mono input">
     <GROUP id="{34CC12DF-A955-ACD4-757D-70767BB2B363}" name="assets">
       <FILE id="iZuoZy" name="logo686.png" compile="0" resource="1" file="../lib/assets/logo686.png"/>
@@ -22,6 +22,8 @@
       <FILE id="o7403J" name="RoomIR2D.h" compile="0" resource="0" file="../lib/dsp/RoomIR2D.h"/>
     </GROUP>
     <GROUP id="{948E793C-A2D4-0EFF-109F-624367E4B162}" name="components">
+      <FILE id="yymofs" name="FxmeLogo.cpp" compile="1" resource="0" file="../lib/components/FxmeLogo.cpp"/>
+      <FILE id="q4qjyU" name="FxmeLogo.h" compile="0" resource="0" file="../lib/components/FxmeLogo.h"/>
       <FILE id="SzNRkN" name="FxmeLookAndFeel.h" compile="0" resource="0"
             file="../lib/components/FxmeLookAndFeel.h"/>
       <FILE id="soqlOy" name="HorizontalBar.h" compile="0" resource="0" file="../lib/components/HorizontalBar.h"/>
@@ -39,6 +41,7 @@
     </GROUP>
   </MAINGROUP>
   <MODULES>
+    <MODULE id="fxme_juce_tools" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
@@ -75,6 +78,7 @@
         <MODULEPATH id="juce_gui_basics" path="../../JUCE/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../JUCE/JUCE/modules"/>
         <MODULEPATH id="juce_dsp" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="fxme_juce_tools" path="../../JUCE/usermodules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
     <VS2022 targetFolder="Builds/VisualStudio2022" IPP1ALibrary="true" MKL1ALibrary="Parallel">
@@ -95,6 +99,7 @@
         <MODULEPATH id="juce_gui_basics" path="../../JUCE/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../JUCE/JUCE/modules"/>
         <MODULEPATH id="juce_dsp" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="fxme_juce_tools" path="../../JUCE/usermodules"/>
       </MODULEPATHS>
     </VS2022>
     <XCODE_MAC targetFolder="Builds/MacOSX">
@@ -115,6 +120,7 @@
         <MODULEPATH id="juce_gui_basics" path="../../JUCE/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../JUCE/JUCE/modules"/>
         <MODULEPATH id="juce_dsp" path="../../JUCE/JUCE/modules"/>
+        <MODULEPATH id="fxme_juce_tools" path="../../JUCE/usermodules"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>

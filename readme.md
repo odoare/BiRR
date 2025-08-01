@@ -25,7 +25,7 @@ The input is mono or stereo, depending on the chosen version (mono in or stereo 
 
 - One omni and one eight-pattern microphone, in MS configuration
 
-- Binaural receptor based on the HRTF provided by MIT medialab (https://sound.media.mit.edu/resources/KEMAR.html).
+- Binaural receptor based on the HRTF provided by MIT medialab (https://sound.media.mit.edu/resources/KEMAR.html), and equalized to sound as neutral as possible compared to the dry original sound.
 
 The 2D version simulates a 2D rectangular flat domain. Consequently, the produced binaural sound doesn't consider height information for sources and listener. The 3D version simmulates a parallelepipedic room, height position of the sources and listener. The latter hence involves more cpu computations for the impulse responses calculations.
 
@@ -64,6 +64,10 @@ A number of threads equal to the number of CPUs is employed for the impulse resp
 - v0.0.3: Fix bug that prevented direct path to be computed
 
 - v0.0.4: Fix crash occuring when parameters are updated, binaries now distributed as VST3
+
+## Compilation
+
+BiRR depends on the JUCE library (visit juce.com), with additional components from fxmejucetools, provided as a JUCE module (visit https://github.com/odoare/FxmeJuceTools)
 
 ## Future improvements
 
