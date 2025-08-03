@@ -503,7 +503,7 @@ bool BoxRoomIR::setIrCaclulatorsParams(IrBoxCalculatorParams& pa)
       && juce::approximatelyEqual(p.damp,pa.damp)
       && juce::approximatelyEqual(p.hfDamp,pa.hfDamp)
       // && juce::approximatelyEqual(p.headAzim,pa.headAzim)
-      && juce::approximatelyEqual(p.diffusion,pa.sWidth)
+      && juce::approximatelyEqual(p.diffusion,pa.diffusion)
       && juce::approximatelyEqual(p.sampleRate,pa.sampleRate))
       {
         p = pa;
