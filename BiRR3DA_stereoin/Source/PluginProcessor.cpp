@@ -238,7 +238,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceRZ","SourceRZ",0.01f,0.99f,0.7f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Damping","Damping",juce::NormalisableRange<float>(MINDAMPING,0.99f,0.001f,0.3f),0.25f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("HF Damping","HF Damping",juce::NormalisableRange<float>(0.01f,0.3f,0.001f,0.3f),0.1f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("Diffusion","Diffusion",juce::NormalisableRange<float>(1e-4f,1e-2f,1e-5f,1.f),1e-3f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Diffusion","Diffusion",juce::NormalisableRange<float>(0.f,1e-2f,1e-5f,1.f),1e-3f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Direct Level","Direct Level",juce::NormalisableRange<float>(-90.0f,6.f,0.1f,1.f),0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Reflections Level","Reflections Level",juce::NormalisableRange<float>(-90.0f,6.f,0.1f,1.f),0.f));
     
