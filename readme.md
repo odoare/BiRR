@@ -2,7 +2,7 @@
 
 A realistic room simulator based on a combination of a convolution processor and a virtual room impulse response calculator.
 
-![image info](./doc/BiRR3D_screen.png)
+![image info](./doc/BiRR3DA_screen.png)
 
 <!-- ### BiRR2D
 ![image info](./doc/BiRR2D_screen.png) -->
@@ -11,11 +11,13 @@ A realistic room simulator based on a combination of a convolution processor and
 
 BiRR2D and BiRR3D are room simulators that accurately emulate the sound produced by a monophonic and omnidirectionnal source perceived by a listener in a rectangular (2D) or parallelepipedic (3D) room.
 
-User can control $(x,y,z)$ dimensions of the room, and position of source and listener in the room. The orientation of the listener can also be adjusted. Wall properties are adjusted with only two parameters:
+User can control $(x,y,z)$ dimensions of the room, and position of source and listener in the room. The orientation of the listener can also be adjusted. Wall properties are adjusted with two or three parameters:
 
 - Wall absorbtion : a coefficient between 0 an 1, representing a reflection coefficient. The acoustic wave amplitude is multiplied by this coefficient at each wall rebound. Higher values produce a shorter reverb.
 
 - Wall high frequency absobtion : this parameter controls the high frequency absorbtion wall rebounds. Higher values produce darker reverb sound.
+
+- Wall diffusion : this parameter controls the wall diffusion properties (parameter only available in the ambisonic version, otherwise fixed to 1e-3, but this is subject to change)
 
 The input is mono or stereo, depending on the chosen version (mono in or stereo in). The output sound is a stereo reverberberated sound with one of the following configurations:
 
@@ -26,6 +28,8 @@ The input is mono or stereo, depending on the chosen version (mono in or stereo 
 - One omni and one eight-pattern microphone, in MS configuration
 
 - Binaural receptor based on the HRTF provided by MIT medialab (https://sound.media.mit.edu/resources/KEMAR.html), and equalized to sound as neutral as possible compared to the dry original sound.
+
+- Ambisonic output (for the ambisonic version)
 
 The 2D version simulates a 2D rectangular flat domain. Consequently, the produced binaural sound doesn't consider height information for sources and listener. The 3D version simmulates a parallelepipedic room, height position of the sources and listener. The latter hence involves more cpu computations for the impulse responses calculations.
 
@@ -47,11 +51,13 @@ In the MS configurations the stereo with quantifies the amplitude of the figure 
 
 The stereo width parameter has no effect in the binaural configuration.
 
+There is no such parameter in the ambisonic version
+
 ## Parameters updating
 
-At each parameter update (except reverb levels), the impulse response is calculated. As each acoustic path has to be calculated, the computation time can be high, in particular if the damping is small.
+At each parameter update (except reverb levels and head orientation in the ambisonic version), the impulse response is calculated. As each acoustic path has to be calculated, the computation time can be high, in particular if the damping is small.
 
-A number of threads equal to the number of CPUs is employed for the impulse response calculation, which allows reasonable computation times (At most a few seconds for largest reverberation times on recent CPUs).
+A number of threads equal to the number of CPUs - 1 is employed for the impulse response calculation, which allows reasonable computation times (At most a few seconds for largest reverberation times on recent CPUs).
 
 *Important note:* the fact that some calculation time is necessary after each parameter change prevents parameter automation, as they cannot be updated in real time. Consequently, this plugin cannot be used to move sounds in the virtual space.
 
@@ -64,6 +70,8 @@ A number of threads equal to the number of CPUs is employed for the impulse resp
 - v0.0.3: Fix bug that prevented direct path to be computed
 
 - v0.0.4: Fix crash occuring when parameters are updated, binaries now distributed as VST3
+
+- v0.0.5: Bug fixes + new ambisonic version
 
 ## Compilation
 
