@@ -32,15 +32,15 @@ void FxmeLogo::paint (juce::Graphics& g)
     {
         if (drawTitle) fac = 0.7f;
         auto bounds = getLocalBounds().toFloat();
-        auto size = juce::jmin(bounds.getWidth(), bounds.getHeight() * fac);
+        auto size = juce::jmin(bounds.getWidth(), bounds.getHeight() * fac );
         if (size < bounds.getWidth())
             bounds.setX(bounds.getX() + (bounds.getWidth() - size) / 2.0f);
         if (size < bounds.getHeight() * fac)
             bounds.setY(bounds.getY() + (bounds.getHeight() * fac - size) / 2.0f);
         auto logoBounds = juce::Rectangle<float>(bounds.getX(),
-                                                 bounds.getY(),
+                                                 bounds.getY()+size*(RATIO-1)/2.f,
                                                  size,
-                                                 size);
+                                                 size/RATIO);
         g.drawImage(logo, logoBounds);
     }
 
