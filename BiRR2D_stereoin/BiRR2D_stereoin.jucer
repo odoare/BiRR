@@ -3,11 +3,11 @@
 <JUCERPROJECT id="SD3Wpk" name="BiRR2D stereo input" projectType="audioplug"
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" displaySplashScreen="1"
               jucerFormatVersion="1" companyName="FX-Mechanics" companyWebsite="fx-mechanics.com"
-              pluginFormats="buildStandalone,buildVST,buildVST3" pluginManufacturerCode="FXME"
-              pluginCode="BR22" aaxIdentifier="http://fx-mechanics.com/plugins/BiRR2D_stereoin"
+              pluginFormats="buildLV2,buildStandalone,buildVST,buildVST3" pluginManufacturerCode="FXME"
+              pluginCode="BR22" aaxIdentifier="http://fx-mechanics.com/lv2/BiRR2D_stereoin"
               pluginName="BiRR2D stereo in" pluginDesc="Binaural room reverb, 2D, stereo input"
               pluginVST3Category="Fx,Reverb,Spatial,Stereo" pluginAAXCategory="8"
-              lv2Uri="http://fx-mechanics.com/plugins/BiRR2D_stereoin" version="0.0.4">
+              lv2Uri="http://fx-mechanics.com/plugins/BiRR2D_stereoin" version="0.0.5">
   <MAINGROUP id="NKvv2q" name="BiRR2D stereo input">
     <GROUP id="{34CC12DF-A955-ACD4-757D-70767BB2B363}" name="assets">
       <FILE id="ROsLVc" name="defines.h" compile="0" resource="0" file="../lib/assets/defines.h"/>
