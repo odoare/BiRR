@@ -1,6 +1,6 @@
 PROJUCER= ~/bin/Projucer
 
-all: projects birr2dm birr2ds birr3dm birr3ds
+all: projects birr2dm birr2ds birr3dm birr3ds birr3das
 
 projects:
 	$(PROJUCER) --resave BiRR2D_monoin/BiRR2D_monoin.jucer
