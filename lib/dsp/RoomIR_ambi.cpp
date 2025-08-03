@@ -1,9 +1,4 @@
 #include "RoomIR_ambi.h"
-#include "hrtf.h"
-#include "hrtf44.h"
-#include "hrtf48.h"
-#include "hrtf88.h"
-#include "hrtf96.h"
 
 // ======================================================================
 
@@ -14,8 +9,8 @@ void IrBoxCalculator::run()
     isCalculating[0] = true;
 
     // inBuf is the buffer used for the non-binaural methods
-    float outBuf[NSAMP96]={0.f}, inBuf[NSAMP96]={0.f};
-    inBuf[10] = 1.f;
+    float outBuf[NSAMP]={0.f}, inBuf[NSAMP]={0.f};
+    inBuf[2] = 1.f;
     float x,y,z;
 
     bpWY->setSize(2,longueur,true,true);
@@ -45,15 +40,12 @@ void IrBoxCalculator::run()
 
             int indice = int(round((time+juce::Random::getSystemRandom().nextFloat()*p.diffusion)*p.sampleRate));
             float r = pow(1-p.damp,abs(ix)+abs(iy)+abs(iz));
-            // float gain = pow(-1,ix+iy+iz)*r/dist;
             float gain = (r/dist) * float( !(ix==0 && iy==0 && iz==0) || calculateDirectPath ) ;
             
             float rp = sqrt((p.sx-p.lx)*(p.sx-p.lx)+(p.sy-p.ly)*(p.sy-p.ly));
-            //float elev = atan2f(p.sz-p.lz,rp)*EIGHTYOVERPI;
             float elev = atan2f(z-p.lz,rp)*EIGHTYOVERPI;
 
             // Azimutal angle calculation
-            //float theta = atan2f(y-p.ly,-x+p.lx)*EIGHTYOVERPI-90-p.headAzim;
             // In the ambisonic case, the head orientation is managed by matrix multiplication
             float theta = atan2f(y-p.ly,-x+p.lx)*EIGHTYOVERPI-90;
 
@@ -81,39 +73,13 @@ void IrBoxCalculator::run()
 // Add a given array to a buffer
 void IrBoxCalculator::addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain)
 {
-  for (int i=0; i<nsamp[0]; i++)
+  for (int i=0; i<NSAMP; i++)
   {
     bufPtr[i] += hrtfPtr[i]*gain;
   }
 }
 
-// Compares the values in data to a float prameter value and returns the nearest index
-int IrBoxCalculator::proximityIndex(const float *data, const int length, const float value, const bool wrap)
-{
-  int proxIndex = 0;
-  float minDistance = BIGVALUE;
-  float val;
-  if (wrap && value<0.f)
-  {
-    val = value+360.f;
-  }
-  else
-  {
-    val = value;
-  }
-  for (int i=0; i<length; i++)
-  {
-    float actualDistance = abs(data[i]-val);
-    if (actualDistance < minDistance)
-    {
-      proxIndex = i;
-      minDistance = actualDistance;
-    }
-  }
-  return proxIndex;
-}
-
-// Basic lowpass filter
+// Basic lowpass filter applied to each grain
 void IrBoxCalculator::lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order)
 {
 
@@ -121,7 +87,7 @@ void IrBoxCalculator::lop(const float* in, float* out, const int sampleFreq, con
     const float alpha1 = exp(-om/sampleFreq);
     const float alpha = 1 - alpha1;
     out[0] = alpha*in[0];
-    for (int i=1;i<nsamp[0];i++)
+    for (int i=1;i<NSAMP;i++)
     {
       out[i] = alpha*in[i] + alpha1*out[i-1];
     }
@@ -129,7 +95,7 @@ void IrBoxCalculator::lop(const float* in, float* out, const int sampleFreq, con
     for (int j=0; j<order-1; j++)
     {
       out[0] *= alpha;
-      for (int i=1;i<nsamp[0];i++)
+      for (int i=1;i<NSAMP;i++)
       {
         out[i] = alpha*out[i] + alpha1*out[i-1];
       }
@@ -140,7 +106,7 @@ void IrBoxCalculator::lop(const float* in, float* out, const int sampleFreq, con
 float IrBoxCalculator::max(const float* in)
 {
   float max = 0;
-  for (int i=1;i<nsamp[0];i++)
+  for (int i=1;i<NSAMP;i++)
   {
     if (in[i]>max)
     max = in[i];
@@ -177,12 +143,6 @@ void IrBoxCalculator::setBuffers(juce::AudioBuffer<float>* bWY, juce::AudioBuffe
 void IrBoxCalculator::setCalculateDirectPath(bool c)
 {
   calculateDirectPath = c;
-}
-
-void IrBoxCalculator::setHrtfVars(int* ns, float* nsr)
-{
-  nsamp = ns;
-  nearestSampleRate = nsr;
 }
 
 IrBoxCalculator::IrBoxCalculator() : juce::Thread("calc")
@@ -290,7 +250,7 @@ void BoxRoomIR::initialize()
       boxCalculator[i].setCalculatingBool(&isCalculating[i]);
       boxCalculator[i].setBuffers(&boxIrBufferWY[i], &boxIrBufferZX[i]);
       boxCalculator[i].setCalculateDirectPath(false);
-      boxCalculator[i].setHrtfVars(&nsamp, &nearestSampleRate);
+      // boxCalculator[i].setHrtfVars(&nsamp, &nearestSampleRate);
     }
 
     boxIrTransferWY.setCalculatingBool(&isCalculating[0]);
@@ -308,7 +268,7 @@ void BoxRoomIR::initialize()
     directCalculator.setCalculatingBool(&isCalculatingDirect);
     directCalculator.setBuffers(&directIrBufferWY, &directIrBufferZX);
     directCalculator.setCalculateDirectPath(true);
-    directCalculator.setHrtfVars(&nsamp, &nearestSampleRate);
+    // directCalculator.setHrtfVars(&nsamp, &nearestSampleRate);
 
     directIrTransferWY.setCalculatingBool(&isCalculatingDirect);
     directIrTransferWY.setBuffer(&directIrBufferWY);
@@ -330,36 +290,6 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
     inputBufferCopyWYZX.setSize(4, spec.maximumBlockSize ,false,true);
 
     cout << "Actual sampleRate : " << spec.sampleRate << " Hz." << endl;
-
-    // We have hrtf only for a discrete set of samplerates
-    // (typically 44.1, 48, 88.2, 96)
-    nearestSampleRate = 44100.f;
-    float distance = 200000.f;
-    for (float sr : possibleSampleRates)
-      if (abs(sr-spec.sampleRate)<distance)
-      {
-        distance = abs(sr-spec.sampleRate);
-        nearestSampleRate = sr;
-      };
-
-      if (juce::approximatelyEqual(nearestSampleRate, 44100.f))
-        nsamp = NSAMP44;
-      else if (juce::approximatelyEqual(nearestSampleRate, 48000.f))
-        nsamp = NSAMP48;
-      else if (juce::approximatelyEqual(nearestSampleRate, 88200.f))
-        nsamp = NSAMP88;
-      else if (juce::approximatelyEqual(nearestSampleRate, 96000.f))
-        nsamp = NSAMP96;
-    
-    if (!juce::approximatelyEqual(distance,0.f))
-      cout << "Warning : sample rate of " << p.sampleRate
-            << " Hz not in possible sample rates, using HRTF at "
-            << nearestSampleRate << " Hz." << endl;
-    else
-      {
-        cout << "Sample rate : " << nearestSampleRate << " Hz" << endl;
-        cout << "HRTF size : " << nsamp << endl;
-      }
 
     boxIrTransferWY.setSampleRate(spec.sampleRate);
     boxConvolutionWY.reset();
@@ -444,7 +374,7 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
 
       int n = int(log10(2e-2)/log10(1-p.damp));
       auto dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
-      int longueur = int(ceil(dur*p.sampleRate)+nsamp+int(p.sampleRate*SIGMA_DELTAT));
+      int longueur = int(ceil(dur*p.sampleRate)+nsamp+int(p.sampleRate*p.diffusion));
       int chunksize = floor(2*float(n)/threadsNum);
 
       for (int i=0;i<threadsNum;i++)
@@ -460,7 +390,7 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
 
       n = 1;
       dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
-      longueur = int(ceil(dur*p.sampleRate)+nsamp+int(p.sampleRate*SIGMA_DELTAT));
+      longueur = int(ceil(dur*p.sampleRate)+nsamp+int(p.sampleRate*p.diffusion));
 
       directCalculator.longueur = longueur;
       directCalculator.n = n;
@@ -491,6 +421,10 @@ bool BoxRoomIR::setIrCaclulatorsParams(IrBoxCalculatorParams& pa)
     // If nothing has changed, we do nothing and return false
     // If at least one parameter has changed we update params
     // of each threaded calculator
+    //
+    // We do not test on headAzim because it doesn't necessitate
+    // to recompute IRs when changed
+
     if (juce::approximatelyEqual(p.rx,pa.rx)
       && juce::approximatelyEqual(p.ry,pa.ry)
       && juce::approximatelyEqual(p.rz,pa.rz)
@@ -502,7 +436,6 @@ bool BoxRoomIR::setIrCaclulatorsParams(IrBoxCalculatorParams& pa)
       && juce::approximatelyEqual(p.sz,pa.sz)
       && juce::approximatelyEqual(p.damp,pa.damp)
       && juce::approximatelyEqual(p.hfDamp,pa.hfDamp)
-      // && juce::approximatelyEqual(p.headAzim,pa.headAzim)
       && juce::approximatelyEqual(p.diffusion,pa.diffusion)
       && juce::approximatelyEqual(p.sampleRate,pa.sampleRate))
       {
@@ -600,11 +533,10 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &bufferWYZX)
     filter[2].process(juce::dsp::ProcessContextReplacing<float>(blockZ));
     filter[3].process(juce::dsp::ProcessContextReplacing<float>(blockX));
 
-    //inputBufferCopyWYZX.makeCopyOf(bufferWYZX,true);
-
     // We use the copy block for the rotation operation
     // As we only rotate around Z, only X and Y components are modified
-    // The four components are used
+    // However, the four components are needed to compute the four trigonometric operations
+    // sin(X) cos(X) sin(Y) cos(Y)
     juce::dsp::AudioBlock<float> blockCopyY1 = blockCopyWYZX.getSingleChannelBlock(0);
     juce::dsp::AudioBlock<float> blockCopyY2 = blockCopyWYZX.getSingleChannelBlock(1);
     juce::dsp::AudioBlock<float> blockCopyX1 = blockCopyWYZX.getSingleChannelBlock(2);

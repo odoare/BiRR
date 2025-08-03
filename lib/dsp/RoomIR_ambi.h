@@ -13,7 +13,6 @@ using namespace std;
 #define PIOVEREIGHTY 1.745329252e-02f
 #define EIGHTYOVERPI 57.295779513f
 #define OMEGASTART 125663.706f
-#define SIGMA_DELTAT 1e-3f
 
 #define MAXSIZE 10.f
 #define MINDAMPING 0.02f
@@ -52,7 +51,6 @@ class IrBoxCalculator : public juce::Thread
     void setCalculatingBool(bool* cp);
     void setBuffers(juce::AudioBuffer<float>* bWY, juce::AudioBuffer<float>* bZX);
     void setCalculateDirectPath(bool c);
-    void setHrtfVars(int* ns, float* nsr);
     
     // min and max indices which iR is calculated in this thread
     // If only the direct sound is needed, one has to select
@@ -66,9 +64,6 @@ class IrBoxCalculator : public juce::Thread
     bool* isCalculating;
     juce::AudioBuffer<float> *bpWY, *bpZX;
     bool calculateDirectPath;
-    int* nsamp;
-    float* nearestSampleRate;
-    // int threadsNum;
     
     void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
     int proximityIndex(const float *data, const int length, const float value, const bool wrap);
