@@ -240,8 +240,8 @@ void BoxRoomIR::initialize()
 
     cout << "Number of CPUs : " << juce::SystemStats::getNumCpus() << endl;
     cout << "Number of physical CPUs : " << numCpus << endl;
-    threadsNum = std::min<int>(numCpus-1,MAXTHREADS);
-    cout << "Number of threads : " << threadsNum << endl;    
+    threadsNum = std::max<int>(0,std::min<int>(numCpus-1,MAXTHREADS));
+    cout << "Number of threads : " << threadsNum << endl;
 
     // Calculators for the room reflexions (box)
 

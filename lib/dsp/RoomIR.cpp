@@ -42,7 +42,7 @@ void IrBoxCalculator::run()
             float gain = (r/dist) * float( !(ix==0 && iy==0 && iz==0) || calculateDirectPath ) ;
             
             float rp = sqrt((p.sx-p.lx)*(p.sx-p.lx)+(p.sy-p.ly)*(p.sy-p.ly));
-            float elev = atan2f(p.sz-p.lz,rp)*EIGHTYOVERPI;
+            float elev = atan2f(z-p.lz,rp)*EIGHTYOVERPI;
 
             // Azimutal angle calculation
             float theta = atan2f(y-p.ly,-x+p.lx)*EIGHTYOVERPI-90-p.headAzim;
@@ -329,8 +329,9 @@ void BoxRoomIR::initialize()
     int numCpus = juce::SystemStats::getNumPhysicalCpus();
 
     cout << "Number of CPUs : " << juce::SystemStats::getNumCpus() << endl;
-    cout << "Number of physical CPUs : " << juce::SystemStats::getNumPhysicalCpus() << endl;
-    threadsNum = std::min<int>(numCpus,MAXTHREADS);
+    cout << "Number of physical CPUs : " << numCpus << endl;
+    threadsNum = std::max<int>(0,std::min<int>(numCpus-1,MAXTHREADS));
+    cout << "Number of threads : " << threadsNum << endl;
 
     // Calculators for the room reflexions (box)
 
