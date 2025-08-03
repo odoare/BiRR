@@ -126,8 +126,6 @@ public:
 private:
     IrBoxCalculatorParams p;
     int threadsNum;
-    int nsamp;
-    float nearestSampleRate;
 
     juce::dsp::IIR::Filter<float> filter[4];
     

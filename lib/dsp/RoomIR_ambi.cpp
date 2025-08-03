@@ -374,7 +374,7 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
 
       int n = int(log10(2e-2)/log10(1-p.damp));
       auto dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
-      int longueur = int(ceil(dur*p.sampleRate)+nsamp+int(p.sampleRate*p.diffusion));
+      int longueur = int(ceil(dur*p.sampleRate)+NSAMP+int(p.sampleRate*p.diffusion));
       int chunksize = floor(2*float(n)/threadsNum);
 
       for (int i=0;i<threadsNum;i++)
@@ -390,7 +390,7 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
 
       n = 1;
       dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
-      longueur = int(ceil(dur*p.sampleRate)+nsamp+int(p.sampleRate*p.diffusion));
+      longueur = int(ceil(dur*p.sampleRate)+NSAMP+int(p.sampleRate*p.diffusion));
 
       directCalculator.longueur = longueur;
       directCalculator.n = n;
