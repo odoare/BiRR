@@ -33,24 +33,26 @@ void IrBoxCalculator::run()
         {
           y = 2*float(ceil(float(iy)/2))*p.ry+pow(-1,iy)*p.sy;
           for (int iz=-n+1; iz<n; ++iz)
-          { 
+          {
             z = 2*float(ceil(float(iz)/2))*p.rz+pow(-1,iz)*p.sz;
             float dist = sqrt((x-p.lx)*(x-p.lx)+(y-p.ly)*(y-p.ly)+(z-p.lz)*(z-p.lz));
             float time = dist*INV_SOUNDSPEED;
+            int nbounds = abs(ix)+abs(iy)+abs(iz);
 
-            int indice = int(round((time+juce::Random::getSystemRandom().nextFloat()*p.diffusion)*p.sampleRate));
-            float r = pow(1-p.damp,abs(ix)+abs(iy)+abs(iz));
+            int indice = int(round((time+(juce::Random::getSystemRandom().nextFloat())*p.diffusion)*p.sampleRate));
+            float r = pow(1-p.damp,nbounds);
             float gain = (r/dist) * float( !(ix==0 && iy==0 && iz==0) || calculateDirectPath ) ;
             
             float rp = sqrt((p.sx-p.lx)*(p.sx-p.lx)+(p.sy-p.ly)*(p.sy-p.ly));
             float elev = atan2f(z-p.lz,rp)*EIGHTYOVERPI;
 
             // Azimutal angle calculation
-            // In the ambisonic case, the head orientation is managed by matrix multiplication
+            // In the ambisonic case, the head orientation is managed
+            // at the end of the process by matrix multiplication
             float theta = atan2f(y-p.ly,-x+p.lx)*EIGHTYOVERPI-90;
 
             // Apply filter on the grain
-            lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+            lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
             // Add grains to the buffers
             float costheta = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(-theta));
             float sintheta = juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(-theta));
@@ -250,7 +252,6 @@ void BoxRoomIR::initialize()
       boxCalculator[i].setCalculatingBool(&isCalculating[i]);
       boxCalculator[i].setBuffers(&boxIrBufferWY[i], &boxIrBufferZX[i]);
       boxCalculator[i].setCalculateDirectPath(false);
-      // boxCalculator[i].setHrtfVars(&nsamp, &nearestSampleRate);
     }
 
     boxIrTransferWY.setCalculatingBool(&isCalculating[0]);
@@ -268,7 +269,6 @@ void BoxRoomIR::initialize()
     directCalculator.setCalculatingBool(&isCalculatingDirect);
     directCalculator.setBuffers(&directIrBufferWY, &directIrBufferZX);
     directCalculator.setCalculateDirectPath(true);
-    // directCalculator.setHrtfVars(&nsamp, &nearestSampleRate);
 
     directIrTransferWY.setCalculatingBool(&isCalculatingDirect);
     directIrTransferWY.setBuffer(&directIrBufferWY);
@@ -318,7 +318,7 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
 
 void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
 {
-    std::cout << "Start calculate" << std::endl;
+    // std::cout << "Start calculate" << std::endl;
 
     if (setIrCaclulatorsParams(p))     // (We run the calculation only if a parameter has changed)
     {    
@@ -373,6 +373,7 @@ void BoxRoomIR::calculate(IrBoxCalculatorParams& p)
       // Set some multithread loops parameters
 
       int n = int(log10(2e-2)/log10(1-p.damp));
+      std::cout << "n = " << n << std::endl;
       auto dur = (n+1)*sqrt(p.rx*p.rx+p.ry*p.ry+p.rz*p.rz)/340;
       int longueur = int(ceil(dur*p.sampleRate)+NSAMP+int(p.sampleRate*p.diffusion));
       int chunksize = floor(2*float(n)/threadsNum);

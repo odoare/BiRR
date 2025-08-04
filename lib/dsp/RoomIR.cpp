@@ -35,9 +35,10 @@ void IrBoxCalculator::run()
             z = 2*float(ceil(float(iz)/2))*p.rz+pow(-1,iz)*p.sz;
             float dist = sqrt((x-p.lx)*(x-p.lx)+(y-p.ly)*(y-p.ly)+(z-p.lz)*(z-p.lz));
             float time = dist*INV_SOUNDSPEED;
+            int nbounds = abs(ix)+abs(iy)+abs(iz);            
 
             int indice = int(round((time+juce::Random::getSystemRandom().nextFloat()*SIGMA_DELTAT)*p.sampleRate));
-            float r = pow(1-p.damp,abs(ix)+abs(iy)+abs(iz));
+            float r = pow(1-p.damp,nbounds);
             // float gain = pow(-1,ix+iy+iz)*r/dist;
             float gain = (r/dist) * float( !(ix==0 && iy==0 && iz==0) || calculateDirectPath ) ;
             
@@ -53,18 +54,18 @@ void IrBoxCalculator::run()
               auto elevCardio = (1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev)));
               auto panGain = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta+45*p.sWidth)))
                               * elevCardio;
-              lop(&inBuf[0], &outBuf[0], p.sampleRate,p.hfDamp,abs(ix)+abs(iy),1);
+              lop(&inBuf[0], &outBuf[0], p.sampleRate,p.hfDamp,nbounds,1);
               addArrayToBuffer(&dataL[indice], &outBuf[0], gain*panGain);
               panGain = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta-45*p.sWidth)))
                           * elevCardio;
-              lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+              lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
               addArrayToBuffer(&dataR[indice], &outBuf[0], gain*panGain);
             }
 
-            // MS with cardio mic for mid channel
+            // MS with cardio mic for mid channelabs(ix)+abs(iy)
             if (p.type==1){
               // Apply lowpass filter and add grain to buffer
-              lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+              lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
               auto gainMid = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta)))
                               * (1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev)));
               auto gainSide = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev))
@@ -77,7 +78,7 @@ void IrBoxCalculator::run()
             // MS with omni mic for mid channel
             if (p.type==2){
               // Apply lowpass filter and add grain to buffer
-              lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+              lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
               auto gainMid = 1.f;
               auto gainSide = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev))
                               * juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(theta));
@@ -93,31 +94,31 @@ void IrBoxCalculator::run()
               gain = gain * .707107f;
               if (juce::approximatelyEqual(nearestSampleRate[0],48000.f))
                 {
-                  lop(&lhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  lop(&lhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
-                  lop(&rhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  lop(&rhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
 
                 }
               else if (juce::approximatelyEqual(nearestSampleRate[0],88200.f))
                 {
-                  lop(&lhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  lop(&lhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
-                  lop(&rhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  lop(&rhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
                 }
               else if (juce::approximatelyEqual(nearestSampleRate[0],96000.f))
                 {
-                  lop(&lhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  lop(&lhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
-                  lop(&rhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  lop(&rhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
                 }
               else // if 44.1kHz or any other cases, we use 44.1kHz HRTF
                 {
-                  lop(&lhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  lop(&lhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
-                  lop(&rhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                  lop(&rhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
                 }
             }

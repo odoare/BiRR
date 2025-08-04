@@ -237,8 +237,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceRY","SourceRY",0.01f,0.99f,0.75f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("SourceRZ","SourceRZ",0.01f,0.99f,0.7f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Damping","Damping",juce::NormalisableRange<float>(MINDAMPING,0.99f,0.001f,0.3f),0.25f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("HF Damping","HF Damping",juce::NormalisableRange<float>(0.01f,0.3f,0.001f,0.3f),0.1f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("Diffusion","Diffusion",juce::NormalisableRange<float>(0.f,1e-2f,1e-5f,1.f),1e-3f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("HF Damping","HF Damping",juce::NormalisableRange<float>(0.01f,0.3f,0.001f,0.3f),0.05f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Diffusion","Diffusion",juce::NormalisableRange<float>(0.f,1e-2f,1e-5f,0.5f),1e-3f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Direct Level","Direct Level",juce::NormalisableRange<float>(-90.0f,6.f,0.1f,1.f),0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Reflections Level","Reflections Level",juce::NormalisableRange<float>(-90.0f,6.f,0.1f,1.f),0.f));
     
@@ -250,11 +250,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReverbAudioProcessor::create
 // This is the function where the impulse response is calculated
 void ReverbAudioProcessor::setIrLoaderL()
 {
-    std::cout << "In setIrLoader L" << endl;
+    // std::cout << "In setIrLoader L" << endl;
 
     IrBoxCalculatorParams p;
 
-    std::cout << "Set parameters" << endl;
+    // std::cout << "Set parameters" << endl;
 
     p.rx = apvts.getRawParameterValue("Room Size X")->load();
     p.ry = apvts.getRawParameterValue("Room Size Y")->load();
@@ -271,19 +271,19 @@ void ReverbAudioProcessor::setIrLoaderL()
     p.diffusion = apvts.getRawParameterValue("Diffusion")->load();
     p.sampleRate = spec.sampleRate;
 
-    std::cout << "Start roomIRL.calculate in setIrLoaderL" << endl;    
+    // std::cout << "Start roomIRL.calculate in setIrLoaderL" << endl;    
     roomIRL.calculate(p);
-    std::cout << "Finished" << endl;
+    // std::cout << "Finished" << endl;
 }
 
 // This is the function where the impulse response is calculated
 void ReverbAudioProcessor::setIrLoaderR()
 {
-    std::cout << "In setIrLoader R" << endl;
+    // std::cout << "In setIrLoader R" << endl;
 
     IrBoxCalculatorParams p;
 
-    std::cout << "Set parameters" << endl;
+    // std::cout << "Set parameters" << endl;
 
     p.rx = apvts.getRawParameterValue("Room Size X")->load();
     p.ry = apvts.getRawParameterValue("Room Size Y")->load();
@@ -300,9 +300,9 @@ void ReverbAudioProcessor::setIrLoaderR()
     p.diffusion = apvts.getRawParameterValue("Diffusion")->load();
     p.sampleRate = spec.sampleRate;
 
-    std::cout << "Start roomIRR.calculate in setIrLoaderR" << endl;
+    // std::cout << "Start roomIRR.calculate in setIrLoaderR" << endl;
     roomIRR.calculate(p);
-    std::cout << "Finished" << endl;
+    // std::cout << "Finished" << endl;
 }
 
 void ReverbAudioProcessor::timerCallback()
