@@ -163,7 +163,7 @@ void IrTransfer::run()
 {
 
   hasTransferred = false;
-  
+
   // First we must wait for the buffers to be ready
   bool isCalc = true;
   while (isCalc)
@@ -182,19 +182,32 @@ void IrTransfer::run()
       }
   }
 
-  for (int i=1;i<threadsNum;i++)
+  std::cout << "Buffer copy...." ;
+  tempBuf.makeCopyOf(bp[0],true);
+  std:cout << "Buffer copy done. Size : " << tempBuf.getNumSamples() << std::endl;
+
+  for (int i=0;i<threadsNum;i++)
     {
-      bp[0].addFrom(0,0,bp[i],0,0,bp[i].getNumSamples());
-      bp[0].addFrom(1,0,bp[i],1,0,bp[i].getNumSamples());
+      tempBuf.addFrom(0,0,bp[i],0,0,bp[i].getNumSamples());
+      tempBuf.addFrom(1,0,bp[i],1,0,bp[i].getNumSamples());
     }
 
-  irp->loadImpulseResponse(std::move (bp[0]),
-                      sampleRate,
-                      juce::dsp::Convolution::Stereo::yes,
-                      juce::dsp::Convolution::Trim::no,
-                      juce::dsp::Convolution::Normalise::no);
-
-  hasTransferred = true;
+  if (irp != nullptr)
+  {
+    std::cout << "Transferring impulse response..." << std::endl;
+    irp->loadImpulseResponse(std::move(tempBuf),
+                        sampleRate,
+                        juce::dsp::Convolution::Stereo::yes,
+                        juce::dsp::Convolution::Trim::no,
+                        juce::dsp::Convolution::Normalise::no);
+    hasTransferred = true;
+    std::cout << "Transfer done." << std::endl;
+  }
+  else
+  {
+    std::cerr << "Error: irp pointer is null in IrTransfer::run()" << std::endl;
+    hasTransferred = false;
+  }
 }
 
 void IrTransfer::setBuffer(juce::AudioBuffer<float>* bufPointer)
@@ -215,6 +228,11 @@ void IrTransfer::setCalculatingBool(bool* cp)
 void IrTransfer::setSampleRate(double sr)
 {
   sampleRate = sr;
+}
+
+double IrTransfer::getSampleRate()
+{
+  return sampleRate;
 }
 
 bool IrTransfer::getBufferTransferState()
@@ -555,4 +573,55 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &bufferWYZX)
 
     // cout << "End of BoxRoomIR::process" << endl;
 
+}
+
+void BoxRoomIR::exportIrToWav(juce::File file)
+{
+
+  std::unique_ptr<juce::AudioFormatWriter> writer;
+  juce::FileOutputStream stream(file);
+
+  // Mix the Ir buffers to get a single 4-channels buffer
+  juce::AudioBuffer<float> fullBuffer(4, boxCalculator[0].longueur);
+  std::cout << "Box buffer length : " << fullBuffer.getNumSamples() << std::endl; 
+  fullBuffer.clear();
+
+  if (getBufferTransferState())
+  {
+    for (int i=0;i<threadsNum;i++)
+    {
+    fullBuffer.addFrom(0,0,boxIrTransferWY.bp[i],0,0,boxIrBufferWY[i].getNumSamples());
+    fullBuffer.addFrom(1,0,boxIrTransferWY.bp[i],1,0,boxIrBufferWY[i].getNumSamples());
+    fullBuffer.addFrom(2,0,boxIrTransferZX.bp[i],0,0,boxIrBufferZX[i].getNumSamples());
+    fullBuffer.addFrom(3,0,boxIrTransferZX.bp[i],1,0,boxIrBufferZX[i].getNumSamples());
+    }
+
+    fullBuffer.addFrom(0,0,directIrTransferWY.bp[0],0,0,directIrBufferWY.getNumSamples());
+    fullBuffer.addFrom(1,0,directIrTransferWY.bp[0],1,0,directIrBufferWY.getNumSamples());
+    fullBuffer.addFrom(2,0,directIrTransferZX.bp[0],0,0,directIrBufferZX.getNumSamples());
+    fullBuffer.addFrom(3,0,directIrTransferZX.bp[0],1,0,directIrBufferZX.getNumSamples());
+
+    juce::WavAudioFormat format;
+    std::unique_ptr<juce::AudioFormatWriter> writer;
+    writer.reset (format.createWriterFor (new juce::FileOutputStream (file),
+                                          boxIrTransferWY.getSampleRate(),
+                                          fullBuffer.getNumChannels(),
+                                          24,
+                                          {},
+                                          0));
+    if (writer != nullptr)
+      {
+        cout << "fullBuffer length : " << fullBuffer.getNumSamples() << endl; 
+        writer->writeFromAudioSampleBuffer (fullBuffer, 0, fullBuffer.getNumSamples());
+      }
+    else
+      {
+        std::cout << "Writer = nullptr" << std::endl;
+      }     
+  }
+  else
+  {
+    std::cout << "Buffers not ready" << std::endl;
+  }
+  
 }

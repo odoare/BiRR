@@ -42,6 +42,12 @@ private:
     juce::TextButton addButton;
     juce::TextButton removeButton;
 
+    // juce::TextButton exportIrButton;
+    fxme::FxmeButton exportIrButton{audioProcessor.apvts,"",FXMECOLOUR};
+
+    std::unique_ptr<juce::FileChooser> myChooser;
+    void saveWaveFile();
+
     fxme::FxmeKnob roomXKnob{audioProcessor.apvts,"Room Size X",ROOMCOLOUR};
     fxme::FxmeKnob roomYKnob{audioProcessor.apvts,"Room Size Y",ROOMCOLOUR};
     fxme::FxmeKnob roomZKnob{audioProcessor.apvts,"Room Size Z",ROOMCOLOUR};

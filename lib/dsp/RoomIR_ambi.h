@@ -84,11 +84,14 @@ public:
     void setIr(juce::dsp::Convolution* irPointer);
     void setCalculatingBool(bool* cp);
     void setSampleRate(double sr);
+    double getSampleRate();
     bool getBufferTransferState();
     void setThreadsNum(int n);
 
-private:
     juce::AudioBuffer<float> *bp;
+
+private:
+    juce::AudioBuffer<float> tempBuf;
     juce::dsp::Convolution *irp;
     bool* isCalculating;
     bool hasTransferred;
@@ -111,6 +114,7 @@ public:
     bool getCalculatingState();
     bool getBufferTransferState();
     void process(juce::AudioBuffer<float>& bufferWYZX);
+    void exportIrToWav(juce::File file);
 
     juce::AudioBuffer<float> inputBufferCopyWYZX;
     juce::dsp::Convolution boxConvolutionWY, boxConvolutionZX, directConvolutionWY, directConvolutionZX;
