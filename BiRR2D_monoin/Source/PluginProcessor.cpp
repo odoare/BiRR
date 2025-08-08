@@ -227,7 +227,7 @@ void ReverbAudioProcessor::setIrLoader()
     p.sWidth = apvts.getRawParameterValue("Stereo Width")->load();
     p.sampleRate = spec.sampleRate;
 
-    roomIR.calculate(p);
+    if (roomIR.hasInitialized) roomIR.calculate(p);
 }
 
 void ReverbAudioProcessor::timerCallback()

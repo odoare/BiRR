@@ -108,6 +108,7 @@ void ReverbAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     spec.sampleRate = sampleRate;
     spec.numChannels = getTotalNumOutputChannels();
 
+    std::cout << "In prepareToPlay" << endl;
     roomIR.initialize();
     roomIR.prepare(spec);
 
@@ -235,7 +236,9 @@ void ReverbAudioProcessor::setIrLoader()
     p.sWidth = apvts.getRawParameterValue("Stereo Width")->load();
     p.sampleRate = spec.sampleRate;
 
-    roomIR.calculate(p);
+    // std::cout << "Calculate" << endl;
+
+    if (roomIR.hasInitialized) roomIR.calculate(p);
 }
 
 void ReverbAudioProcessor::timerCallback()

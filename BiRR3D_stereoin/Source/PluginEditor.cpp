@@ -25,6 +25,17 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
       audioProcessor.autoUpdate = autoButton.button.getToggleStateValue().getValue();
     };
 
+    auto exportFile = [this](){   
+      saveWaveFile();
+      autoButton.button.setState(juce::Button::ButtonState::buttonNormal);
+    };
+
+    addAndMakeVisible (exportIrButton.button);
+    exportIrButton.button.setLookAndFeel(&fxmeLookAndFeel);
+    exportIrButton.button.setButtonText("Export IR");
+    exportIrButton.button.onClick = exportFile;
+    autoButton.button.setState(juce::Button::ButtonState::buttonNormal);
+
     // Room size controllers
 
     addAndMakeVisible(roomXKnob.slider);
@@ -239,7 +250,7 @@ void ReverbAudioProcessorEditor::resized()
 {
     using fi = juce::FlexItem;
     juce::FlexBox fbmain, fb1, fb20, fb2, fb3, fb21,
-                  fb2t, fb2b, fb2tl, fb2tc, fb2tr, fb2bl, fb2br, fb31, fb32, fb311, fb3111;
+                  fb2t, fb2b, fb2tl, fb2tc, fb2tr, fb2bl, fb2br, fb31, fb32, fb311, fb312, fb3111;
 
     fbmain.flexDirection = juce::FlexBox::Direction::column;
     fb1.flexDirection = juce::FlexBox::Direction::row;
@@ -255,6 +266,7 @@ void ReverbAudioProcessorEditor::resized()
     fb31.flexDirection = juce::FlexBox::Direction::column;
     fb32.flexDirection = juce::FlexBox::Direction::column;
     fb311.flexDirection = juce::FlexBox::Direction::row;
+    fb312.flexDirection = juce::FlexBox::Direction::row;
     fb3111.flexDirection = juce::FlexBox::Direction::column;
 
     fb1.items.add(fi(roomXKnob.flex()).withFlex(1.f));
@@ -289,7 +301,10 @@ void ReverbAudioProcessorEditor::resized()
     fb31.items.add(fi(fb311).withFlex(1.f).withMargin(juce::FlexItem::Margin(0.f,20.f,0.f,0.f)));
     fb31.items.add(fi(typeComboBox).withFlex(0.2f).withMargin(juce::FlexItem::Margin(25.f,0.f,0.f,0.f)));
 
-    fb31.items.add(fi(autoButton.flex()).withFlex(0.25f).withMargin(juce::FlexItem::Margin(20.f,20.f,0.f,20.f)));
+    fb312.items.add(fi(autoButton.flex()).withFlex(1.f).withMargin(juce::FlexItem::Margin(0.f,0.f,0.f,0.f)));
+    fb312.items.add(fi(exportIrButton.flex()).withFlex(0.75f).withMargin(juce::FlexItem::Margin(0.f,0.f,0.f,0.f)));
+
+    fb31.items.add(fi(fb312).withFlex(0.25f).withMargin(juce::FlexItem::Margin(20.f,20.f,0.f,20.f)));
     fb31.items.add(fi(progressBarL).withFlex(0.18f));
     fb31.items.add(fi(progressBarR).withFlex(0.18f));
     fb32.items.add(fi(directLevelKnob.flex()).withFlex(1.f).withMargin(juce::FlexItem::Margin(20.f,0.f,0.f,0.f)));
@@ -339,4 +354,29 @@ void ReverbAudioProcessorEditor::addAndConnectLabel(juce::Slider& slider,
   addAndMakeVisible(label);
   label.setJustificationType(juce::Justification::centred);
   label.attachToComponent(&slider,false);
+}
+
+void ReverbAudioProcessorEditor::saveWaveFile()
+{
+    myChooser = std::make_unique<juce::FileChooser> ("Please select the wav you want to save...",
+                                            juce::File::getSpecialLocation (juce::File::userHomeDirectory),
+                                            "*.wav");
+    auto chooserFlags = juce::FileBrowserComponent::saveMode;
+    myChooser->launchAsync (chooserFlags, [this] (const juce::FileChooser& chooser)
+    {
+      std::cout << "In launchAsync..." << std::endl;
+      juce::File wavFile (chooser.getResult()); 
+      std::cout << "You choosed 💾 " << wavFile.getFullPathName() << std::endl;
+      std::cout << "File name without extension: " << wavFile.getFileNameWithoutExtension() << std::endl;
+      std::cout << "File extension: " << wavFile.getFileExtension() << std::endl;
+      std::cout << "Parent directory: " << wavFile.getParentDirectory().getFullPathName() << std::endl;
+      
+      auto fname = wavFile.getParentDirectory().getFullPathName()
+                    + "/"
+                    + wavFile.getFileNameWithoutExtension();
+      wavFile = juce::File(fname+ "_L" + ".wav") ;
+      audioProcessor.roomIRL.exportIrToWav(wavFile);
+      wavFile = juce::File(fname+ "_R" + ".wav") ;
+      audioProcessor.roomIRR.exportIrToWav(wavFile);
+    });
 }

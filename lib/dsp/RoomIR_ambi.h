@@ -126,6 +126,7 @@ public:
                               directIrBufferZX;
     IrTransfer boxIrTransferWY, boxIrTransferZX, directIrTransferWY, directIrTransferZX;
     float directLevel, reflectionsLevel;
+    bool hasInitialized{false};
 
 private:
     IrBoxCalculatorParams p;

@@ -262,7 +262,7 @@ void ReverbAudioProcessor::setIrLoaderL()
     p.sampleRate = spec.sampleRate;
 
     std::cout << "Start roomIRL.calculate in setIrLoaderL" << endl;    
-    roomIRL.calculate(p);
+    if (roomIRL.hasInitialized) roomIRL.calculate(p);
     std::cout << "Finished" << endl;
 }
 
@@ -292,7 +292,7 @@ void ReverbAudioProcessor::setIrLoaderR()
     p.sampleRate = spec.sampleRate;
 
     std::cout << "Start roomIRR.calculate in setIrLoaderR" << endl;
-    roomIRR.calculate(p);
+    if (roomIRR.hasInitialized) roomIRR.calculate(p);
     std::cout << "Finished" << endl;
 }
 

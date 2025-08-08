@@ -351,12 +351,22 @@ void ReverbAudioProcessorEditor::saveWaveFile()
     myChooser = std::make_unique<juce::FileChooser> ("Please select the wav you want to save...",
                                             juce::File::getSpecialLocation (juce::File::userHomeDirectory),
                                             "*.wav");
-    auto folderChooserFlags = juce::FileBrowserComponent::saveMode;
-    myChooser->launchAsync (folderChooserFlags, [this] (const juce::FileChooser& chooser)
+    auto chooserFlags = juce::FileBrowserComponent::saveMode;
+    myChooser->launchAsync (chooserFlags, [this] (const juce::FileChooser& chooser)
     {
       std::cout << "In launchAsync..." << std::endl;
       juce::File wavFile (chooser.getResult()); 
       std::cout << "You choosed 💾 " << wavFile.getFullPathName() << std::endl;
+      std::cout << "File name without extension: " << wavFile.getFileNameWithoutExtension() << std::endl;
+      std::cout << "File extension: " << wavFile.getFileExtension() << std::endl;
+      std::cout << "Parent directory: " << wavFile.getParentDirectory().getFullPathName() << std::endl;
+      
+      auto fname = wavFile.getParentDirectory().getFullPathName()
+                    + "/"
+                    + wavFile.getFileNameWithoutExtension();
+      wavFile = juce::File(fname+ "_L" + ".wav") ;
       audioProcessor.roomIRL.exportIrToWav(wavFile);
+      wavFile = juce::File(fname+ "_R" + ".wav") ;
+      audioProcessor.roomIRR.exportIrToWav(wavFile);
     });
 }

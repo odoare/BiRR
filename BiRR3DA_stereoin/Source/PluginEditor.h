@@ -39,10 +39,9 @@ private:
 
     fxme::FxmeLookAndFeel fxmeLookAndFeel;
 
-    juce::TextButton addButton;
-    juce::TextButton removeButton;
+    // juce::TextButton addButton;
+    // juce::TextButton removeButton;
 
-    // juce::TextButton exportIrButton;
     fxme::FxmeButton exportIrButton{audioProcessor.apvts,"",FXMECOLOUR};
 
     std::unique_ptr<juce::FileChooser> myChooser;

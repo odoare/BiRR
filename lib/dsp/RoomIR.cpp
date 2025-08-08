@@ -10,6 +10,8 @@
 // This is the function where the impulse response is calculated
 void IrBoxCalculator::run()
 {
+    std::cout << "Start calculate" << std::endl;
+
     isCalculating[0] = true;
 
     // inBuf is the buffer used for the non-binaural methods
@@ -271,13 +273,17 @@ void IrTransfer::run()
       }
   }
 
-  for (int i=1;i<threadsNum;i++)
+  std::cout << "Buffer copy...." ;
+  tempBuf.makeCopyOf(bp[0],true);
+  std:cout << "Buffer copy done. Size : " << tempBuf.getNumSamples() << std::endl;
+
+  for (int i=0;i<threadsNum;i++)
     {
-      bp[0].addFrom(0,0,bp[i],0,0,bp[i].getNumSamples());
-      bp[0].addFrom(1,0,bp[i],1,0,bp[i].getNumSamples());
+      tempBuf.addFrom(0,0,bp[i],0,0,bp[i].getNumSamples());
+      tempBuf.addFrom(1,0,bp[i],1,0,bp[i].getNumSamples());
     }
 
-  irp->loadImpulseResponse(std::move (bp[0]),
+  irp->loadImpulseResponse(std::move (tempBuf),
                       sampleRate,
                       juce::dsp::Convolution::Stereo::yes,
                       juce::dsp::Convolution::Trim::no,
@@ -306,6 +312,11 @@ void IrTransfer::setSampleRate(double sr)
   sampleRate = sr;
 }
 
+double IrTransfer::getSampleRate()
+{
+  return sampleRate;
+}
+
 bool IrTransfer::getBufferTransferState()
 {
   return hasTransferred;
@@ -327,6 +338,10 @@ BoxRoomIR::BoxRoomIR()
 
 void BoxRoomIR::initialize()
 {
+    hasInitialized = false;
+
+    std::cout << "In BoxRoomIR::initialize()" << std::endl;
+
     int numCpus = juce::SystemStats::getNumPhysicalCpus();
 
     cout << "Number of CPUs : " << juce::SystemStats::getNumCpus() << endl;
@@ -349,7 +364,6 @@ void BoxRoomIR::initialize()
     boxIrTransfer.setIr(&boxConvolution);
     boxIrTransfer.setThreadsNum(threadsNum);
 
-
     // Calculator for the direct path
 
     directCalculator.setCalculatingBool(&isCalculatingDirect);
@@ -362,11 +376,12 @@ void BoxRoomIR::initialize()
     directIrTransfer.setIr(&directConvolution);
     directIrTransfer.setThreadsNum(1);
 
+    hasInitialized = true;
+
 }
 
 void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
 {
-
 
     inputBufferCopy.setSize(2, spec.maximumBlockSize ,false,true);
 
@@ -594,4 +609,51 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
     filter[0].process(juce::dsp::ProcessContextReplacing<float>(blockL));
     filter[1].process(juce::dsp::ProcessContextReplacing<float>(blockR));
 
+}
+
+void BoxRoomIR::exportIrToWav(juce::File file)
+{
+
+  std::unique_ptr<juce::AudioFormatWriter> writer;
+  juce::FileOutputStream stream(file);
+
+  // Mix the Ir buffers to get a single 2-channels buffer
+  juce::AudioBuffer<float> fullBuffer(2, boxCalculator[0].longueur);
+  std::cout << "Box buffer length : " << fullBuffer.getNumSamples() << std::endl; 
+  fullBuffer.clear();
+
+  if (getBufferTransferState())
+  {
+    for (int i=0;i<threadsNum;i++)
+    {
+    fullBuffer.addFrom(0,0,boxIrBuffer[i],0,0,boxIrBuffer[i].getNumSamples());
+    fullBuffer.addFrom(1,0,boxIrBuffer[i],1,0,boxIrBuffer[i].getNumSamples());
+    }
+
+    fullBuffer.addFrom(0,0,directIrBuffer,0,0,directIrBuffer.getNumSamples());
+    fullBuffer.addFrom(1,0,directIrBuffer,1,0,directIrBuffer.getNumSamples());
+
+    juce::WavAudioFormat format;
+    std::unique_ptr<juce::AudioFormatWriter> writer;
+    writer.reset (format.createWriterFor (new juce::FileOutputStream (file),
+                                          boxIrTransfer.getSampleRate(),
+                                          fullBuffer.getNumChannels(),
+                                          24,
+                                          {},
+                                          0));
+    if (writer != nullptr)
+      {
+        cout << "fullBuffer length : " << fullBuffer.getNumSamples() << endl; 
+        writer->writeFromAudioSampleBuffer (fullBuffer, 0, fullBuffer.getNumSamples());
+      }
+    else
+      {
+        std::cout << "Writer = nullptr" << std::endl;
+      }     
+  }
+  else
+  {
+    std::cout << "Buffers not ready" << std::endl;
+  }
+  
 }

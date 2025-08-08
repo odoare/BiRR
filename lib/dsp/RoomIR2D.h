@@ -86,10 +86,12 @@ public:
     void setIr(juce::dsp::Convolution* irPointer);
     void setCalculatingBool(bool* cp);
     void setSampleRate(double sr);
+    double getSampleRate();    
     bool getBufferTransferState();
     void setThreadsNum(int n);
 
 private:
+    juce::AudioBuffer<float> tempBuf;
     juce::AudioBuffer<float>* bp;
     juce::dsp::Convolution* irp;
     bool* isCalculating;
@@ -113,6 +115,7 @@ public:
     bool getCalculatingState();
     bool getBufferTransferState();
     void process(juce::AudioBuffer<float>& buffer);
+    void exportIrToWav(juce::File file);
 
     juce::AudioBuffer<float> inputBufferCopy;
     juce::dsp::Convolution boxConvolution, directConvolution;
@@ -121,6 +124,7 @@ public:
     juce::AudioBuffer<float> boxIrBuffer[MAXTHREADS], directIrBuffer;
     IrTransfer boxIrTransfer, directIrTransfer;
     float directLevel, reflectionsLevel;
+    bool hasInitialized{false};
 
 private:
     IrBoxCalculatorParams p;

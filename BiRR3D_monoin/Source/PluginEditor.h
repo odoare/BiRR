@@ -37,6 +37,10 @@ private:
     // access the processor object that created it.
     ReverbAudioProcessor& audioProcessor;
 
+    fxme::FxmeButton exportIrButton{audioProcessor.apvts,"",FXMECOLOUR};
+    std::unique_ptr<juce::FileChooser> myChooser;
+    void saveWaveFile();
+
     juce::TextButton addButton;
     juce::TextButton removeButton;
 

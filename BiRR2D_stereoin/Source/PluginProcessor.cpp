@@ -243,7 +243,7 @@ void ReverbAudioProcessor::setIrLoaderL()
     p.sWidth = apvts.getRawParameterValue("Stereo Width")->load();
     p.sampleRate = spec.sampleRate;
 
-    roomIRL.calculate(p);
+    if (roomIRL.hasInitialized) roomIRL.calculate(p);
 }
 
 // This is the function where the impulse response is calculated
@@ -268,7 +268,7 @@ void ReverbAudioProcessor::setIrLoaderR()
     p.sWidth = apvts.getRawParameterValue("Stereo Width")->load();
     p.sampleRate = spec.sampleRate;
 
-    roomIRR.calculate(p);
+    if (roomIRR.hasInitialized) roomIRR.calculate(p);
 }
 
 void ReverbAudioProcessor::timerCallback()
