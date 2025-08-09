@@ -256,6 +256,11 @@ BoxRoomIR::BoxRoomIR()
 
 void BoxRoomIR::initialize()
 {
+
+    hasInitialized = false;
+
+    std::cout << "In BoxRoomIR::initialize()" << std::endl;
+
     int numCpus = juce::SystemStats::getNumPhysicalCpus();
 
     cout << "Number of CPUs : " << juce::SystemStats::getNumCpus() << endl;
@@ -298,6 +303,7 @@ void BoxRoomIR::initialize()
     directIrTransferZX.setIr(&directConvolutionZX);
     directIrTransferZX.setThreadsNum(1);
 
+    hasInitialized = true;
     std::cout << "Has initialized" << std::endl;
 
 }
