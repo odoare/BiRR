@@ -18,37 +18,40 @@ void IrBoxCalculator::run()
     float outBuf[NSAMP96]={0.f}, inBuf[NSAMP96]={0.f};
     inBuf[10] = 1.f;
     float x,y,z;
+    float dist, time, r, gain, rp, elev, theta, costheta, sintheta, cosphi, sinphi;
+    int nbounds, indice;
+
 
     bp->setSize(2,longueur,true,true);
     bp->clear();
     auto* dataL = bp->getWritePointer(0);
     auto* dataR = bp->getWritePointer(1);
 
-    for (int ix = nxmin; ix < nxmax ; ++ix)
+    for (float ix = float(nxmin); ix < float(nxmax) ; ++ix)
     {
-      x = 2*float(ceil(float(ix)/2))*p.rx+pow(-1,ix)*p.sx;
+      x = 2*ceil(ix/2)*p.rx+pow(-1,ix)*p.sx;
       if (!threadShouldExit())
       {
-        for (int iy = -n+1; iy < n ; ++iy)
+        for (float iy = -float(n)+1.f; iy < float(n) ; ++iy)
         {
-          y = 2*float(ceil(float(iy)/2))*p.ry+pow(-1,iy)*p.sy;
-          for (int iz=-n+1; iz<n; ++iz)
+          y = 2*ceil(iy/2)*p.ry+pow(-1,iy)*p.sy;
+          for (float iz=-float(n)+1; iz<float(n); ++iz)
           {
-            z = 2*float(ceil(float(iz)/2))*p.rz+pow(-1,iz)*p.sz;
-            float dist = sqrt((x-p.lx)*(x-p.lx)+(y-p.ly)*(y-p.ly)+(z-p.lz)*(z-p.lz));
-            float time = dist*INV_SOUNDSPEED;
-            int nbounds = abs(ix)+abs(iy)+abs(iz);            
+            z = 2*ceil(iz/2)*p.rz+pow(-1,iz)*p.sz;
+            dist = sqrt((x-p.lx)*(x-p.lx)+(y-p.ly)*(y-p.ly)+(z-p.lz)*(z-p.lz));
+            time = dist*INV_SOUNDSPEED;
+            nbounds = abs(ix)+abs(iy)+abs(iz);            
 
-            int indice = int(round((time+juce::Random::getSystemRandom().nextFloat()*SIGMA_DELTAT)*p.sampleRate));
-            float r = pow(1-p.damp,nbounds);
+            indice = int(round((time+juce::Random::getSystemRandom().nextFloat()*SIGMA_DELTAT)*p.sampleRate));
+            r = pow(1-p.damp,nbounds);
             // float gain = pow(-1,ix+iy+iz)*r/dist;
-            float gain = (r/dist) * float( !(ix==0 && iy==0 && iz==0) || calculateDirectPath ) ;
+            gain = (r/dist) * float( !(ix==0 && iy==0 && iz==0) || calculateDirectPath ) ;
             
-            float rp = sqrt((p.sx-p.lx)*(p.sx-p.lx)+(p.sy-p.ly)*(p.sy-p.ly));
-            float elev = atan2f(z-p.lz,rp)*EIGHTYOVERPI;
+            rp = sqrt((p.sx-p.lx)*(p.sx-p.lx)+(p.sy-p.ly)*(p.sy-p.ly));
+            elev = atan2f(z-p.lz,rp)*EIGHTYOVERPI;
 
             // Azimutal angle calculation
-            float theta = atan2f(y-p.ly,-x+p.lx)*EIGHTYOVERPI-90-p.headAzim;
+            theta = atan2f(y-p.ly,-x+p.lx)*EIGHTYOVERPI-90-p.headAzim;
             
             // XY
             if (p.type==0){

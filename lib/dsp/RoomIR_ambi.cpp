@@ -12,6 +12,8 @@ void IrBoxCalculator::run()
     float outBuf[NSAMP]={0.f}, inBuf[NSAMP]={0.f};
     inBuf[2] = 1.f;
     float x,y,z;
+    float dist, time, r, gain, rp, elev, theta, costheta, sintheta, cosphi, sinphi;
+    int nbounds, indice;
 
     bpWY->setSize(2,longueur,true,true);
     bpWY->clear();
@@ -23,41 +25,41 @@ void IrBoxCalculator::run()
     auto* dataZ = bpZX->getWritePointer(0);
     auto* dataX = bpZX->getWritePointer(1);
 
-    for (int ix = nxmin; ix < nxmax ; ++ix)
+    for (float ix = float(nxmin); ix < float(nxmax) ; ++ix)
     {
-      x = 2*float(ceil(float(ix)/2))*p.rx+pow(-1,ix)*p.sx;
+      x = 2*ceil(ix/2)*p.rx+pow(-1,ix)*p.sx;
 
       if (!threadShouldExit())
       {
-        for (int iy = -n+1; iy < n ; ++iy)
+        for (float iy = -float(n)+1.f; iy < float(n) ; ++iy)
         {
-          y = 2*float(ceil(float(iy)/2))*p.ry+pow(-1,iy)*p.sy;
-          for (int iz=-n+1; iz<n; ++iz)
+          y = 2*ceil(iy/2)*p.ry+pow(-1,iy)*p.sy;
+          for (float iz=-float(n)+1.f; iz<float(n); ++iz)
           {
-            z = 2*float(ceil(float(iz)/2))*p.rz+pow(-1,iz)*p.sz;
-            float dist = sqrt((x-p.lx)*(x-p.lx)+(y-p.ly)*(y-p.ly)+(z-p.lz)*(z-p.lz));
-            float time = dist*INV_SOUNDSPEED;
-            int nbounds = abs(ix)+abs(iy)+abs(iz);
+            z = 2*ceil(iz/2)*p.rz+pow(-1,iz)*p.sz;
+            dist = sqrt((x-p.lx)*(x-p.lx)+(y-p.ly)*(y-p.ly)+(z-p.lz)*(z-p.lz));
+            time = dist*INV_SOUNDSPEED;
+            nbounds = abs(ix)+abs(iy)+abs(iz);
 
-            int indice = int(round((time+(juce::Random::getSystemRandom().nextFloat())*p.diffusion)*p.sampleRate));
-            float r = pow(1-p.damp,nbounds);
-            float gain = (r/dist) * float( !(ix==0 && iy==0 && iz==0) || calculateDirectPath ) ;
+            indice = int(round((time+(juce::Random::getSystemRandom().nextFloat())*p.diffusion)*p.sampleRate));
+            r = pow(1-p.damp,nbounds);
+            gain = (r/dist) * float( !(ix==0.f && iy==0.f && iz==0.f) || calculateDirectPath ) ;
             
-            float rp = sqrt((p.sx-p.lx)*(p.sx-p.lx)+(p.sy-p.ly)*(p.sy-p.ly));
-            float elev = atan2f(z-p.lz,rp)*EIGHTYOVERPI;
+            rp = sqrt((p.sx-p.lx)*(p.sx-p.lx)+(p.sy-p.ly)*(p.sy-p.ly));
+            elev = atan2f(z-p.lz,rp)*EIGHTYOVERPI;
 
             // Azimutal angle calculation
             // In the ambisonic case, the head orientation is managed
             // at the end of the process by matrix multiplication
-            float theta = atan2f(y-p.ly,-x+p.lx)*EIGHTYOVERPI-90;
+            theta = atan2f(y-p.ly,-x+p.lx)*EIGHTYOVERPI-90;
 
             // Apply filter on the grain
             lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
             // Add grains to the buffers
-            float costheta = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(-theta));
-            float sintheta = juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(-theta));
-            float cosphi = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev));
-            float sinphi = juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(elev));
+            costheta = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(-theta));
+            sintheta = juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(-theta));
+            cosphi = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev));
+            sinphi = juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(elev));
             addArrayToBuffer(&dataW[indice], &outBuf[0], gain);
             addArrayToBuffer(&dataY[indice], &outBuf[0], gain*sintheta*cosphi);
             addArrayToBuffer(&dataZ[indice], &outBuf[0], gain*sinphi);
