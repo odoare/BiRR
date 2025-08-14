@@ -11,7 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "../../lib/dsp/RoomIR_WDL.h"
+#include "../../lib/dsp/RoomIR.h"
 
 //==============================================================================
 /**
