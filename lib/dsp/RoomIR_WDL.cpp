@@ -7,20 +7,137 @@
 
 // ======================================================================
 
-// This is the function where the impulse response is calculated
-void IrBoxCalculator::run()
+void IrBoxCalculator::calculate2D()
 {
-    std::cout << "Start calculate" << std::endl;
+    // 2D calculation logic here
+    // inBuf is the buffer used for the non-binaural methods
+    float outBuf[NSAMP96]={0.f}, inBuf[NSAMP96]={0.f};
+    inBuf[10] = 1.f;
+    float x,y,z;
 
-    isCalculating[0] = true;
+    bp->setSize(2,longueur,true,true);
+    bp->clear();
+    auto* dataL = bp->getWritePointer(0);
+    auto* dataR = bp->getWritePointer(1);
 
+    if (!threadShouldExit())
+    for (int ix = nxmin; ix < nxmax ; ++ix)
+    {
+      x = 2*float(ceil(float(ix)/2))*p.rx+pow(-1,ix)*p.sx;
+      if (!threadShouldExit())
+      {
+        for (int iy = -n+1; iy < n ; ++iy)
+        {
+          y = 2*float(ceil(float(iy)/2))*p.ry+pow(-1,iy)*p.sy;
+
+          float dist = sqrt((x-p.lx)*(x-p.lx)+(y-p.ly)*(y-p.ly));
+          float time = dist*INV_SOUNDSPEED;
+
+          int indice = int(round((time+juce::Random::getSystemRandom().nextFloat()*SIGMA_DELTAT)*p.sampleRate));
+          float r = pow(1-p.damp,abs(ix)+abs(iy));
+          // float gain = pow(-1,ix+iy+iz)*r/dist;
+          float gain = (r/dist) * float( !(ix==0 && iy==0) || calculateDirectPath ) ;
+          
+          float rp = sqrt((p.sx-p.lx)*(p.sx-p.lx)+(p.sy-p.ly)*(p.sy-p.ly));
+          float elev = 0.f;
+          
+          // Azimutal angle calculation
+          float theta = atan2f(y-p.ly,-x+p.lx)*EIGHTYOVERPI-90-p.headAzim;
+          
+          // XY
+          if (p.type==0){
+            // Apply lowpass filter and add grain to buffer
+            auto elevCardio = (1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev)));
+            auto panGain = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta+45*p.sWidth)))
+                            * elevCardio;
+            lop(&inBuf[0], &outBuf[0], p.sampleRate,p.hfDamp,abs(ix)+abs(iy),1);
+            addArrayToBuffer(&dataL[indice], &outBuf[0], gain*panGain);
+            panGain = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta-45*p.sWidth)))
+                        * elevCardio;
+            lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+            addArrayToBuffer(&dataR[indice], &outBuf[0], gain*panGain);
+          }
+
+          // MS with cardio mic for mid channel
+          if (p.type==1){
+            // Apply lowpass filter and add grain to buffer
+            lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+            auto gainMid = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta)))
+                            * (1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev)));
+            auto gainSide = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev))
+                            * juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(theta));
+
+            addArrayToBuffer(&dataL[indice], &outBuf[0], gain*(gainMid-gainSide*p.sWidth));
+            addArrayToBuffer(&dataR[indice], &outBuf[0], gain*(gainMid+gainSide*p.sWidth));
+          }
+
+          // MS with omni mic for mid channel
+          if (p.type==2){
+            // Apply lowpass filter and add grain to buffer
+            lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+            auto gainMid = 1.f;
+            auto gainSide = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev))
+                            * juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(theta));
+
+            addArrayToBuffer(&dataL[indice], &outBuf[0], gain*(gainMid-gainSide*p.sWidth));
+            addArrayToBuffer(&dataR[indice], &outBuf[0], gain*(gainMid+gainSide*p.sWidth));
+          }
+
+          // Binaural
+          if (p.type==3){
+            int elevationIndex = proximityIndex(&elevations[0],NELEV,elev,false);
+            int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta,true);
+            gain = gain * .707107f;
+            if (juce::approximatelyEqual(nearestSampleRate[0],48000.f))
+              {
+                lop(&lhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+                lop(&rhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+
+              }
+            else if (juce::approximatelyEqual(nearestSampleRate[0],88200.f))
+              {
+                lop(&lhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+                lop(&rhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+              }
+            else if (juce::approximatelyEqual(nearestSampleRate[0],96000.f))
+              {
+                lop(&lhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+                lop(&rhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+              }
+            else // if 44.1kHz or any other cases, we use 44.1kHz HRTF
+              {
+                lop(&lhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
+                lop(&rhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,abs(ix)+abs(iy),1);
+                addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
+              }
+          }
+        }
+        progress = float(ix-nxmin)/float(nxmax-nxmin);
+      }
+      else
+      {
+        isCalculating[0] = false;
+        return;
+      }
+    }
+}
+
+void IrBoxCalculator::calculate3D()
+{
+    // 3D calculation logic here
     // inBuf is the buffer used for the non-binaural methods
     float outBuf[NSAMP96]={0.f}, inBuf[NSAMP96]={0.f};
     inBuf[10] = 1.f;
     float x,y,z;
     float dist, time, r, gain, rp, elev, theta, costheta, sintheta, cosphi, sinphi;
     int nbounds, indice;
-
 
     bp->setSize(2,longueur,true,true);
     bp->clear();
@@ -133,6 +250,128 @@ void IrBoxCalculator::run()
       }
       else return;
     }
+}
+
+void IrBoxCalculator::calculateAmbi3D()
+{
+  // Calculate the ambisonic representation
+    // inBuf is the buffer used for the non-binaural methods
+    float outBuf[NSAMP44]={0.f}, inBuf[NSAMP44]={0.f};
+    inBuf[2] = 1.f;
+    float x,y,z;
+    float dist, time, r, gain, rp, elev, theta, costheta, sintheta, cosphi, sinphi;
+    int nbounds, indice;
+
+    bp->setSize(4,longueur,true,true);
+    bp->clear();
+
+    auto* dataW = bp->getWritePointer(0);
+    auto* dataY = bp->getWritePointer(1);
+    auto* dataZ = bp->getWritePointer(2);
+    auto* dataX = bp->getWritePointer(3);
+
+    for (float ix = float(nxmin); ix < float(nxmax) ; ++ix)
+    {
+      x = 2*ceil(ix/2)*p.rx+pow(-1,ix)*p.sx;
+
+      if (!threadShouldExit())
+      {
+        for (float iy = -float(n)+1.f; iy < float(n) ; ++iy)
+        {
+          y = 2*ceil(iy/2)*p.ry+pow(-1,iy)*p.sy;
+          for (float iz=-float(n)+1.f; iz<float(n); ++iz)
+          {
+            z = 2*ceil(iz/2)*p.rz+pow(-1,iz)*p.sz;
+            dist = sqrt((x-p.lx)*(x-p.lx)+(y-p.ly)*(y-p.ly)+(z-p.lz)*(z-p.lz));
+            time = dist*INV_SOUNDSPEED;
+            nbounds = abs(ix)+abs(iy)+abs(iz);
+
+            indice = int(round((time+(juce::Random::getSystemRandom().nextFloat())*p.diffusion)*p.sampleRate));
+            r = pow(1-p.damp,nbounds);
+            gain = (r/dist) * float( !(ix==0.f && iy==0.f && iz==0.f) || calculateDirectPath ) ;
+            
+            rp = sqrt((p.sx-p.lx)*(p.sx-p.lx)+(p.sy-p.ly)*(p.sy-p.ly));
+            elev = atan2f(z-p.lz,rp)*EIGHTYOVERPI;
+
+            // Azimutal angle calculation
+            // In the ambisonic case, the head orientation is managed
+            // at the end of the process by matrix multiplication
+            theta = atan2f(y-p.ly,-x+p.lx)*EIGHTYOVERPI-90;
+
+            // Apply filter on the grain
+            lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
+            // Add grains to the buffers
+            costheta = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(-theta));
+            sintheta = juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(-theta));
+            cosphi = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev));
+            sinphi = juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(elev));
+            addArrayToBuffer(&dataW[indice], &outBuf[0], gain);
+            addArrayToBuffer(&dataY[indice], &outBuf[0], gain*sintheta*cosphi);
+            addArrayToBuffer(&dataZ[indice], &outBuf[0], gain*sinphi);
+            addArrayToBuffer(&dataX[indice], &outBuf[0], gain*costheta*cosphi);
+          }
+        }
+        progress = float(ix-nxmin)/float(nxmax-nxmin);
+      }
+      else return;
+    }
+    isCalculating[0] = false;
+    cout << "Done" << endl;
+
+}
+
+// Applique un filtre passe-haut du premier ordre sur un buffer mono
+void IrBoxCalculator::highPassFilter(float* buffer, int numSamples, float cutoffFreq, float sampleRate)
+{
+    if (numSamples <= 0 || !buffer) return;
+
+    // Calcul des coefficients (filtre RC)
+    float RC = 1.0f / (2.0f * float(M_PI) * cutoffFreq);
+    float dt = 1.0f / sampleRate;
+    float alpha = RC / (RC + dt);
+
+    float prevInput = buffer[0];
+    float prevOutput = buffer[0];
+
+    for (int n = 1; n < numSamples; ++n)
+    {
+        float input = buffer[n];
+        buffer[n] = alpha * (prevOutput + input - prevInput);
+        prevOutput = buffer[n];
+        prevInput = input;
+    }
+}
+
+// This is the function where the impulse response is calculated
+void IrBoxCalculator::run()
+{
+    std::cout << "Start calculate" << std::endl;
+
+    isCalculating[0] = true;
+
+    // Call the appropriate calculation function based on the dimension
+    if (p.dimension == 2)
+    {
+        calculate2D();
+    }
+    else if (p.dimension == 3)
+    {
+        calculate3D();
+    }
+    else if (p.dimension == 13)
+    {
+        calculateAmbi3D();
+    }
+    else
+    {
+      std::cout << "Not implemented" << std::endl;
+    }
+
+    for (int ch = 0; ch < bp->getNumChannels(); ++ch)
+    {
+        highPassFilter(bp->getWritePointer(ch), bp->getNumSamples(), 15.0f, p.sampleRate);
+    }
+
     isCalculating[0] = false;
     cout << "Done" << endl;
 }
@@ -270,19 +509,22 @@ void IrTransfer::run()
         sleep(200);
       }
 
+    int numChannels = bp[0].getNumChannels();
+    int numSamples = bp[0].getNumSamples();
+
     // Fusionner les buffers de tous les threads dans tempBuf
     tempBuf.makeCopyOf(bp[0], true);
     for (int i = 1; i < threadsNum; ++i)
       {
-        tempBuf.addFrom(0, 0, bp[i], 0, 0, bp[i].getNumSamples());
-        tempBuf.addFrom(1, 0, bp[i], 1, 0, bp[i].getNumSamples());
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+          tempBuf.addFrom(ch, 0, bp[i], ch, 0, bp[i].getNumSamples());
+        }
       }
 
     hasTransferred = false;
 
     // Conversion juce::AudioBuffer<float> -> WDL_ImpulseBuffer
-    int numChannels = tempBuf.getNumChannels();
-    int numSamples = tempBuf.getNumSamples();
     WDL_ImpulseBuffer impulse;
     impulse.SetNumChannels(numChannels, false);
     impulse.SetLength(numSamples);
@@ -297,7 +539,7 @@ void IrTransfer::run()
     // Charger l'impulsion dans le moteur WDL
     if (irp)
       {
-        const juce::SpinLock::ScopedLockType lock(boxRoomIrInstance->convolutionLock);  
+        // const juce::SpinLock::ScopedLockType lock(boxRoomIrInstance->convolutionLock);  
         irp->SetImpulse(&impulse, 0); // 0 = taille FFT auto
       }
 
@@ -308,8 +550,8 @@ void IrTransfer::run()
 void IrTransfer::setBuffer(juce::AudioBuffer<float>* bufPointer)
 {
   bp = bufPointer;
-
 }
+
 void IrTransfer::setIr(WDL_ConvolutionEngine_Div* irPointer)
 {
   irp = irPointer;
@@ -384,17 +626,13 @@ void BoxRoomIR::initialize()
   directIrTransfer.setIr(&directConvolution);
   directIrTransfer.setThreadsNum(1);
 
-  boxIrTransfer.setBoxRoomIrInstance(this);
-  directIrTransfer.setBoxRoomIrInstance(this);
-
   hasInitialized = true;
-
 }
 
 void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
 {
 
-    inputBufferCopy.setSize(2, spec.maximumBlockSize, false, true);
+    inputBufferCopy.setSize(spec.numChannels, spec.maximumBlockSize, false, true);
 
     std::cout << "Actual sampleRate : " << spec.sampleRate << " Hz." << std::endl;
 
@@ -433,12 +671,14 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
     directIrTransfer.setSampleRate(spec.sampleRate);
     directConvolution.Reset();
 
-    // Output highpass filter to cut everything below 15Hz
-    for (int i=0; i<2; i++)
-    {
-        filter[i].coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(spec.sampleRate, 15.f);
-        filter[i].prepare(spec);
-    }
+    // filters.resize(spec.numChannels);
+
+    // // Output highpass filter to cut everything below 15Hz
+    // for (int i=0; i<spec.numChannels; i++)
+    // {
+    //     filters[i].coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(spec.sampleRate, 15.f);
+    //     filters[i].prepare(spec);
+    // }
 
     std::cout << "BoxRoomIR::prepare has finished." << std::endl;
 
@@ -544,6 +784,7 @@ bool BoxRoomIR::setIrCaclulatorsParams(IrBoxCalculatorParams& pa)
       && juce::approximatelyEqual(p.damp,pa.damp)
       && juce::approximatelyEqual(p.hfDamp,pa.hfDamp)
       && juce::approximatelyEqual(p.type,pa.type)
+      && juce::approximatelyEqual(p.dimension,pa.dimension)
       && juce::approximatelyEqual(p.headAzim,pa.headAzim)
       && juce::approximatelyEqual(p.sWidth,pa.sWidth)
       && juce::approximatelyEqual(p.sampleRate,pa.sampleRate))
@@ -590,8 +831,6 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
 {
     if (getBufferTransferState())
     {
-      const juce::SpinLock::ScopedLockType lock(convolutionLock);
-
       int numChannels = buffer.getNumChannels();
       int numSamples = buffer.getNumSamples();
 
@@ -622,7 +861,6 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
             {
               if (outputPtrs[ch])
               {
-                // std::cout << "Doing the job" << std::endl;
                 buffer.addFrom(ch, 0, outputPtrs[ch], nAvailableSamples, reflectionsLevel);
                 boxConvolution.Advance(nAvailableSamples);
               }
@@ -654,13 +892,13 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
             }
         }
 
-      // Filtre passe-haut de sortie
-      juce::dsp::AudioBlock<float> block(buffer);
-      juce::dsp::AudioBlock<float> blockL = block.getSingleChannelBlock(0);
-      juce::dsp::AudioBlock<float> blockR = block.getSingleChannelBlock(1);
+      // // Filtre passe-haut de sortie
+      // juce::dsp::AudioBlock<float> block(buffer);
+      // juce::dsp::AudioBlock<float> blockL = block.getSingleChannelBlock(0);
+      // juce::dsp::AudioBlock<float> blockR = block.getSingleChannelBlock(1);
 
-      filter[0].process(juce::dsp::ProcessContextReplacing<float>(blockL));
-      filter[1].process(juce::dsp::ProcessContextReplacing<float>(blockR));
+      // filter[0].process(juce::dsp::ProcessContextReplacing<float>(blockL));
+      // filter[1].process(juce::dsp::ProcessContextReplacing<float>(blockR));
   }
   else
   {

@@ -8,6 +8,7 @@
 using namespace std;
 
 #define CHOICES {"XY", "MS with Cardio", "MS with Omni", "Binaural"}
+#define DIMENSIONS {"2", "3"}
 
 #define NPROC 6
 #define MAXTHREADS 8
@@ -21,6 +22,12 @@ using namespace std;
 #define MAXSIZE 10.f
 #define MINDAMPING 0.02f
 
+// Dimension parameter "dimension" can be:
+// - 2 : 2D room
+// - 3 : 3D room
+// - 12 : Ambisonic 2D
+// - 13 : Ambisonic 3D
+
 struct IrBoxCalculatorParams{
   float rx;
   float ry;
@@ -33,7 +40,9 @@ struct IrBoxCalculatorParams{
   float sz;
   float damp;
   float hfDamp;
+  float diffusion;
   int type;
+  int dimension;
   float headAzim;
   float sWidth;
   double sampleRate;
@@ -44,9 +53,11 @@ class IrBoxCalculator : public juce::Thread
   {
 
   public:
-
     IrBoxCalculator();
     void run() override ;
+    void calculate2D();
+    void calculate3D();
+    void calculateAmbi3D();
     void setParams(IrBoxCalculatorParams& pa);
     float getProgress();
     void resetProgress();
@@ -60,7 +71,7 @@ class IrBoxCalculator : public juce::Thread
     // n=1, nxmin=0, nxmax=1
     int n, nxmin, nxmax;
     int longueur;
-    
+
   private:
     IrBoxCalculatorParams p;
     float progress;
@@ -74,12 +85,12 @@ class IrBoxCalculator : public juce::Thread
     void addArrayToBuffer(float *bufPtr, const float *hrtfPtr, const float gain);
     int proximityIndex(const float *data, const int length, const float value, const bool wrap);
     void lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order);
+    void highPassFilter(float* buffer, int numSamples, float cutoffFreq, float sampleRate);
     float max(const float* in);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IrBoxCalculator)
   };
 
-class BoxRoomIR;
 
 // ==================================================================
 class IrTransfer : public juce::Thread
@@ -95,9 +106,6 @@ public:
     double getSampleRate();
     bool getBufferTransferState();
     void setThreadsNum(int n);
-
-    BoxRoomIR* boxRoomIrInstance = nullptr;
-    void setBoxRoomIrInstance(BoxRoomIR* instance) { boxRoomIrInstance = instance; }
 
 private:
     juce::AudioBuffer<float> tempBuf;
@@ -135,17 +143,14 @@ public:
     float directLevel, reflectionsLevel;
     bool hasInitialized{false};
 
-    juce::SpinLock convolutionLock;
-
-
 private:
     IrBoxCalculatorParams p;
     int threadsNum;
     int nsamp;
     float nearestSampleRate;
 
-    juce::dsp::IIR::Filter<float> filter[2];
-    
+    //std::vector<juce::dsp::IIR::Filter<float>> filters;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoxRoomIR)
 
 };
