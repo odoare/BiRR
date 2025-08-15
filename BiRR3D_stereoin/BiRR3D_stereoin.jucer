@@ -22,20 +22,14 @@
       <FILE id="FP50fg" name="XyPad.cpp" compile="1" resource="0" file="../lib/components/XyPad.cpp"/>
       <FILE id="nbuTz7" name="XyPad.h" compile="0" resource="0" file="../lib/components/XyPad.h"/>
     </GROUP>
-    <GROUP id="{3F43597E-3DCD-47A9-62BF-89B9328B022E}" name="WDL">
-      <FILE id="DMNp2R" name="convoengine.cpp" compile="1" resource="0" file="../WDL/WDL/convoengine.cpp"/>
-      <FILE id="lF6IFg" name="convoengine.h" compile="0" resource="0" file="../WDL/WDL/convoengine.h"/>
-      <FILE id="VhuMXb" name="fft.c" compile="1" resource="0" file="../WDL/WDL/fft.c"/>
-      <FILE id="oh7Ay7" name="fft.h" compile="0" resource="0" file="../WDL/WDL/fft.h"/>
-    </GROUP>
     <GROUP id="{B91B5D08-D925-7891-4A05-081471B94090}" name="dsp">
       <FILE id="XNms1V" name="hrtf.h" compile="0" resource="0" file="../lib/dsp/hrtf.h"/>
       <FILE id="lpjudB" name="hrtf44.h" compile="0" resource="0" file="../lib/dsp/hrtf44.h"/>
       <FILE id="c3xhby" name="hrtf48.h" compile="0" resource="0" file="../lib/dsp/hrtf48.h"/>
       <FILE id="fIGde7" name="hrtf88.h" compile="0" resource="0" file="../lib/dsp/hrtf88.h"/>
       <FILE id="mSVtqR" name="hrtf96.h" compile="0" resource="0" file="../lib/dsp/hrtf96.h"/>
-      <FILE id="Tr0GxK" name="RoomIR_WDL.cpp" compile="1" resource="0" file="../lib/dsp/RoomIR_WDL.cpp"/>
-      <FILE id="m4eWCS" name="RoomIR_WDL.h" compile="0" resource="0" file="../lib/dsp/RoomIR_WDL.h"/>
+      <FILE id="gNNCIs" name="RoomIR.cpp" compile="1" resource="0" file="../lib/dsp/RoomIR.cpp"/>
+      <FILE id="h5Jaag" name="RoomIR.h" compile="0" resource="0" file="../lib/dsp/RoomIR.h"/>
     </GROUP>
     <GROUP id="{06E13A3E-246C-4F43-EBED-8C65CF204F5E}" name="Source">
       <FILE id="nAjK9Q" name="PluginEditor.cpp" compile="1" resource="0"
