@@ -912,8 +912,8 @@ void BoxRoomIR::exportIrToWav(juce::File file)
   std::unique_ptr<juce::AudioFormatWriter> writer;
   juce::FileOutputStream stream(file);
 
-  // Mix the Ir buffers to get a single 2-channels buffer
-  juce::AudioBuffer<float> fullBuffer(2, boxCalculator[0].longueur);
+  // Mix the Ir buffers to get a single n-channels buffer
+  juce::AudioBuffer<float> fullBuffer(boxIrBuffer[0].getNumChannels(), boxCalculator[0].longueur);
   std::cout << "Box buffer length : " << fullBuffer.getNumSamples() << std::endl; 
   fullBuffer.clear();
 
@@ -921,12 +921,16 @@ void BoxRoomIR::exportIrToWav(juce::File file)
   {
     for (int i=0;i<threadsNum;i++)
     {
-    fullBuffer.addFrom(0,0,boxIrBuffer[i],0,0,boxIrBuffer[i].getNumSamples());
-    fullBuffer.addFrom(1,0,boxIrBuffer[i],1,0,boxIrBuffer[i].getNumSamples());
+      for (int ch = 0; ch < fullBuffer.getNumChannels(); ++ch)
+      {
+        fullBuffer.addFrom(ch, 0, boxIrBuffer[i], ch, 0, boxIrBuffer[i].getNumSamples());
+      }
     }
 
-    fullBuffer.addFrom(0,0,directIrBuffer,0,0,directIrBuffer.getNumSamples());
-    fullBuffer.addFrom(1,0,directIrBuffer,1,0,directIrBuffer.getNumSamples());
+    for (int ch = 0; ch < fullBuffer.getNumChannels(); ++ch)
+    {
+      fullBuffer.addFrom(ch, 0, directIrBuffer, ch, 0, directIrBuffer.getNumSamples());
+    }
 
     juce::WavAudioFormat format;
     std::unique_ptr<juce::AudioFormatWriter> writer;
