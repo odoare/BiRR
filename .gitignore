@@ -10,6 +10,8 @@
 **/BiRR3DA_stereoin/JuceLibraryCode
 **/BiRR/Builds
 **/BiRR/JuceLibraryCode
+**/AmbiRR/Builds
+**/AmbiRR/JuceLibraryCode
 **/.vscode
 **/tests
 BiRR.code-workspace
