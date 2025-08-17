@@ -91,6 +91,7 @@ class IrBoxCalculator : public juce::Thread
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IrBoxCalculator)
   };
 
+class BoxRoomIR;
 
 // ==================================================================
 class IrTransfer : public juce::Thread
@@ -106,6 +107,8 @@ public:
     double getSampleRate();
     bool getBufferTransferState();
     void setThreadsNum(int n);
+    void setBoxRoomIrInstance(BoxRoomIR* instance) { boxRoomIrInstance = instance; }
+
 
 private:
     juce::AudioBuffer<float> tempBuf;
@@ -115,6 +118,7 @@ private:
     bool hasTransferred;
     double sampleRate;
     int threadsNum;
+    BoxRoomIR* boxRoomIrInstance = nullptr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IrTransfer)
 };
@@ -133,6 +137,8 @@ public:
     bool getBufferTransferState();
     void process(juce::AudioBuffer<float>& buffer);
     void exportIrToWav(juce::File file);
+    juce::SpinLock convolutionLock;
+
 
     juce::AudioBuffer<float> inputBufferCopy;
     WDL_ConvolutionEngine_Div boxConvolution, directConvolution;

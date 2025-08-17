@@ -495,7 +495,7 @@ IrTransfer::IrTransfer() : juce::Thread("transfer")
 void IrTransfer::run()
 {
 
-    std::cout << "In IrTransfer::run()" << std::endl;
+    std::cout << "In IrTransfer::run()  " << "Num of threads: " << threadsNum << std::endl;
 
     // Attendre que tous les threads de calcul aient terminé
     bool isCalc = true;
@@ -522,6 +522,7 @@ void IrTransfer::run()
         }
       }
 
+    std::cout << "Start transfer" << "Num of threads: " << threadsNum << std::endl;
     hasTransferred = false;
 
     // Conversion juce::AudioBuffer<float> -> WDL_ImpulseBuffer
@@ -537,9 +538,9 @@ void IrTransfer::run()
       }
 
     // Charger l'impulsion dans le moteur WDL
-    if (irp)
+    if (irp && boxRoomIrInstance)
       {
-        // const juce::SpinLock::ScopedLockType lock(boxRoomIrInstance->convolutionLock);  
+        const juce::SpinLock::ScopedLockType lock(boxRoomIrInstance->convolutionLock);  
         irp->SetImpulse(&impulse, 0); // 0 = taille FFT auto
       }
 
@@ -596,6 +597,9 @@ void BoxRoomIR::initialize()
   hasInitialized = false;
 
   std::cout << "In BoxRoomIR::initialize()" << std::endl;
+
+  boxIrTransfer.setBoxRoomIrInstance(this);
+  directIrTransfer.setBoxRoomIrInstance(this);
 
   int numCpus = juce::SystemStats::getNumPhysicalCpus();
   std::cout << "Number of CPUs : " << juce::SystemStats::getNumCpus() << std::endl;
@@ -829,6 +833,7 @@ bool BoxRoomIR::getBufferTransferState()
 
 void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
 {
+    const juce::SpinLock::ScopedLockType lock(convolutionLock);
     if (getBufferTransferState())
     {
       int numChannels = buffer.getNumChannels();
