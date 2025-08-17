@@ -790,7 +790,7 @@ bool BoxRoomIR::setIrCaclulatorsParams(IrBoxCalculatorParams& pa)
       && juce::approximatelyEqual(p.type,pa.type)
       && juce::approximatelyEqual(p.dimension,pa.dimension)
       && juce::approximatelyEqual(p.diffusion,pa.diffusion)
-      && juce::approximatelyEqual(p.headAzim,pa.headAzim)
+      && (juce::approximatelyEqual(p.headAzim,pa.headAzim) || p.dimension == 13)
       && juce::approximatelyEqual(p.sWidth,pa.sWidth)
       && juce::approximatelyEqual(p.sampleRate,pa.sampleRate))
       {
@@ -897,6 +897,35 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
               }
             }
         }
+
+      // If this is an ambisonic signal, we need to process it to take into
+      // account head azimuth. We need to rotate the ambisonic signal
+      // We use inputBufferCopy because it is not in use 
+      if (p.dimension == 13 && p.headAzim != 0.f)
+      {
+        juce::dsp::AudioBlock<float> block(buffer);
+        juce::dsp::AudioBlock<float> blockX = block.getSingleChannelBlock(2);
+        juce::dsp::AudioBlock<float> blockY = block.getSingleChannelBlock(1);
+
+        inputBufferCopy.makeCopyOf(buffer, true);
+        juce::dsp::AudioBlock<float> blockCopy (inputBufferCopy);
+        juce::dsp::AudioBlock<float> blockCopyY1 = blockCopy.getSingleChannelBlock(0);
+        juce::dsp::AudioBlock<float> blockCopyY2 = blockCopy.getSingleChannelBlock(1);
+        juce::dsp::AudioBlock<float> blockCopyX1 = blockCopy.getSingleChannelBlock(2);
+        juce::dsp::AudioBlock<float> blockCopyX2 = blockCopy.getSingleChannelBlock(3);
+
+        blockCopyX1.replaceWithProductOf(blockX,juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*p.headAzim));
+        blockCopyX2.replaceWithProductOf(blockX,juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*p.headAzim));
+        blockCopyY1.replaceWithProductOf(blockY,juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*p.headAzim));
+        blockCopyY2.replaceWithProductOf(blockY,-juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*p.headAzim));
+
+        blockX.replaceWithSumOf(blockCopyX1,blockCopyY2);
+        blockY.replaceWithSumOf(blockCopyX2,blockCopyY1);
+      }
+
+
+
+      
 
       // // Filtre passe-haut de sortie
       // juce::dsp::AudioBlock<float> block(buffer);
