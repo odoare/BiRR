@@ -1,6 +1,6 @@
 PROJUCER= ~/bin/Projucer
 
-all: projects birr2dm birr2ds birr3dm birr3ds birr3das birr
+all: projects birr2dm birr2ds birr3dm birr3ds birr3das birr ambirr
 
 projects:
 	$(PROJUCER) --resave BiRR2D_monoin/BiRR2D_monoin.jucer
@@ -9,6 +9,7 @@ projects:
 	$(PROJUCER) --resave BiRR3D_stereoin/BiRR3D_stereoin.jucer
 	$(PROJUCER) --resave BiRR3DA_stereoin/BiRR3DA_stereoin.jucer
 	$(PROJUCER) --resave BiRR/BiRR.jucer
+	$(PROJUCER) --resave AmbiRR/AmbiRR.jucer
 
 birr2dm:
 	cd BiRR2D_monoin/Builds/LinuxMakefile && make && cd ../../..
@@ -27,3 +28,6 @@ birr3das:
 
 birr:
 	cd BiRR/Builds/LinuxMakefile && make && cd ../../..
+
+ambirr:
+	cd AmbiRR/Builds/LinuxMakefile && make && cd ../../..
