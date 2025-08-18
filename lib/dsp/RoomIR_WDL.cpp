@@ -794,6 +794,10 @@ bool BoxRoomIR::setIrCaclulatorsParams(IrBoxCalculatorParams& pa)
       && juce::approximatelyEqual(p.sWidth,pa.sWidth)
       && juce::approximatelyEqual(p.sampleRate,pa.sampleRate))
       {
+        p = pa;
+        for (int i=0;i<threadsNum;i++)
+          boxCalculator[i].setParams(pa);
+        directCalculator.setParams(pa);
         return false;
       }
     else
@@ -903,6 +907,7 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
       // We use inputBufferCopy because it is not in use 
       if (p.dimension == 13 && p.headAzim != 0.f)
       {
+        //std::cout << "Processing ambisonic signal with head azimuth: " << p.headAzim << std::endl;
         juce::dsp::AudioBlock<float> block(buffer);
         juce::dsp::AudioBlock<float> blockX = block.getSingleChannelBlock(2);
         juce::dsp::AudioBlock<float> blockY = block.getSingleChannelBlock(1);
