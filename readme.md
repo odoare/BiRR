@@ -2,7 +2,7 @@
 
 A realistic room simulator based on a combination of a convolution processor and a virtual room impulse response calculator.
 
-![image info](./doc/BiRR_screen.png)
+![image info](./doc/BIRR_screen.png)
 
 <!-- ### BiRR
 ![image info](./doc/BiRR_screen.png) -->
