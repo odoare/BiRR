@@ -9,7 +9,7 @@ A realistic room simulator based on a combination of a convolution processor and
 
 ## Info
 
-BiRR2D and BiRR3D are room simulators that accurately emulate the sound produced by a monophonic and omnidirectionnal source perceived by a listener in a rectangular (2D) or parallelepipedic (3D) room.
+BiRR (and its ambisonic sister AmbiRR) are room simulators that accurately emulate the sound produced by a monophonic and omnidirectionnal source perceived by a listener in a rectangular (2D) or parallelepipedic (3D) room.
 
 User can control $(x,y,z)$ dimensions of the room, and position of source and listener in the room. The orientation of the listener can also be adjusted. Wall properties are adjusted with two or three parameters:
 
@@ -19,19 +19,19 @@ User can control $(x,y,z)$ dimensions of the room, and position of source and li
 
 - Wall diffusion : this parameter controls the wall diffusion properties (parameter only available in the ambisonic version, otherwise fixed to 1e-3, but this is subject to change)
 
-The input is mono or stereo, depending on the chosen version (mono in or stereo in). The output sound is a stereo reverberberated sound with one of the following configurations:
+The input is stereo. The output sound is a 2 or 4-channel reverberberated sound with one of the following configurations:
 
-- Two cardioid microphones in XY configuration
+- Two cardioid microphones in XY configuration (2-ch)
 
-- One cardioid and one eight-pattern microphones, in MS configuration
+- One cardioid and one eight-pattern microphones, in MS configuration (2-ch)
 
-- One omni and one eight-pattern microphone, in MS configuration
+- One omni and one eight-pattern microphone, in MS configuration (2-ch)
 
-- Binaural receptor based on the HRTF provided by MIT medialab (https://sound.media.mit.edu/resources/KEMAR.html), and equalized to sound as neutral as possible compared to the dry original sound.
+- Binaural receptor based on the HRTF provided by MIT medialab (https://sound.media.mit.edu/resources/KEMAR.html), and equalized to sound as neutral as possible compared to the dry original sound (2-ch)
 
-- Ambisonic output (for the ambisonic version)
+- Ambisonic output (for the ambisonic version, 4-ch)
 
-The 2D version simulates a 2D rectangular flat domain. Consequently, the produced binaural sound doesn't consider height information for sources and listener. The 3D version simmulates a parallelepipedic room, height position of the sources and listener. The latter hence involves more cpu computations for the impulse responses calculations.
+The 2D version simulates a 2D rectangular flat domain. Consequently, the produced binaural sound doesn't consider height information for sources and listener. The 3D version simmulates a parallelepipedic room, height position of the sources and listener. The latter hence involves more cpu computations for the impulse responses calculations, one has to wait a longer time to get the IRs ready.
 
 ## Direct path and reflections paths
 
@@ -91,6 +91,8 @@ In random order:
 - More flexible inputs management (ability add/remove multiple virtual sources in the room in the same UI)
 
 - Rooms not necessarly parallelepipedic (raytracing implementation)
+
+- Realtime response to some parameter variations (all but room dimensions and wall properties parameters).
 
 ## Contact
 
