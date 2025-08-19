@@ -6,7 +6,7 @@
               pluginManufacturerCode="FXME" pluginCode="BiRR" lv2Uri="http://fx-mechanics.com/lv2/BiRR"
               pluginAAXCategory="8" version="0.1" companyName="FX-Mechanics"
               companyWebsite="fx-mechanics.com" pluginVST3Category="Fx,Reverb,Spatial"
-              pluginName="BiRR" pluginDesc="Binaural room reverb">
+              pluginName="BiRR" pluginDesc="Binaural room reverb, stereo input">
   <MAINGROUP id="BIm9jF" name="BiRR">
     <GROUP id="{73833252-B5AF-B4C1-E839-2064ACA9F25A}" name="assets">
       <FILE id="M2MJ3r" name="defines.h" compile="0" resource="0" file="../lib/assets/defines.h"/>
