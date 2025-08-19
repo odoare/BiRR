@@ -2,10 +2,10 @@
 
 A realistic room simulator based on a combination of a convolution processor and a virtual room impulse response calculator.
 
-![image info](./doc/BiRR3DA_screen.png)
+![image info](./doc/BiRR_screen.png)
 
-<!-- ### BiRR2D
-![image info](./doc/BiRR2D_screen.png) -->
+<!-- ### BiRR
+![image info](./doc/BiRR_screen.png) -->
 
 ## Info
 
@@ -73,23 +73,24 @@ A number of threads equal to the number of CPUs - 1 is employed for the impulse 
 
 - v0.0.5: Bug fixes + new ambisonic version
 
+- v0.1: A few interesting changes:
+    * Convolution engine is now that from WDL (https://github.com/justinfrankel/WDL), which has a strongly reduced CPU usage compared to the Juce engine. As a consequence, the plugin is now only proposed with stereo inputs, and comes in two flavors, a Binaural/XY/MS version (BiRR), and a first order ambisonic version (AmbiRR).
+    * The BiRR flavor contains now 2D and 3D room calculators. The dimension can be changed as a parameter.
+    * It is possible to export calculated impulse responses as wav files if one wants to use them in other convolution plugins.
+
 ## Compilation
 
-BiRR depends on the JUCE library (visit juce.com), with additional components from fxmejucetools, provided as a JUCE module (visit https://github.com/odoare/FxmeJuceTools)
+BiRR depends on the JUCE library (visit juce.com), with additional components from fxmejucetools, provided as a JUCE module (visit https://github.com/odoare/FxmeJuceTools). The WDL library is included as a submodule, one has to do a "git submodule update --init --recursive" after cloning.
 
 ## Future improvements
 
-In priority order:
-
-- Ambisonic output (FOA)
+In random order:
 
 - Absorption parameters for each wall
 
-- Multiple inputs (and ability to place multiple virtual sources in the room in the same UI)
+- More flexible inputs management (ability add/remove multiple virtual sources in the room in the same UI)
 
-- Faster convolution (?)
-
-- Rooms not necessarly parallelepipedic
+- Rooms not necessarly parallelepipedic (raytracing implementation)
 
 ## Contact
 
