@@ -1,4 +1,4 @@
-# Binaural Room Reverb (BiRR) 2D and 3D
+# Binaural Room Reverb (BiRR) and Ambisonic Room Reverb (AmbiRR)
 
 A realistic room simulator based on a combination of a convolution processor and a virtual room impulse response calculator.
 
