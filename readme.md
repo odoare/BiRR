@@ -9,9 +9,9 @@ A realistic room simulator based on a combination of a convolution processor and
 
 ## Info
 
-BiRR (and its ambisonic sister AmbiRR) are room simulators that accurately emulate the sound produced by a monophonic and omnidirectionnal source perceived by a listener in a rectangular (2D) or parallelepipedic (3D) room.
+BiRR (and her ambisonic sister AmbiRR) are room simulators that accurately emulate the sound produced by a monophonic and omnidirectionnal source perceived by a listener in a rectangular (2D) or parallelepipedic (3D) room.
 
-User can control $(x,y,z)$ dimensions of the room, and position of source and listener in the room. The orientation of the listener can also be adjusted. Wall properties are adjusted with two or three parameters:
+User can control $(x,y,z)$ dimensions of the room, and position of source and listeners in the room. The head azimuth of the listener can also be adjusted. Wall properties are adjusted with two or three parameters:
 
 - Wall absorbtion : a coefficient between 0 an 1, representing a reflection coefficient. The acoustic wave amplitude is multiplied by this coefficient at each wall rebound. Higher values produce a shorter reverb.
 
@@ -29,7 +29,7 @@ The input is stereo. The output sound is a 2 or 4-channel reverberberated sound 
 
 - Binaural receptor based on the HRTF provided by MIT medialab (https://sound.media.mit.edu/resources/KEMAR.html), and equalized to sound as neutral as possible compared to the dry original sound (2-ch)
 
-- Ambisonic output (for the ambisonic version, 4-ch)
+- Ambisonic output (for the ambisonic version, 4-ch, First order, Ambix, ACN)
 
 The 2D version simulates a 2D rectangular flat domain. Consequently, the produced binaural sound doesn't consider height information for sources and listener. The 3D version simmulates a parallelepipedic room, height position of the sources and listener. The latter hence involves more cpu computations for the impulse responses calculations, one has to wait a longer time to get the IRs ready.
 
