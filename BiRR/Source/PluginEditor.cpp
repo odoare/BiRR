@@ -38,46 +38,46 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
 
     // Room size controllers
 
-    addAndMakeVisible(roomXKnob.slider);
+    addAndMakeVisible(roomXKnob);
     roomXKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     roomXKnob.slider.onDragEnd = stopDrag;
     roomXKnob.slider.onDragStart = startDrag;
 
-    addAndMakeVisible(roomYKnob.slider);
+    addAndMakeVisible(roomYKnob);
     roomYKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     roomYKnob.slider.onDragEnd = stopDrag;
     roomYKnob.slider.onDragStart = startDrag;
 
-    addAndMakeVisible(roomZKnob.slider);
+    addAndMakeVisible(roomZKnob);
     roomZKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     roomZKnob.slider.onDragEnd = stopDrag;
     roomZKnob.slider.onDragStart = startDrag;
 
     // Damping sliders
 
-    addAndMakeVisible(dampingKnob.slider);
+    addAndMakeVisible(dampingKnob);
     dampingKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     dampingKnob.slider.onDragEnd = stopDrag;
     dampingKnob.slider.onDragStart = startDrag;
 
-    addAndMakeVisible(hfDampingKnob.slider);
+    addAndMakeVisible(hfDampingKnob);
     hfDampingKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     hfDampingKnob.slider.onDragEnd = stopDrag;
     hfDampingKnob.slider.onDragStart = startDrag;
 
     // Width slider (not effective with binaural mode)
-    addAndMakeVisible(widthKnob.slider);
+    addAndMakeVisible(widthKnob);
     widthKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     widthKnob.slider.onDragEnd = stopDrag;
     widthKnob.slider.onDragStart = startDrag;
 
     // Level sliders
-    addAndMakeVisible(directLevelKnob.slider);
+    addAndMakeVisible(directLevelKnob);
     directLevelKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     directLevelKnob.slider.onDragEnd = stopDrag;
     directLevelKnob.slider.onDragStart = startDrag;
 
-    addAndMakeVisible(reflectionsLevelKnob.slider);
+    addAndMakeVisible(reflectionsLevelKnob);
     reflectionsLevelKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     reflectionsLevelKnob.slider.onDragEnd = stopDrag;
     reflectionsLevelKnob.slider.onDragStart = startDrag;
@@ -102,7 +102,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     listenerZSlider.onDragStart = startDrag;
     listenerZSlider.onDragEnd = stopDrag;
 
-    addAndMakeVisible(listenerOKnob.slider);
+    addAndMakeVisible(listenerOKnob);
     listenerOKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     listenerOKnob.slider.onDragEnd = stopDrag;
     listenerOKnob.slider.onDragStart = startDrag;
@@ -304,12 +304,12 @@ void ReverbAudioProcessorEditor::resized()
     fb312.flexDirection = juce::FlexBox::Direction::row;
     fb3111.flexDirection = juce::FlexBox::Direction::column;
 
-    fb1.items.add(fi(roomXKnob.flex()).withFlex(1.f));
-    fb1.items.add(fi(roomYKnob.flex()).withFlex(1.f));
-    fb1.items.add(fi(roomZKnob.flex()).withFlex(1.f));
-    fb1.items.add(fi(dampingKnob.flex()).withFlex(1.f));
-    fb1.items.add(fi(hfDampingKnob.flex()).withFlex(1.f));
-    fb1.items.add(fi(widthKnob.flex()).withFlex(1.f));
+    fb1.items.add(fi(roomXKnob).withFlex(1.f));
+    fb1.items.add(fi(roomYKnob).withFlex(1.f));
+    fb1.items.add(fi(roomZKnob).withFlex(1.f));
+    fb1.items.add(fi(dampingKnob).withFlex(1.f));
+    fb1.items.add(fi(hfDampingKnob).withFlex(1.f));
+    fb1.items.add(fi(widthKnob).withFlex(1.f));
 
     fb21.items.add(fi(sourceLYSlider).withFlex(0.1f));
     fb21.items.add(fi(sourceRYSlider).withFlex(0.1f));
@@ -328,7 +328,7 @@ void ReverbAudioProcessorEditor::resized()
     fb2b.items.add(fi(listenerXSlider).withFlex(1.f));
     fb2b.items.add(fi(fb2br).withFlex(0.1f));
     
-    fb3111.items.add(fi(listenerOKnob.flex()).withFlex(1.f));
+    fb3111.items.add(fi(listenerOKnob).withFlex(1.f));
     fb311.items.add(fi(fb3111).withFlex(1.f).withMargin(juce::FlexItem::Margin(0.f,0.f,20.f,0.f)));
     fb311.items.add(fi(sourceLZSlider).withFlex(0.2f).withMargin(juce::FlexItem::Margin(25.f,0.f,0.f,0.f)));
     fb311.items.add(fi(sourceRZSlider).withFlex(0.2f).withMargin(juce::FlexItem::Margin(25.f,0.f,0.f,0.f)));
@@ -345,8 +345,8 @@ void ReverbAudioProcessorEditor::resized()
     fb31.items.add(fi(fb313).withFlex(0.3f).withMargin(juce::FlexItem::Margin(10.f,20.f,0.f,20.f)));
     fb31.items.add(fi(progressBarL).withFlex(0.18f));
     fb31.items.add(fi(progressBarR).withFlex(0.18f));
-    fb32.items.add(fi(directLevelKnob.flex()).withFlex(1.f).withMargin(juce::FlexItem::Margin(20.f,0.f,0.f,0.f)));
-    fb32.items.add(fi(reflectionsLevelKnob.flex()).withFlex(1.f).withMargin(juce::FlexItem::Margin(20.f,0.f,0.f,0.f)));
+    fb32.items.add(fi(directLevelKnob).withFlex(1.f).withMargin(juce::FlexItem::Margin(20.f,0.f,0.f,0.f)));
+    fb32.items.add(fi(reflectionsLevelKnob).withFlex(1.f).withMargin(juce::FlexItem::Margin(20.f,0.f,0.f,0.f)));
     fb32.items.add(juce::FlexItem(logo).withFlex(0.65f).withMargin(juce::FlexItem::Margin(5.f, 5.f, 5.f, 5.f)).withAlignSelf(juce::FlexItem::AlignSelf::stretch));
 
     fb3.items.add(fi(fb31).withFlex(1.f).withMargin(juce::FlexItem::Margin(20.f,0.f,0.f,0.f)));
