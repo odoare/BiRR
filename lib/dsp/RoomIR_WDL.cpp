@@ -177,11 +177,13 @@ void IrBoxCalculator::calculate3D()
               auto panGain = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta+45*p.sWidth)))
                               * elevCardio;
               lop(&inBuf[0], &outBuf[0], p.sampleRate,p.hfDamp,nbounds,1);
-              addArrayToBuffer(&dataL[indice], &outBuf[0], gain*panGain);
+              if (indice + nsamp[0] < longueur)
+                addArrayToBuffer(&dataL[indice], &outBuf[0], gain*panGain);
               panGain = 0.25*(1+juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(theta-45*p.sWidth)))
                           * elevCardio;
               lop(&inBuf[0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
-              addArrayToBuffer(&dataR[indice], &outBuf[0], gain*panGain);
+              if (indice + nsamp[0] < longueur)
+                addArrayToBuffer(&dataR[indice], &outBuf[0], gain*panGain);
             }
 
             // MS with cardio mic for mid channelabs(ix)+abs(iy)
@@ -193,8 +195,11 @@ void IrBoxCalculator::calculate3D()
               auto gainSide = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev))
                               * juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(theta));
 
-              addArrayToBuffer(&dataL[indice], &outBuf[0], gain*(gainMid-gainSide*p.sWidth));
-              addArrayToBuffer(&dataR[indice], &outBuf[0], gain*(gainMid+gainSide*p.sWidth));
+              if (indice + nsamp[0] < longueur)
+              {
+                addArrayToBuffer(&dataL[indice], &outBuf[0], gain*(gainMid-gainSide*p.sWidth));
+                addArrayToBuffer(&dataR[indice], &outBuf[0], gain*(gainMid+gainSide*p.sWidth));
+              }
             }
 
             // MS with omni mic for mid channel
@@ -205,8 +210,11 @@ void IrBoxCalculator::calculate3D()
               auto gainSide = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev))
                               * juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(theta));
 
-              addArrayToBuffer(&dataL[indice], &outBuf[0], gain*(gainMid-gainSide*p.sWidth));
-              addArrayToBuffer(&dataR[indice], &outBuf[0], gain*(gainMid+gainSide*p.sWidth));
+              if (indice + nsamp[0] < longueur)
+              {
+                addArrayToBuffer(&dataL[indice], &outBuf[0], gain*(gainMid-gainSide*p.sWidth));
+                addArrayToBuffer(&dataR[indice], &outBuf[0], gain*(gainMid+gainSide*p.sWidth));
+              }
             }
 
             // Binaural
@@ -214,7 +222,9 @@ void IrBoxCalculator::calculate3D()
               int elevationIndex = proximityIndex(&elevations[0],NELEV,elev,false);
               int azimutalIndex = proximityIndex(&azimuths[elevationIndex][0],NAZIM,theta,true);
               gain = gain * .707107f;
-              if (juce::approximatelyEqual(nearestSampleRate[0],48000.f))
+              if (indice + nsamp[0] < longueur)
+              {
+                if (juce::approximatelyEqual(nearestSampleRate[0],48000.f))
                 {
                   lop(&lhrtf48[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
@@ -222,27 +232,28 @@ void IrBoxCalculator::calculate3D()
                   addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
 
                 }
-              else if (juce::approximatelyEqual(nearestSampleRate[0],88200.f))
+                else if (juce::approximatelyEqual(nearestSampleRate[0],88200.f))
                 {
                   lop(&lhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
                   lop(&rhrtf88[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
                 }
-              else if (juce::approximatelyEqual(nearestSampleRate[0],96000.f))
+                else if (juce::approximatelyEqual(nearestSampleRate[0],96000.f))
                 {
                   lop(&lhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
                   lop(&rhrtf96[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
                 }
-              else // if 44.1kHz or any other cases, we use 44.1kHz HRTF
+                else // if 44.1kHz or any other cases, we use 44.1kHz HRTF
                 {
                   lop(&lhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataL[indice], &outBuf[0], gain);
                   lop(&rhrtf44[elevationIndex][azimutalIndex][0], &outBuf[0], p.sampleRate, p.hfDamp,nbounds,1);
                   addArrayToBuffer(&dataR[indice], &outBuf[0], gain);
                 }
+              }
             }
           }
         }
@@ -305,10 +316,13 @@ void IrBoxCalculator::calculateAmbi3D()
             sintheta = juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(-theta));
             cosphi = juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*(elev));
             sinphi = juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*(elev));
-            addArrayToBuffer(&dataW[indice], &outBuf[0], gain);
-            addArrayToBuffer(&dataY[indice], &outBuf[0], gain*sintheta*cosphi);
-            addArrayToBuffer(&dataZ[indice], &outBuf[0], gain*sinphi);
-            addArrayToBuffer(&dataX[indice], &outBuf[0], gain*costheta*cosphi);
+            if (indice + nsamp[0] < longueur)
+            {
+              addArrayToBuffer(&dataW[indice], &outBuf[0], gain);
+              addArrayToBuffer(&dataY[indice], &outBuf[0], gain*sintheta*cosphi);
+              addArrayToBuffer(&dataZ[indice], &outBuf[0], gain*sinphi);
+              addArrayToBuffer(&dataX[indice], &outBuf[0], gain*costheta*cosphi);
+            }
           }
         }
         progress = float(ix-nxmin)/float(nxmax-nxmin);
@@ -909,8 +923,9 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
       {
         //std::cout << "Processing ambisonic signal with head azimuth: " << p.headAzim << std::endl;
         juce::dsp::AudioBlock<float> block(buffer);
-        juce::dsp::AudioBlock<float> blockX = block.getSingleChannelBlock(2);
         juce::dsp::AudioBlock<float> blockY = block.getSingleChannelBlock(1);
+        juce::dsp::AudioBlock<float> blockZ = block.getSingleChannelBlock(2);
+        juce::dsp::AudioBlock<float> blockX = block.getSingleChannelBlock(3);
 
         inputBufferCopy.makeCopyOf(buffer, true);
         juce::dsp::AudioBlock<float> blockCopy (inputBufferCopy);
@@ -984,6 +999,8 @@ void BoxRoomIR::exportIrToWav(juce::File file)
       {
         cout << "fullBuffer length : " << fullBuffer.getNumSamples() << endl; 
         writer->writeFromAudioSampleBuffer (fullBuffer, 0, fullBuffer.getNumSamples());
+        writer->flush();
+        writer = nullptr; // (deletes the writer and closes the file)
       }
     else
       {
