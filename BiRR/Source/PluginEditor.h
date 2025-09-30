@@ -15,6 +15,7 @@
 #include "PluginProcessor.h"
 #include "../../lib/components/XyPad.h"
 #include "../../lib/components/FxmeLookAndFeel.h"
+#include "RoomComponent.h"
 #include "../../lib/components/HorizontalBar.h"
 #include "../../lib/components/FxmeLogo.h"
 #include "../../lib/assets/defines.h"
@@ -89,7 +90,7 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> typeComboBoxAttachment;
     juce::Label typeLabel{"typeLabel", "Microphones"};
     
-    Gui::XyPad3h xyPad3;
+    RoomComponent roomComponent;
 
     juce::TextButton calculateButton;
 

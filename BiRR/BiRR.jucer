@@ -8,6 +8,9 @@
               companyWebsite="fx-mechanics.com" pluginVST3Category="Fx,Reverb,Spatial"
               pluginName="Binaural Room Reverb" pluginDesc="Binaural room reverb, stereo input">
   <MAINGROUP id="BIm9jF" name="BiRR">
+    <FILE id="pUU9IH" name="RoomComponent.cpp" compile="1" resource="0"
+          file="Source/RoomComponent.cpp"/>
+    <FILE id="NMhjD6" name="RoomComponent.h" compile="0" resource="0" file="Source/RoomComponent.h"/>
     <GROUP id="{73833252-B5AF-B4C1-E839-2064ACA9F25A}" name="assets">
       <FILE id="M2MJ3r" name="defines.h" compile="0" resource="0" file="../lib/assets/defines.h"/>
       <FILE id="Y6mGAm" name="logo686.png" compile="0" resource="1" file="../lib/assets/logo686.png"/>

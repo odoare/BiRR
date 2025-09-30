@@ -13,7 +13,7 @@
 
 //==============================================================================
 ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p), audioProcessor (p), roomComponent(p, p.apvts)
 {
     // logo = juce::ImageCache::getFromMemory(BinaryData::logo686_png, BinaryData::logo686_pngSize);
 
@@ -170,23 +170,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     addAndMakeVisible(dimensionComboBox);
 
     // XY Pad
-    addAndMakeVisible(xyPad3);
-    xyPad3.registerSlider(&listenerXSlider, Gui::XyPad3h::Axis::X1);
-    xyPad3.registerSlider(&listenerYSlider, Gui::XyPad3h::Axis::Y1);
-    xyPad3.registerSlider(&sourceLXSlider, Gui::XyPad3h::Axis::X2);
-    xyPad3.registerSlider(&sourceLYSlider, Gui::XyPad3h::Axis::Y2);
-    xyPad3.registerSlider(&sourceRXSlider, Gui::XyPad3h::Axis::X3);
-    xyPad3.registerSlider(&sourceRYSlider, Gui::XyPad3h::Axis::Y3);
-    xyPad3.registerSlider(&listenerOKnob.slider, Gui::XyPad3h::Axis::O1);
-    xyPad3.thumb1.setColour(LISTENERCOLOUR);
-    xyPad3.thumb2.setColour(SOURCELCOLOUR);
-    xyPad3.thumb3.setColour(SOURCERCOLOUR);
-    xyPad3.thumb1.mouseUpCallback = stopDrag;
-    xyPad3.thumb2.mouseUpCallback = stopDrag;
-    xyPad3.thumb3.mouseUpCallback = stopDrag;
-    xyPad3.thumb1.mouseDownCallback = startDrag;
-    xyPad3.thumb2.mouseDownCallback = startDrag;
-    xyPad3.thumb3.mouseDownCallback = startDrag;
+    addAndMakeVisible(roomComponent);
 
     addAndMakeVisible(autoButton.button);
     autoButton.button.setLookAndFeel(&fxmeLookAndFeel);
@@ -206,12 +190,6 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
 
 ReverbAudioProcessorEditor::~ReverbAudioProcessorEditor()
 {
-  xyPad3.deregisterSlider(&listenerXSlider);
-  xyPad3.deregisterSlider(&listenerYSlider);
-  xyPad3.deregisterSlider(&sourceLXSlider);
-  xyPad3.deregisterSlider(&sourceLYSlider);
-  xyPad3.deregisterSlider(&sourceRXSlider);
-  xyPad3.deregisterSlider(&sourceRYSlider);
 }
 
 //==============================================================================
@@ -313,7 +291,7 @@ void ReverbAudioProcessorEditor::resized()
 
     fb21.items.add(fi(sourceLYSlider).withFlex(0.1f));
     fb21.items.add(fi(sourceRYSlider).withFlex(0.1f));
-    fb21.items.add(fi(xyPad3).withFlex(1.f));
+    fb21.items.add(fi(roomComponent).withFlex(1.f));
     fb21.items.add(fi(listenerYSlider).withFlex(0.1f));
 
     fb2.items.add(fi(fb2t).withFlex(0.2f));
