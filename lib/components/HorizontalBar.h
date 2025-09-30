@@ -19,7 +19,7 @@ namespace Gui
   public:
     HorizontalBar(std::function<float()>&& valueFunction) : valueSupplier(std::move(valueFunction))
     {
-      startTimerHz(5);
+      startTimerHz(10);
       barColour=juce::Colours::green;
     }
 

@@ -1,9 +1,9 @@
 #include "RoomComponent.h"
-#include "../../lib/assets/defines.h"
+#include "../assets/defines.h"
 
 //==============================================================================
-RoomComponent::RoomComponent(ReverbAudioProcessor& p, juce::AudioProcessorValueTreeState& vts)
-    : audioProcessor(p), valueTreeState(vts)
+RoomComponent::RoomComponent(juce::AudioProcessorValueTreeState& vts)
+    : valueTreeState(vts)
 {
     startTimerHz(20);
 }
@@ -137,45 +137,16 @@ void RoomComponent::paint (juce::Graphics& g)
 
 void RoomComponent::mouseDown (const juce::MouseEvent& event)
 {
-    if (event.mods.isRightButtonDown()) {
+    //if (event.mods.isRightButtonDown()) {
         lastMousePosition = event.getPosition();
         draggedObject = None; // Ensure we aren't dragging an object
-    }
-    else if (event.mods.isLeftButtonDown())
-    {
-        const float hitRadius = 10.0f;
-        auto pos = event.getPosition().toFloat();
-
-        if (pos.getDistanceFrom(projectedListener) < hitRadius)
-        {
-            draggedObject = Listener;
-        }
-        else if (pos.getDistanceFrom(projectedSourceL) < hitRadius)
-        {
-            draggedObject = SourceL;
-        }
-        else if (pos.getDistanceFrom(projectedSourceR) < hitRadius)
-        {
-            draggedObject = SourceR;
-        }
-        else
-        {
-            draggedObject = None;
-        }
-
-        if (draggedObject != None)
-        {
-            lastMousePosition = event.getPosition();
-            // Temporarily disable auto-updating IRs while dragging for performance
-            audioProcessor.autoUpdate = false;
-        }
-    }
+    //}
 }
 
 void RoomComponent::mouseDrag (const juce::MouseEvent& event)
 {
-    if (event.mods.isRightButtonDown())
-    {
+    // if (event.mods.isRightButtonDown())
+    // {
         auto currentPosition = event.getPosition();
         auto diff = currentPosition - lastMousePosition;
 
@@ -188,56 +159,7 @@ void RoomComponent::mouseDrag (const juce::MouseEvent& event)
         viewAngleX = juce::jlimit(-juce::MathConstants<float>::pi / 2.0f + 0.01f, juce::MathConstants<float>::pi / 2.0f - 0.01f, viewAngleX);
 
         lastMousePosition = currentPosition;
-    }
-    else if (event.mods.isLeftButtonDown() && draggedObject != None)
-    {
-        auto currentPosition = event.getPosition();
-        auto diff = currentPosition - lastMousePosition;
-
-        // --- Inverse projection for dragging in the view plane ---
-
-        // 1. Un-scale the 2D mouse delta to get normalized projection-space delta.
-        const float scale = juce::jmin(getWidth(), getHeight()) * 0.8f;
-        const float dx_proj = (float)diff.x / scale;
-        const float dy_proj = -(float)diff.y / scale; // Screen Y is inverted relative to our 3D view's Y.
-
-        // 2. Un-rotate the projection-space delta to get the 3D world-space delta.
-        // This is the inverse of the rotation part of the `project()` function.
-        const float invCosX = cosX; // cos(-x) = cos(x)
-        const float invSinX = -sinX; // sin(-x) = -sin(x)
-        const float invCosY = cosY;
-        const float invSinY = -sinY;
-
-        const float deltaX_norm = dx_proj * invCosY;
-        const float deltaY_norm = -(dx_proj * invSinY * invCosX - dy_proj * invSinX);
-        const float deltaZ_norm = dx_proj * invSinY * invSinX + dy_proj * invCosX;
-
-        float maxDim = std::max({ roomWidth, roomDepth, roomHeight, 1.0f });
-
-        juce::RangedAudioParameter* xParam = nullptr, *yParam = nullptr, *zParam = nullptr;
-
-        if (draggedObject == Listener) {
-            xParam = valueTreeState.getParameter("ListenerX");
-            yParam = valueTreeState.getParameter("ListenerY");
-            zParam = valueTreeState.getParameter("ListenerZ");
-        } else if (draggedObject == SourceL) {
-            xParam = valueTreeState.getParameter("SourceLX");
-            yParam = valueTreeState.getParameter("SourceLY");
-            zParam = valueTreeState.getParameter("SourceLZ");
-        } else if (draggedObject == SourceR) {
-            xParam = valueTreeState.getParameter("SourceRX");
-            yParam = valueTreeState.getParameter("SourceRY");
-            zParam = valueTreeState.getParameter("SourceRZ");
-        }
-
-        if (xParam && yParam && zParam) {
-            xParam->setValueNotifyingHost(xParam->getValue() + deltaX_norm * maxDim / roomWidth);
-            yParam->setValueNotifyingHost(yParam->getValue() + deltaY_norm * maxDim / roomDepth);
-            zParam->setValueNotifyingHost(zParam->getValue() + deltaZ_norm * maxDim / roomHeight);
-        }
-
-        lastMousePosition = currentPosition;
-    }
+    // }
 }
 
 void RoomComponent::mouseUp(const juce::MouseEvent& event)
@@ -245,9 +167,6 @@ void RoomComponent::mouseUp(const juce::MouseEvent& event)
     if (draggedObject != None)
     {
         draggedObject = None;
-        // Re-enable auto-update if it was on before
-        if (auto* button = valueTreeState.getParameter("Update"))
-            audioProcessor.autoUpdate = button->getValue();
     }
 }
 

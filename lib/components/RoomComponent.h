@@ -1,7 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "PluginProcessor.h"
+
 
 //==============================================================================
 /*
@@ -9,7 +9,7 @@
 class RoomComponent  : public juce::Component, public juce::Timer
 {
 public:
-    RoomComponent(ReverbAudioProcessor& p, juce::AudioProcessorValueTreeState& vts);
+    RoomComponent(juce::AudioProcessorValueTreeState& vts);
     ~RoomComponent() override;
 
     void paint (juce::Graphics&) override;
@@ -31,7 +31,6 @@ private:
 
     Point2D project(Point3D p);
 
-    ReverbAudioProcessor& audioProcessor;
     juce::AudioProcessorValueTreeState& valueTreeState;
 
     float roomWidth, roomDepth, roomHeight;

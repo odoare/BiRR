@@ -2,540 +2,313 @@
 
 namespace Gui
 {
-    Thumb::Thumb(int ts)
+    //==============================================================================
+    DraggablePoint::DraggablePoint(int ts) : pointSize(ts)
     {
-        thumbSize = ts;
-        constrainer.setMinimumOnscreenAmounts(thumbSize,thumbSize,thumbSize,thumbSize);
+        constrainer.setMinimumOnscreenAmounts(pointSize, pointSize, pointSize, pointSize);
     }
 
-    void Thumb::paint(juce::Graphics& g)
-    {
-        g.setColour(thumbColour);
-        g.drawEllipse(getLocalBounds().reduced(5).toFloat(),5.f);
-    }
-
-    void Thumb::mouseDown(const juce::MouseEvent& event)
+    void DraggablePoint::mouseDown(const juce::MouseEvent& event)
     {
         dragger.startDraggingComponent(this, event);
-        mouseDownCallback();
+        if (mouseDownCallback)
+            mouseDownCallback();
     }
 
-    void Thumb::mouseDrag(const juce::MouseEvent& event)
+    void DraggablePoint::mouseDrag(const juce::MouseEvent& event)
     {
         dragger.dragComponent(this, event, &constrainer);
         if (moveCallback)
             moveCallback(getPosition().toDouble());
     }
 
-    void Thumb::mouseUp(const juce::MouseEvent& event)
+    void DraggablePoint::mouseUp(const juce::MouseEvent& event)
     {
-        mouseUpCallback();
+        if (mouseUpCallback)
+            mouseUpCallback();
     }
 
-    void Thumb::setColour(juce::Colour newColour)
+    void DraggablePoint::setColour(juce::Colour newColour)
     {
-        thumbColour = newColour;
+        pointColour = newColour;
+        repaint();
     }
 
-    Head::Head(int ts)
+    //==============================================================================
+    Thumb::Thumb(int thumbSize) : DraggablePoint(thumbSize) {}
+
+    void Thumb::paint(juce::Graphics& g)
     {
-        thumbSize = ts;
-        constrainer.setMinimumOnscreenAmounts(thumbSize,thumbSize,thumbSize,thumbSize);
+        g.setColour(pointColour);
+        g.drawEllipse(getLocalBounds().reduced(5).toFloat(), 5.f);
     }
+
+    //==============================================================================
+    Head::Head(int headSize) : DraggablePoint(headSize) {}
 
     void Head::paint(juce::Graphics& g)
     {
-        float thickness = 5.f;
+        const float thickness = 5.f;
 
-        g.setColour(headColour);
+        g.setColour(pointColour);
         g.fillEllipse(getLocalBounds().reduced(5).toFloat());
 
-        juce::Path nose;
-        juce::Rectangle<int> rect(0.f,0.f,thickness,.5f*thumbSize);
-        nose.addRectangle(rect);
-        g.fillPath(nose,juce::AffineTransform::translation(-thickness/2,0.f).rotated(headOrientation+3.1415927f).translated(thumbSize/2,thumbSize/2));
-        //g.fillEllipse(getLocalBounds().reduced(8,0).toFloat());
-    }
-
-    void Head::mouseDown(const juce::MouseEvent& event)
-    {
-        dragger.startDraggingComponent(this, event);
-        mouseDownCallback();
+        if (showNose)
+        {
+            juce::Path nose;
+            juce::Rectangle<float> rect(0.f, 0.f, thickness, .5f * (float)pointSize);
+            nose.addRectangle(rect);
+            g.fillPath(nose, juce::AffineTransform::translation(-thickness / 2.f, 0.f)
+                             .rotated(headOrientation + juce::MathConstants<float>::pi)
+                             .translated((float)pointSize / 2.f, (float)pointSize / 2.f));
+        }
     }
 
     void Head::mouseDoubleClick(const juce::MouseEvent& event)
     {
-        headOrientation = 0.f;
-        repaint();
-    }
-
-    void Head::mouseDrag(const juce::MouseEvent& event)
-    {
-        dragger.dragComponent(this, event, &constrainer);
+        setOrientation(0.f);
         if (moveCallback)
             moveCallback(getPosition().toDouble());
-    }
-
-    void Head::mouseUp(const juce::MouseEvent& event)
-    {
-        mouseUpCallback();
+        repaint();
     }
 
     void Head::mouseWheelMove(const juce::MouseEvent& e, const juce::MouseWheelDetails& wheel)
     {
-        // juce::MouseWheelDetails w(wheel);
-        // if (w.deltaY>0.f)
-        //     headOrientation = juce::jmin<float>(headOrientation+w.deltaY,juce::MathConstants<float>::pi);
-        // else
-        //     headOrientation = juce::jmax<float>(headOrientation+w.deltaY,-juce::MathConstants<float>::pi);
-        // moveCallback(getPosition().toDouble());
-        // repaint();
+        float newOrientation = headOrientation + wheel.deltaY * 0.5f; // Adjust sensitivity
+        newOrientation = juce::jlimit(-juce::MathConstants<float>::pi, juce::MathConstants<float>::pi, newOrientation);
+        setOrientation(newOrientation);
+        if (moveCallback)
+            moveCallback(getPosition().toDouble());
     }
 
-    void Head::setColour(juce::Colour newColour)
+    void Head::setOrientation(float newOrientation)
     {
-        headColour = newColour;
-    }
-
-    void Head::setOrientation(float o)
-    {
-        headOrientation = o;
-    }
-
-    XyPad2::XyPad2()
-    {
-        addAndMakeVisible(thumb1);
-        addAndMakeVisible(thumb2);
-        thumb1.moveCallback = [&](juce::Point<double> position)
+        if (headOrientation != newOrientation)
         {
-            const auto bounds = getLocalBounds().toDouble();
-            const auto w = static_cast<double>(thumb1.thumbSize);
-            for (auto* slider : x1Sliders)
-            {
-                slider->setValue(juce::jmap(position.getX(), 0.0, bounds.getWidth()-w, slider->getMinimum(), slider->getMaximum()));
-            }
-            for (auto* slider : y1Sliders)
-            {
-                slider->setValue(juce::jmap(position.getY(), bounds.getHeight()-w, 0.0, slider->getMinimum(), slider->getMaximum()));
-            }
-        };
-        thumb2.moveCallback = [&](juce::Point<double> position)
-        {
-            const auto bounds = getLocalBounds().toDouble();
-            const auto w = static_cast<double>(thumb2.thumbSize);
-            for (auto* slider : x2Sliders)
-            {
-                slider->setValue(juce::jmap(position.getX(), 0.0, bounds.getWidth()-w, slider->getMinimum(), slider->getMaximum()));
-
-            }
-            for (auto* slider : y2Sliders)
-            {
-                slider->setValue(juce::jmap(position.getY(), bounds.getHeight()-w, 0.0, slider->getMinimum(), slider->getMaximum()));
-            }
-        };
+            headOrientation = newOrientation;
+            repaint();
+        }
     }
 
-    void XyPad2::paint(juce::Graphics& g)
+    float Head::getOrientation() const
+    {
+        return headOrientation;
+    }
+
+    void Head::setShowNose(bool shouldShow)
+    {
+        showNose = shouldShow;
+        repaint();
+    }
+
+    bool Head::isShowingNose() const
+    {
+        return showNose;
+    }
+
+    //==============================================================================
+    namespace
+    {
+        // Private helper to avoid duplicating the callback logic
+        void setupCallbacks (XyPad* pad, DraggablePoint* point)
+        {
+            const int pointIndex = pad->getNumPoints() - 1;
+            point->moveCallback = [pad, pointIndex] (juce::Point<double> position)
+            {
+                if (auto* p = pad->getPoint (pointIndex))
+                {
+                    const auto bounds = pad->getLocalBounds().toDouble();
+                    const auto w = static_cast<double> (p->pointSize);
+
+                    for (const auto& binding : pad->getSliderBindings())
+                    {
+                        if (binding.pointIndex == pointIndex)
+                        {
+                            if (binding.axis == XyPad::Axis::X)
+                                binding.slider->setValue (juce::jmap (position.getX(), 0.0, bounds.getWidth() - w, binding.slider->getMinimum(), binding.slider->getMaximum()));
+                            else if (binding.axis == XyPad::Axis::Y)
+                                binding.slider->setValue (juce::jmap (position.getY(), bounds.getHeight() - w, 0.0, binding.slider->getMinimum(), binding.slider->getMaximum()));
+                            else if (binding.axis == XyPad::Axis::O)
+                            {
+                            if (auto* head = dynamic_cast<Head*> (p))
+                                binding.slider->setValue (juce::jmap (static_cast<double>(head->getOrientation()),
+                                                               -juce::MathConstants<double>::pi, juce::MathConstants<double>::pi,
+                                                               binding.slider->getMinimum(), binding.slider->getMaximum()));
+                            }
+                        }
+                    }
+                }
+            };
+        }
+    }
+
+    //==============================================================================
+    XyPad::XyPad()
+    {
+    }
+
+    XyPad::~XyPad()
+    {
+        for (const auto& binding : sliderBindings)
+        {
+            if (binding.slider != nullptr)
+                binding.slider->removeListener(this);
+        }
+    }
+
+    void XyPad::paint(juce::Graphics& g)
     {
         g.setColour(juce::Colours::black);
         g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.0f);
     }
 
-    void XyPad2::resized()
+    void XyPad::resized()
     {
-        const auto bounds = getLocalBounds();
-        const auto w1 = static_cast<double>(thumb1.thumbSize);
-        const auto w2 = static_cast<double>(thumb2.thumbSize);
+        for (int i = 0; i < points.size(); ++i)
+        {
+            auto* point = points.getUnchecked(i);
+            point->setBounds(getLocalBounds().withSizeKeepingCentre(point->pointSize, point->pointSize));
 
-        thumb1.setBounds(getLocalBounds().withSizeKeepingCentre(thumb1.thumbSize,thumb1.thumbSize));
-        thumb2.setBounds(getLocalBounds().withSizeKeepingCentre(thumb2.thumbSize,thumb2.thumbSize));
+            const auto bounds = getLocalBounds().toDouble();
+            const auto w = static_cast<double>(point->pointSize);
 
-        thumb1.setTopLeftPosition(
-                juce::jmap(x1Sliders[0]->getValue(), x1Sliders[0]->getMinimum(), x1Sliders[0]->getMaximum(), 0.0, bounds.getWidth() - w1),
-                juce::jmap(y1Sliders[0]->getValue(), y1Sliders[0]->getMinimum(), y1Sliders[0]->getMaximum(), bounds.getHeight() - w1, 0.0)
-            );
-        thumb2.setTopLeftPosition(
-                juce::jmap(x2Sliders[0]->getValue(), x2Sliders[0]->getMinimum(), x2Sliders[0]->getMaximum(), 0.0, bounds.getWidth() - w2),
-                juce::jmap(y2Sliders[0]->getValue(), y2Sliders[0]->getMinimum(), y2Sliders[0]->getMaximum(), bounds.getHeight() - w2, 0.0)
-            );
+            double x = 0.0, y = 0.0;
+            bool xSet = false, ySet = false;
+
+            for (const auto& binding : sliderBindings)
+            {
+                if (binding.pointIndex == i)
+                {
+                    if (binding.axis == Axis::X && !xSet)
+                    {
+                        x = juce::jmap(binding.slider->getValue(), binding.slider->getMinimum(), binding.slider->getMaximum(), 0.0, bounds.getWidth() - w);
+                        xSet = true;
+                    }
+                    else if (binding.axis == Axis::Y && !ySet)
+                    {
+                        y = juce::jmap(binding.slider->getValue(), binding.slider->getMinimum(), binding.slider->getMaximum(), bounds.getHeight() - w, 0.0);
+                        ySet = true;
+                    }
+                }
+            }
+            point->setTopLeftPosition((int)x, (int)y);
+        }
     }
 
-    void XyPad2::registerSlider(juce::Slider* slider, Axis axis)
+    DraggablePoint* XyPad::addPoint (DraggablePoint* newPoint, juce::Colour colour)
     {
+        points.add (newPoint);
+        newPoint->setColour (colour);
+        addAndMakeVisible (newPoint);
+        setupCallbacks (this, newPoint);
+        resized();
+        return newPoint;
+    }
+
+    DraggablePoint* XyPad::addThumb (int size, juce::Colour colour)
+    {
+        return addPoint (new Thumb (size), colour);
+    }
+
+    Head* XyPad::addHead(int size, juce::Colour colour)
+    {
+        return static_cast<Head*> (addPoint (new Head (size), colour));
+    }
+
+    void XyPad::removePoint(int pointIndex)
+    {
+        if (juce::isPositiveAndBelow(pointIndex, points.size()))
+        {
+            // First, remove all slider bindings for this point
+            sliderBindings.erase(std::remove_if(sliderBindings.begin(), sliderBindings.end(),
+                [pointIndex](const SliderBinding& b) { return b.pointIndex == pointIndex; }),
+                sliderBindings.end());
+
+            // Then, update indices of subsequent points
+            for (auto& binding : sliderBindings)
+            {
+                if (binding.pointIndex > pointIndex)
+                    binding.pointIndex--;
+            }
+
+            points.remove(pointIndex);
+            resized();
+        }
+    }
+
+    DraggablePoint* XyPad::getPoint(int pointIndex)
+    {
+        return points[pointIndex];
+    }
+
+    juce::Slider* XyPad::getSliderForPoint (int pointIndex, Axis axis) const
+    {
+        for (const auto& binding : sliderBindings)
+        {
+            if (binding.pointIndex == pointIndex && binding.axis == axis)
+            {
+                return binding.slider;
+            }
+        }
+        return nullptr;
+    }
+
+    int XyPad::getNumPoints() const
+    {
+        return points.size();
+    }
+
+    void XyPad::registerSlider(juce::Slider* slider, int pointIndex, Axis axis)
+    {
+        jassert(isPositiveAndBelow(pointIndex, points.size()));
         slider->addListener(this);
-        if (axis == Axis::X1)
-            x1Sliders.push_back(slider);
-        if (axis == Axis::X2)
-            x2Sliders.push_back(slider);
-        if (axis == Axis::Y1)
-            y1Sliders.push_back(slider);
-        if (axis == Axis::Y2)
-            y2Sliders.push_back(slider);
+        sliderBindings.push_back({ slider, pointIndex, axis });
     }
 
-    void XyPad2::deregisterSlider(juce::Slider* slider)
+    void XyPad::deregisterSlider(juce::Slider* slider)
     {
         slider->removeListener(this);
-        x1Sliders.erase(std::remove(x1Sliders.begin(), x1Sliders.end(), slider), x1Sliders.end());
-        x2Sliders.erase(std::remove(x2Sliders.begin(), x2Sliders.end(), slider), x2Sliders.end());
-        y1Sliders.erase(std::remove(y1Sliders.begin(), y1Sliders.end(), slider), y1Sliders.end());
-        y2Sliders.erase(std::remove(y2Sliders.begin(), y2Sliders.end(), slider), y2Sliders.end());
+        sliderBindings.erase(std::remove_if(sliderBindings.begin(), sliderBindings.end(),
+            [slider](const SliderBinding& b) { return b.slider == slider; }),
+            sliderBindings.end());
     }
 
-    void XyPad2::sliderValueChanged(juce::Slider* slider)
+    void XyPad::sliderValueChanged(juce::Slider* slider)
     {
-        // Avoid loopback
-        if (thumb1.isMouseOverOrDragging(false))
-            return;
-        if (thumb2.isMouseOverOrDragging(false))
-            return;
+        for (const auto& binding : sliderBindings)
+        {
+            if (binding.slider == slider)
+            {
+                auto* point = points[binding.pointIndex];
+                if (point == nullptr || point->isMouseOverOrDragging(false))
+                    return;
 
-        const auto isX1AxisSlider = std::find(x1Sliders.begin(), x1Sliders.end(), slider) != x1Sliders.end();
-        const auto isX2AxisSlider = std::find(x2Sliders.begin(), x2Sliders.end(), slider) != x2Sliders.end();
-        const auto isY1AxisSlider = std::find(y1Sliders.begin(), y1Sliders.end(), slider) != y1Sliders.end();
-        
-        const auto bounds = getLocalBounds().toDouble();
-        const auto w1 = static_cast<double>(thumb1.thumbSize);
-        const auto w2 = static_cast<double>(thumb2.thumbSize);
-        if (isX1AxisSlider)
-        {
-            thumb1.setTopLeftPosition(
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), 0.0, bounds.getWidth() - w1),
-                thumb1.getY()
-            );
-        } else if (isY1AxisSlider)
-        {
-            thumb1.setTopLeftPosition(
-                thumb1.getX(),
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), bounds.getHeight() - w1, 0.0)
-            );
-        } else if (isX2AxisSlider)
-        {
-            thumb2.setTopLeftPosition(
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), 0.0, bounds.getWidth() - w2),
-                thumb2.getY()
-            );
-        } else
-        {
-            thumb2.setTopLeftPosition(
-                thumb2.getX(),
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), bounds.getHeight() - w2, 0.0)
-            );
+                const auto bounds = getLocalBounds().toDouble();
+                const auto w = static_cast<double>(point->pointSize);
+
+                switch (binding.axis)
+                {
+                    case Axis::X:
+                        point->setTopLeftPosition(
+                            (int)juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), 0.0, bounds.getWidth() - w),
+                            point->getY());
+                        break;
+                    case Axis::Y:
+                        point->setTopLeftPosition(
+                            point->getX(),
+                            (int)juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), bounds.getHeight() - w, 0.0));
+                        break;
+                    case Axis::O:
+                        if (auto* head = dynamic_cast<Head*>(point))
+                        {
+                            head->setOrientation((float)juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(),
+                                                                   -juce::MathConstants<double>::pi, juce::MathConstants<double>::pi));
+                        }
+                        break;
+                }
+                repaint();
+                return; // Found it, no need to continue
+            }
         }
-        repaint();   
-    }
-
-    XyPad2h::XyPad2h()
-    {
-        addAndMakeVisible(thumb1);
-        addAndMakeVisible(thumb2);
-        thumb1.moveCallback = [&](juce::Point<double> position)
-        {
-            const auto bounds = getLocalBounds().toDouble();
-            const auto w = static_cast<double>(thumb1.thumbSize);
-            for (auto* slider : x1Sliders)
-            {
-                slider->setValue(juce::jmap(position.getX(), 0.0, bounds.getWidth()-w, slider->getMinimum(), slider->getMaximum()));
-            }
-            for (auto* slider : y1Sliders)
-            {
-                slider->setValue(juce::jmap(position.getY(), bounds.getHeight()-w, 0.0, slider->getMinimum(), slider->getMaximum()));
-            }
-            for (auto* slider : o1Sliders)
-            {
-                slider->setValue(juce::jmap<float>(thumb1.headOrientation, -juce::MathConstants<float>::pi , juce::MathConstants<float>::pi, slider->getMinimum(), slider->getMaximum()));
-            }
-        };
-        thumb2.moveCallback = [&](juce::Point<double> position)
-        {
-            const auto bounds = getLocalBounds().toDouble();
-            const auto w = static_cast<double>(thumb2.thumbSize);
-            for (auto* slider : x2Sliders)
-            {
-                slider->setValue(juce::jmap(position.getX(), 0.0, bounds.getWidth()-w, slider->getMinimum(), slider->getMaximum()));
-
-            }
-            for (auto* slider : y2Sliders)
-            {
-                slider->setValue(juce::jmap(position.getY(), bounds.getHeight()-w, 0.0, slider->getMinimum(), slider->getMaximum()));
-            }
-        };
-    }
-
-    void XyPad2h::paint(juce::Graphics& g)
-    {
-        g.setColour(juce::Colours::black);
-        g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.0f);
-    }
-
-    void XyPad2h::resized()
-    {
-        const auto bounds = getLocalBounds();
-        const auto w1 = static_cast<double>(thumb1.thumbSize);
-        const auto w2 = static_cast<double>(thumb2.thumbSize);
-
-        thumb1.setBounds(getLocalBounds().withSizeKeepingCentre(thumb1.thumbSize,thumb1.thumbSize));
-        thumb2.setBounds(getLocalBounds().withSizeKeepingCentre(thumb2.thumbSize,thumb2.thumbSize));
-
-        thumb1.setTopLeftPosition(
-                juce::jmap(x1Sliders[0]->getValue(), x1Sliders[0]->getMinimum(), x1Sliders[0]->getMaximum(), 0.0, bounds.getWidth() - w1),
-                juce::jmap(y1Sliders[0]->getValue(), y1Sliders[0]->getMinimum(), y1Sliders[0]->getMaximum(), bounds.getHeight() - w1, 0.0)
-            );
-        thumb2.setTopLeftPosition(
-                juce::jmap(x2Sliders[0]->getValue(), x2Sliders[0]->getMinimum(), x2Sliders[0]->getMaximum(), 0.0, bounds.getWidth() - w2),
-                juce::jmap(y2Sliders[0]->getValue(), y2Sliders[0]->getMinimum(), y2Sliders[0]->getMaximum(), bounds.getHeight() - w2, 0.0)
-            );
-    }
-
-    void XyPad2h::registerSlider(juce::Slider* slider, Axis axis)
-    {
-        slider->addListener(this);
-        if (axis == Axis::X1)
-            x1Sliders.push_back(slider);
-        if (axis == Axis::X2)
-            x2Sliders.push_back(slider);
-        if (axis == Axis::Y1)
-            y1Sliders.push_back(slider);
-        if (axis == Axis::Y2)
-            y2Sliders.push_back(slider);
-        if (axis == Axis::O1)
-            o1Sliders.push_back(slider);
-    }
-
-    void XyPad2h::deregisterSlider(juce::Slider* slider)
-    {
-        slider->removeListener(this);
-        x1Sliders.erase(std::remove(x1Sliders.begin(), x1Sliders.end(), slider), x1Sliders.end());
-        x2Sliders.erase(std::remove(x2Sliders.begin(), x2Sliders.end(), slider), x2Sliders.end());
-        y1Sliders.erase(std::remove(y1Sliders.begin(), y1Sliders.end(), slider), y1Sliders.end());
-        y2Sliders.erase(std::remove(y2Sliders.begin(), y2Sliders.end(), slider), y2Sliders.end());
-        o1Sliders.erase(std::remove(y2Sliders.begin(), y2Sliders.end(), slider), y2Sliders.end());
-    }
-
-    void XyPad2h::sliderValueChanged(juce::Slider* slider)
-    {
-        // Avoid loopback
-        if (thumb1.isMouseOverOrDragging(false))
-            return;
-        if (thumb2.isMouseOverOrDragging(false))
-            return;
-
-        const auto isX1AxisSlider = std::find(x1Sliders.begin(), x1Sliders.end(), slider) != x1Sliders.end();
-        const auto isX2AxisSlider = std::find(x2Sliders.begin(), x2Sliders.end(), slider) != x2Sliders.end();
-        const auto isY1AxisSlider = std::find(y1Sliders.begin(), y1Sliders.end(), slider) != y1Sliders.end();
-        const auto isY2AxisSlider = std::find(y2Sliders.begin(), y2Sliders.end(), slider) != y2Sliders.end();
-        
-        const auto bounds = getLocalBounds().toDouble();
-        const auto w1 = static_cast<double>(thumb1.thumbSize);
-        const auto w2 = static_cast<double>(thumb2.thumbSize);
-        if (isX1AxisSlider)
-        {
-            thumb1.setTopLeftPosition(
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), 0.0, bounds.getWidth() - w1),
-                thumb1.getY()
-            );
-        } else if (isY1AxisSlider)
-        {
-            thumb1.setTopLeftPosition(
-                thumb1.getX(),
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), bounds.getHeight() - w1, 0.0)
-            );
-        } else if (isX2AxisSlider)
-        {
-            thumb2.setTopLeftPosition(
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), 0.0, bounds.getWidth() - w2),
-                thumb2.getY()
-            );
-        } else if (isY2AxisSlider)
-        {
-            thumb2.setTopLeftPosition(
-                thumb2.getX(),
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), bounds.getHeight() - w2, 0.0)
-            );
-        }
-         else
-        {
-            thumb1.setOrientation(juce::jmap<float>(slider->getValue(), slider->getMinimum(), slider->getMaximum(), -juce::MathConstants<float>::pi , juce::MathConstants<float>::pi ));
-        }
-        repaint();   
-    }
-
-    XyPad3h::XyPad3h()
-    {
-        addAndMakeVisible(thumb1);
-        addAndMakeVisible(thumb2);
-        addAndMakeVisible(thumb3);
-        thumb1.moveCallback = [&](juce::Point<double> position)
-        {
-            const auto bounds = getLocalBounds().toDouble();
-            const auto w = static_cast<double>(thumb1.thumbSize);
-            for (auto* slider : x1Sliders)
-            {
-                slider->setValue(juce::jmap(position.getX(), 0.0, bounds.getWidth()-w, slider->getMinimum(), slider->getMaximum()));
-            }
-            for (auto* slider : y1Sliders)
-            {
-                slider->setValue(juce::jmap(position.getY(), bounds.getHeight()-w, 0.0, slider->getMinimum(), slider->getMaximum()));
-            }
-            for (auto* slider : o1Sliders)
-            {
-                slider->setValue(juce::jmap<float>(thumb1.headOrientation, -juce::MathConstants<float>::pi , juce::MathConstants<float>::pi, slider->getMinimum(), slider->getMaximum()));
-            }
-        };
-        thumb2.moveCallback = [&](juce::Point<double> position)
-        {
-            const auto bounds = getLocalBounds().toDouble();
-            const auto w = static_cast<double>(thumb2.thumbSize);
-            for (auto* slider : x2Sliders)
-            {
-                slider->setValue(juce::jmap(position.getX(), 0.0, bounds.getWidth()-w, slider->getMinimum(), slider->getMaximum()));
-
-            }
-            for (auto* slider : y2Sliders)
-            {
-                slider->setValue(juce::jmap(position.getY(), bounds.getHeight()-w, 0.0, slider->getMinimum(), slider->getMaximum()));
-            }
-        };
-        thumb3.moveCallback = [&](juce::Point<double> position)
-        {
-            const auto bounds = getLocalBounds().toDouble();
-            const auto w = static_cast<double>(thumb3.thumbSize);
-            for (auto* slider : x3Sliders)
-            {
-                slider->setValue(juce::jmap(position.getX(), 0.0, bounds.getWidth()-w, slider->getMinimum(), slider->getMaximum()));
-
-            }
-            for (auto* slider : y3Sliders)
-            {
-                slider->setValue(juce::jmap(position.getY(), bounds.getHeight()-w, 0.0, slider->getMinimum(), slider->getMaximum()));
-            }
-        };
-    }
-
-    void XyPad3h::paint(juce::Graphics& g)
-    {
-        g.setColour(juce::Colours::black);
-        g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.0f);
-    }
-
-    void XyPad3h::resized()
-    {
-        const auto bounds = getLocalBounds();
-        const auto w1 = static_cast<double>(thumb1.thumbSize);
-        const auto w2 = static_cast<double>(thumb2.thumbSize);
-        const auto w3 = static_cast<double>(thumb3.thumbSize);
-
-        thumb1.setBounds(getLocalBounds().withSizeKeepingCentre(thumb1.thumbSize,thumb1.thumbSize));
-        thumb2.setBounds(getLocalBounds().withSizeKeepingCentre(thumb2.thumbSize,thumb2.thumbSize));
-        thumb3.setBounds(getLocalBounds().withSizeKeepingCentre(thumb3.thumbSize,thumb3.thumbSize));
-
-        thumb1.setTopLeftPosition(
-                juce::jmap(x1Sliders[0]->getValue(), x1Sliders[0]->getMinimum(), x1Sliders[0]->getMaximum(), 0.0, bounds.getWidth() - w1),
-                juce::jmap(y1Sliders[0]->getValue(), y1Sliders[0]->getMinimum(), y1Sliders[0]->getMaximum(), bounds.getHeight() - w1, 0.0)
-            );
-        thumb2.setTopLeftPosition(
-                juce::jmap(x2Sliders[0]->getValue(), x2Sliders[0]->getMinimum(), x2Sliders[0]->getMaximum(), 0.0, bounds.getWidth() - w2),
-                juce::jmap(y2Sliders[0]->getValue(), y2Sliders[0]->getMinimum(), y2Sliders[0]->getMaximum(), bounds.getHeight() - w2, 0.0)
-            );
-        thumb3.setTopLeftPosition(
-                juce::jmap(x3Sliders[0]->getValue(), x3Sliders[0]->getMinimum(), x3Sliders[0]->getMaximum(), 0.0, bounds.getWidth() - w3),
-                juce::jmap(y3Sliders[0]->getValue(), y3Sliders[0]->getMinimum(), y3Sliders[0]->getMaximum(), bounds.getHeight() - w3, 0.0)
-            );
-    }
-
-    void XyPad3h::registerSlider(juce::Slider* slider, Axis axis)
-    {
-        slider->addListener(this);
-        if (axis == Axis::X1)
-            x1Sliders.push_back(slider);
-        if (axis == Axis::X2)
-            x2Sliders.push_back(slider);
-        if (axis == Axis::X3)
-            x3Sliders.push_back(slider);
-        if (axis == Axis::Y1)
-            y1Sliders.push_back(slider);
-        if (axis == Axis::Y2)
-            y2Sliders.push_back(slider);
-        if (axis == Axis::Y3)
-            y3Sliders.push_back(slider);
-        if (axis == Axis::O1)
-            o1Sliders.push_back(slider);
-    }
-
-    void XyPad3h::deregisterSlider(juce::Slider* slider)
-    {
-        slider->removeListener(this);
-        x1Sliders.erase(std::remove(x1Sliders.begin(), x1Sliders.end(), slider), x1Sliders.end());
-        x2Sliders.erase(std::remove(x2Sliders.begin(), x2Sliders.end(), slider), x2Sliders.end());
-        x3Sliders.erase(std::remove(x3Sliders.begin(), x3Sliders.end(), slider), x3Sliders.end());
-        y1Sliders.erase(std::remove(y1Sliders.begin(), y1Sliders.end(), slider), y1Sliders.end());
-        y2Sliders.erase(std::remove(y2Sliders.begin(), y2Sliders.end(), slider), y2Sliders.end());
-        y3Sliders.erase(std::remove(y3Sliders.begin(), y3Sliders.end(), slider), y3Sliders.end());
-        o1Sliders.erase(std::remove(o1Sliders.begin(), o1Sliders.end(), slider), o1Sliders.end());
-    }
-
-    void XyPad3h::sliderValueChanged(juce::Slider* slider)
-    {
-        // Avoid loopback
-        if (thumb1.isMouseOverOrDragging(false))
-            return;
-        if (thumb2.isMouseOverOrDragging(false))
-            return;
-        if (thumb3.isMouseOverOrDragging(false))
-            return;
-
-        const auto isX1AxisSlider = std::find(x1Sliders.begin(), x1Sliders.end(), slider) != x1Sliders.end();
-        const auto isX2AxisSlider = std::find(x2Sliders.begin(), x2Sliders.end(), slider) != x2Sliders.end();
-        const auto isX3AxisSlider = std::find(x3Sliders.begin(), x3Sliders.end(), slider) != x3Sliders.end();
-        const auto isY1AxisSlider = std::find(y1Sliders.begin(), y1Sliders.end(), slider) != y1Sliders.end();
-        const auto isY2AxisSlider = std::find(y2Sliders.begin(), y2Sliders.end(), slider) != y2Sliders.end();
-        const auto isY3AxisSlider = std::find(y3Sliders.begin(), y3Sliders.end(), slider) != y3Sliders.end();
-        const auto isO1AxisSlider = std::find(o1Sliders.begin(), o1Sliders.end(), slider) != o1Sliders.end();
-        
-        const auto bounds = getLocalBounds().toDouble();
-        const auto w1 = static_cast<double>(thumb1.thumbSize);
-        const auto w2 = static_cast<double>(thumb2.thumbSize);
-        const auto w3 = static_cast<double>(thumb3.thumbSize);
-        if (isX1AxisSlider)
-        {
-            thumb1.setTopLeftPosition(
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), 0.0, bounds.getWidth() - w1),
-                thumb1.getY()
-            );
-        } else if (isY1AxisSlider)
-        {
-            thumb1.setTopLeftPosition(
-                thumb1.getX(),
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), bounds.getHeight() - w1, 0.0)
-            );
-        } else if (isX2AxisSlider)
-        {
-            thumb2.setTopLeftPosition(
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), 0.0, bounds.getWidth() - w2),
-                thumb2.getY()
-            );
-        } else if (isY2AxisSlider)
-        {
-            thumb2.setTopLeftPosition(
-                thumb2.getX(),
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), bounds.getHeight() - w2, 0.0)
-            );
-        } else if (isX3AxisSlider)
-        {
-            thumb3.setTopLeftPosition(
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), 0.0, bounds.getWidth() - w3),
-                thumb3.getY()
-            );
-        } else if (isY3AxisSlider)
-        {
-            thumb3.setTopLeftPosition(
-                thumb3.getX(),
-                juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), bounds.getHeight() - w3, 0.0)
-            );
-        } else
-        {
-            thumb1.setOrientation(juce::jmap<float>(slider->getValue(), slider->getMinimum(), slider->getMaximum(), -juce::MathConstants<float>::pi , juce::MathConstants<float>::pi ));
-        }
-        repaint();   
     }
 }

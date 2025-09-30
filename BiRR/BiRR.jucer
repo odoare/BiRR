@@ -8,9 +8,6 @@
               companyWebsite="fx-mechanics.com" pluginVST3Category="Fx,Reverb,Spatial"
               pluginName="Binaural Room Reverb" pluginDesc="Binaural room reverb, stereo input">
   <MAINGROUP id="BIm9jF" name="BiRR">
-    <FILE id="pUU9IH" name="RoomComponent.cpp" compile="1" resource="0"
-          file="Source/RoomComponent.cpp"/>
-    <FILE id="NMhjD6" name="RoomComponent.h" compile="0" resource="0" file="Source/RoomComponent.h"/>
     <GROUP id="{73833252-B5AF-B4C1-E839-2064ACA9F25A}" name="assets">
       <FILE id="M2MJ3r" name="defines.h" compile="0" resource="0" file="../lib/assets/defines.h"/>
       <FILE id="Y6mGAm" name="logo686.png" compile="0" resource="1" file="../lib/assets/logo686.png"/>
@@ -21,6 +18,9 @@
       <FILE id="R5uhO2" name="FxmeLookAndFeel.h" compile="0" resource="0"
             file="../lib/components/FxmeLookAndFeel.h"/>
       <FILE id="Xu9cHV" name="HorizontalBar.h" compile="0" resource="0" file="../lib/components/HorizontalBar.h"/>
+      <FILE id="x9FMNP" name="RoomComponent.cpp" compile="1" resource="0"
+            file="../lib/components/RoomComponent.cpp"/>
+      <FILE id="PZvvD1" name="RoomComponent.h" compile="0" resource="0" file="../lib/components/RoomComponent.h"/>
       <FILE id="FP50fg" name="XyPad.cpp" compile="1" resource="0" file="../lib/components/XyPad.cpp"/>
       <FILE id="nbuTz7" name="XyPad.h" compile="0" resource="0" file="../lib/components/XyPad.h"/>
     </GROUP>
