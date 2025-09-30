@@ -15,8 +15,10 @@
 #include "PluginProcessor.h"
 #include "../../lib/components/XyPad.h"
 #include "../../lib/components/FxmeLookAndFeel.h"
+#include "../../lib/components/RoomComponent.h"
 #include "../../lib/components/HorizontalBar.h"
 #include "../../lib/components/FxmeLogo.h"
+#include "../../lib/components/XyPad.h"
 #include "../../lib/assets/defines.h"
 
 //==============================================================================
@@ -82,7 +84,12 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sourceRZSliderAttachment;
     juce::Label sourceRZLabel{"sourceRZLabel", "Z"};
 
-    Gui::XyPad3h xyPad3;
+    Gui::XyPad xyPad;
+    Gui::XyPad xzPad;
+    juce::Label xPadLabel;
+    juce::Label yPadLabel;
+    juce::Label zPadLabel;
+    RoomComponent roomComponent;
 
     juce::TextButton calculateButton;
 
@@ -98,5 +105,15 @@ private:
     Gui::HorizontalBar progressBarL{[&]() { return audioProcessor.roomIRL.getProgress(); }};
     Gui::HorizontalBar progressBarR{[&]() { return audioProcessor.roomIRR.getProgress(); }};
 
+    // Helper to restore thumb colours
+    bool xzPadIsColourSet = true;
+    void setXzPadThumbColours()
+    {
+        if (auto* p = xzPad.getPoint(0)) p->setColour(LISTENERCOLOUR);
+        if (auto* p = xzPad.getPoint(1)) p->setColour(SOURCELCOLOUR);
+        if (auto* p = xzPad.getPoint(2)) p->setColour(SOURCERCOLOUR);
+        xzPadIsColourSet = true;
+    }
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReverbAudioProcessorEditor)
 };

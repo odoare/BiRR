@@ -18,6 +18,9 @@
       <FILE id="R5uhO2" name="FxmeLookAndFeel.h" compile="0" resource="0"
             file="../lib/components/FxmeLookAndFeel.h"/>
       <FILE id="Xu9cHV" name="HorizontalBar.h" compile="0" resource="0" file="../lib/components/HorizontalBar.h"/>
+      <FILE id="YkECiN" name="RoomComponent.cpp" compile="1" resource="0"
+            file="../lib/components/RoomComponent.cpp"/>
+      <FILE id="IMDSX2" name="RoomComponent.h" compile="0" resource="0" file="../lib/components/RoomComponent.h"/>
       <FILE id="FP50fg" name="XyPad.cpp" compile="1" resource="0" file="../lib/components/XyPad.cpp"/>
       <FILE id="nbuTz7" name="XyPad.h" compile="0" resource="0" file="../lib/components/XyPad.h"/>
     </GROUP>

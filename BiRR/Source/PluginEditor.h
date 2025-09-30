@@ -112,7 +112,6 @@ private:
     Gui::HorizontalBar progressBarL{[&]() { return audioProcessor.roomIRL.getProgress(); }};
     Gui::HorizontalBar progressBarR{[&]() { return audioProcessor.roomIRR.getProgress(); }};
 
-private:
     // Helper to restore thumb colours
     bool xzPadIsColourSet = true;
     void setXzPadThumbColours()

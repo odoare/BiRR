@@ -14,10 +14,11 @@ RoomComponent::~RoomComponent()
 
 void RoomComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    //g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll (juce::Colours::black);
 
     g.setColour (juce::Colours::white);
-    g.drawRect (getLocalBounds(), 1);
+    g.drawRoundedRectangle(getLocalBounds().toFloat(), 5.0f, 1.0f);
 
     // Pre-calculate trig functions for projection
     cosX = std::cos(viewAngleX);

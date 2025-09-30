@@ -13,7 +13,7 @@
 
 //==============================================================================
 ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p), audioProcessor (p), roomComponent(p.apvts)
 {
     // logo = juce::ImageCache::getFromMemory(BinaryData::logo686_png, BinaryData::logo686_pngSize);
 
@@ -38,46 +38,46 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
 
     // Room size controllers
 
-    addAndMakeVisible(roomXKnob.slider);
+    addAndMakeVisible(roomXKnob);
     roomXKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     roomXKnob.slider.onDragEnd = stopDrag;
     roomXKnob.slider.onDragStart = startDrag;
 
-    addAndMakeVisible(roomYKnob.slider);
+    addAndMakeVisible(roomYKnob);
     roomYKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     roomYKnob.slider.onDragEnd = stopDrag;
     roomYKnob.slider.onDragStart = startDrag;
 
-    addAndMakeVisible(roomZKnob.slider);
+    addAndMakeVisible(roomZKnob);
     roomZKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     roomZKnob.slider.onDragEnd = stopDrag;
     roomZKnob.slider.onDragStart = startDrag;
 
     // Damping sliders
 
-    addAndMakeVisible(dampingKnob.slider);
+    addAndMakeVisible(dampingKnob);
     dampingKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     dampingKnob.slider.onDragEnd = stopDrag;
     dampingKnob.slider.onDragStart = startDrag;
 
-    addAndMakeVisible(hfDampingKnob.slider);
+    addAndMakeVisible(hfDampingKnob);
     hfDampingKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     hfDampingKnob.slider.onDragEnd = stopDrag;
     hfDampingKnob.slider.onDragStart = startDrag;
 
     // Width slider (not effective with binaural mode)
-    addAndMakeVisible(diffusionKnob.slider);
+    addAndMakeVisible(diffusionKnob);
     diffusionKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     diffusionKnob.slider.onDragEnd = stopDrag;
     diffusionKnob.slider.onDragStart = startDrag;
 
     // Level sliders
-    addAndMakeVisible(directLevelKnob.slider);
+    addAndMakeVisible(directLevelKnob);
     directLevelKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     directLevelKnob.slider.onDragEnd = stopDrag;
     directLevelKnob.slider.onDragStart = startDrag;
 
-    addAndMakeVisible(reflectionsLevelKnob.slider);
+    addAndMakeVisible(reflectionsLevelKnob);
     reflectionsLevelKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     reflectionsLevelKnob.slider.onDragEnd = stopDrag;
     reflectionsLevelKnob.slider.onDragStart = startDrag;
@@ -102,7 +102,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     listenerZSlider.onDragStart = startDrag;
     listenerZSlider.onDragEnd = stopDrag;
 
-    addAndMakeVisible(listenerOKnob.slider);
+    addAndMakeVisible(listenerOKnob);
     listenerOKnob.slider.setLookAndFeel(&fxmeLookAndFeel);
     // listenerOKnob.slider.onDragEnd = stopDrag;
     // listenerOKnob.slider.onDragStart = startDrag;
@@ -153,23 +153,59 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     addAndConnectLabel(sourceRZSlider, sourceRZLabel);
 
     // XY Pad
-    addAndMakeVisible(xyPad3);
-    xyPad3.registerSlider(&listenerXSlider, Gui::XyPad3h::Axis::X1);
-    xyPad3.registerSlider(&listenerYSlider, Gui::XyPad3h::Axis::Y1);
-    xyPad3.registerSlider(&sourceLXSlider, Gui::XyPad3h::Axis::X2);
-    xyPad3.registerSlider(&sourceLYSlider, Gui::XyPad3h::Axis::Y2);
-    xyPad3.registerSlider(&sourceRXSlider, Gui::XyPad3h::Axis::X3);
-    xyPad3.registerSlider(&sourceRYSlider, Gui::XyPad3h::Axis::Y3);
-    xyPad3.registerSlider(&listenerOKnob.slider, Gui::XyPad3h::Axis::O1);
-    xyPad3.thumb1.setColour(LISTENERCOLOUR);
-    xyPad3.thumb2.setColour(SOURCELCOLOUR);
-    xyPad3.thumb3.setColour(SOURCERCOLOUR);
-    xyPad3.thumb1.mouseUpCallback = stopDrag;
-    xyPad3.thumb2.mouseUpCallback = stopDrag;
-    xyPad3.thumb3.mouseUpCallback = stopDrag;
-    xyPad3.thumb1.mouseDownCallback = startDrag;
-    xyPad3.thumb2.mouseDownCallback = startDrag;
-    xyPad3.thumb3.mouseDownCallback = startDrag;
+    addAndMakeVisible(xyPad);
+    auto* listenerHeadXY = xyPad.addHead(30, LISTENERCOLOUR);
+    auto* sourceLThumbXY = xyPad.addThumb(30, SOURCELCOLOUR);
+    auto* sourceRThumbXY = xyPad.addThumb(30, SOURCERCOLOUR);
+
+    xyPad.registerSlider(&listenerXSlider, 0, Gui::XyPad::Axis::X);
+    xyPad.registerSlider(&listenerYSlider, 0, Gui::XyPad::Axis::Y);
+    xyPad.registerSlider(&listenerOKnob.slider, 0, Gui::XyPad::Axis::O);
+    xyPad.registerSlider(&sourceLXSlider, 1, Gui::XyPad::Axis::X);
+    xyPad.registerSlider(&sourceLYSlider, 1, Gui::XyPad::Axis::Y);
+    xyPad.registerSlider(&sourceRXSlider, 2, Gui::XyPad::Axis::X);
+    xyPad.registerSlider(&sourceRYSlider, 2, Gui::XyPad::Axis::Y);
+
+    listenerHeadXY->mouseUpCallback = stopDrag;
+    sourceLThumbXY->mouseUpCallback = stopDrag;
+    sourceRThumbXY->mouseUpCallback = stopDrag;
+    listenerHeadXY->mouseDownCallback = startDrag;
+    sourceLThumbXY->mouseDownCallback = startDrag;
+    sourceRThumbXY->mouseDownCallback = startDrag;
+    listenerHeadXY->setShowNose(true);
+
+    // XZ Pad
+    addAndMakeVisible(xzPad);
+    auto* listenerHeadXZ = xzPad.addHead(30, LISTENERCOLOUR);
+    auto* sourceLThumbXZ = xzPad.addThumb(30, SOURCELCOLOUR);
+    auto* sourceRThumbXZ = xzPad.addThumb(30, SOURCERCOLOUR);
+
+    xzPad.registerSlider(&listenerXSlider, 0, Gui::XyPad::Axis::X);
+    xzPad.registerSlider(&listenerZSlider, 0, Gui::XyPad::Axis::Y);
+    xzPad.registerSlider(&sourceLXSlider, 1, Gui::XyPad::Axis::X);
+    xzPad.registerSlider(&sourceLZSlider, 1, Gui::XyPad::Axis::Y);
+    xzPad.registerSlider(&sourceRXSlider, 2, Gui::XyPad::Axis::X);
+    xzPad.registerSlider(&sourceRZSlider, 2, Gui::XyPad::Axis::Y);
+
+    listenerHeadXZ->mouseUpCallback = stopDrag;
+    sourceLThumbXZ->mouseUpCallback = stopDrag;
+    sourceRThumbXZ->mouseUpCallback = stopDrag;
+    listenerHeadXZ->mouseDownCallback = startDrag;
+    sourceLThumbXZ->mouseDownCallback = startDrag;
+    sourceRThumbXZ->mouseDownCallback = startDrag;
+    listenerHeadXZ->setShowNose(false);
+
+    addAndMakeVisible(xPadLabel);
+    xPadLabel.setText("X", juce::dontSendNotification);
+    xPadLabel.setJustificationType(juce::Justification::centred);
+
+    addAndMakeVisible(yPadLabel);
+    yPadLabel.setText("Y", juce::dontSendNotification);
+    yPadLabel.setJustificationType(juce::Justification::centred);
+
+    addAndMakeVisible(zPadLabel);
+    zPadLabel.setText("Z", juce::dontSendNotification);
+    zPadLabel.setJustificationType(juce::Justification::centred);
 
     addAndMakeVisible(autoButton.button);
     autoButton.button.setLookAndFeel(&fxmeLookAndFeel);
@@ -179,22 +215,18 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor (ReverbAudioProcessor& p)
     addAndMakeVisible(progressBarL);
     addAndMakeVisible(progressBarR);
 
+    addAndMakeVisible(roomComponent);
+
     addAndMakeVisible(logo);
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (650, 480);
+    setSize (640, 560);
     setResizable(true,true);
 }
 
 ReverbAudioProcessorEditor::~ReverbAudioProcessorEditor()
 {
-  xyPad3.deregisterSlider(&listenerXSlider);
-  xyPad3.deregisterSlider(&listenerYSlider);
-  xyPad3.deregisterSlider(&sourceLXSlider);
-  xyPad3.deregisterSlider(&sourceLYSlider);
-  xyPad3.deregisterSlider(&sourceRXSlider);
-  xyPad3.deregisterSlider(&sourceRYSlider);
 }
 
 //==============================================================================
@@ -240,86 +272,67 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
 void ReverbAudioProcessorEditor::resized()
 {
     using fi = juce::FlexItem;
-    juce::FlexBox fbmain, fb1, fb20, fb2, fb3, fb21,
-                  fb2t, fb2b, fb2tl, fb2tc, fb2tr, fb2bl, fb2br, fb31, fb32, fb311,fb312, fb3111;
+    juce::FlexBox fb1, fb2;
 
-    fbmain.flexDirection = juce::FlexBox::Direction::column;
-    fb1.flexDirection = juce::FlexBox::Direction::row;
-    fb20.flexDirection = juce::FlexBox::Direction::row;
-    fb2.flexDirection = juce::FlexBox::Direction::column;
-    fb2t.flexDirection = juce::FlexBox::Direction::row;
-    fb2tc.flexDirection = juce::FlexBox::Direction::column;
-    fb2b.flexDirection = juce::FlexBox::Direction::row;
-    fb3.flexDirection = juce::FlexBox::Direction::row;
-    fb21.flexDirection = juce::FlexBox::Direction::row;
-    fb21.flexDirection = juce::FlexBox::Direction::row;
-    fb21.flexDirection = juce::FlexBox::Direction::row;
-    fb31.flexDirection = juce::FlexBox::Direction::column;
-    fb32.flexDirection = juce::FlexBox::Direction::column;
-    fb311.flexDirection = juce::FlexBox::Direction::row;
-    fb312.flexDirection = juce::FlexBox::Direction::row;
-    fb3111.flexDirection = juce::FlexBox::Direction::column;
+    fb1.flexDirection = juce::FlexBox::Direction::column;
+    fb2.flexDirection = juce::FlexBox::Direction::row;
 
-    fb1.items.add(fi(roomXKnob.flex()).withFlex(1.f));
-    fb1.items.add(fi(roomYKnob.flex()).withFlex(1.f));
-    fb1.items.add(fi(roomZKnob.flex()).withFlex(1.f));
-    fb1.items.add(fi(dampingKnob.flex()).withFlex(1.f));
-    fb1.items.add(fi(hfDampingKnob.flex()).withFlex(1.f));
-    fb1.items.add(fi(diffusionKnob.flex()).withFlex(1.f));
+    juce::FlexBox padsBox;
+    padsBox.flexDirection = juce::FlexBox::Direction::column;
+    juce::FlexBox xyPadBox, xzPadBox;
+    xyPadBox.flexDirection = juce::FlexBox::Direction::row;
+    xzPadBox.flexDirection = juce::FlexBox::Direction::row;
+    xyPadBox.items.add(fi(yPadLabel).withFlex(0.1f));
+    xyPadBox.items.add(fi(xyPad).withFlex(1.0f));
+    xzPadBox.items.add(fi(zPadLabel).withFlex(0.1f));
+    xzPadBox.items.add(fi(xzPad).withFlex(1.0f));
+    padsBox.items.add(fi(xyPadBox).withFlex(1.f).withMargin(juce::FlexItem::Margin(10.f,10.f,10.f,0.f)));
+    padsBox.items.add(fi(xzPadBox).withFlex(1.f).withMargin(juce::FlexItem::Margin(0.f,10.f,0.f,0.f)));
+    padsBox.items.add(fi(xPadLabel).withFlex(.1f));
 
-    fb21.items.add(fi(sourceLYSlider).withFlex(0.1f));
-    fb21.items.add(fi(sourceRYSlider).withFlex(0.1f));
-    fb21.items.add(fi(xyPad3).withFlex(1.f));
-    fb21.items.add(fi(listenerYSlider).withFlex(0.1f));
+    padsBox.items.add(fi(progressBarL).withFlex(0.113f).withMargin(juce::FlexItem::Margin(-5.f,0.f,-5.f,0.f)));
+    padsBox.items.add(fi(progressBarR).withFlex(0.11f).withMargin(juce::FlexItem::Margin(-5.f,0.f,-5.f,0.f)));    
 
-    fb2.items.add(fi(fb2t).withFlex(0.2f));
-    fb2t.items.add(fi(fb2tl).withFlex(0.2f));
-    fb2t.items.add(fi(fb2tc).withFlex(1.f));
-    fb2t.items.add(fi(fb2tr).withFlex(0.1f));
-    fb2tc.items.add(fi(sourceRXSlider).withFlex(0.1f));
-    fb2tc.items.add(fi(sourceLXSlider).withFlex(0.1f));
-    fb2.items.add(fi(fb21).withFlex(1.f));
-    fb2.items.add(fi(fb2b).withFlex(0.1f));
-    fb2b.items.add(fi(fb2bl).withFlex(0.2f));
-    fb2b.items.add(fi(listenerXSlider).withFlex(1.f));
-    fb2b.items.add(fi(fb2br).withFlex(0.1f));
+    juce::FlexBox fbRoom;
+    fbRoom.flexDirection = juce::FlexBox::Direction::row;
+    fbRoom.items.add(fi(roomXKnob).withFlex(1.f));
+    fbRoom.items.add(fi(roomYKnob).withFlex(1.f));
+    fbRoom.items.add(fi(roomZKnob).withFlex(1.f));
     
-    fb3111.items.add(fi(listenerOKnob.flex()).withFlex(1.f));
-    fb311.items.add(fi(fb3111).withFlex(1.f).withMargin(juce::FlexItem::Margin(0.f,0.f,20.f,0.f)));
-    fb311.items.add(fi(sourceLZSlider).withFlex(0.2f).withMargin(juce::FlexItem::Margin(25.f,0.f,0.f,0.f)));
-    fb311.items.add(fi(sourceRZSlider).withFlex(0.2f).withMargin(juce::FlexItem::Margin(25.f,0.f,0.f,0.f)));
-    fb311.items.add(fi(listenerZSlider).withFlex(0.2f).withMargin(juce::FlexItem::Margin(25.f,0.f,0.f,0.f)));
+    juce::FlexBox fbDamp;
+    fbDamp.flexDirection = juce::FlexBox::Direction::row;
+    fbDamp.items.add(fi(dampingKnob).withFlex(1.f));
+    fbDamp.items.add(fi(hfDampingKnob).withFlex(1.f));
+    fbDamp.items.add(fi(diffusionKnob).withFlex(1.f));
+    
+    juce::FlexBox fbKn;
+    fbKn.flexDirection = juce::FlexBox::Direction::row;
+    fbKn.items.add(fi(listenerOKnob).withFlex(1.f));
+    fbKn.items.add(fi(directLevelKnob).withFlex(1.f));
+    fbKn.items.add(fi(reflectionsLevelKnob).withFlex(1.f));
 
-    fb312.items.add(fi(autoButton.flex()).withFlex(1.f).withMargin(juce::FlexItem::Margin(0.f,0.f,0.f,0.f)));
-    fb312.items.add(fi(exportIrButton.flex()).withFlex(0.75f).withMargin(juce::FlexItem::Margin(0.f,0.f,0.f,0.f)));
+    juce::FlexBox fbBottom;
+    fbBottom.flexDirection = juce::FlexBox::Direction::row;
+    fbBottom.items.add(fi(roomComponent).withFlex(1.f).withMargin(juce::FlexItem::Margin(10.f,10.f,10.f,10.f)));
 
-    fb31.items.add(fi(fb311).withFlex(1.f).withMargin(juce::FlexItem::Margin(0.f,0.f,0.f,0.f)));
-    fb31.items.add(fi(fb312).withFlex(0.25f).withMargin(juce::FlexItem::Margin(0.f,0.f,0.f,0.f)));
-    fb31.items.add(fi(progressBarL).withFlex(0.18f));
-    fb31.items.add(fi(progressBarR).withFlex(0.18f));
-    fb32.items.add(fi(directLevelKnob.flex()).withFlex(1.f).withMargin(juce::FlexItem::Margin(20.f,0.f,0.f,0.f)));
-    fb32.items.add(fi(reflectionsLevelKnob.flex()).withFlex(1.f).withMargin(juce::FlexItem::Margin(20.f,0.f,0.f,0.f)));
-    fb32.items.add(juce::FlexItem(logo).withFlex(0.65f).withMargin(juce::FlexItem::Margin(5.f, 5.f, 5.f, 5.f)).withAlignSelf(juce::FlexItem::AlignSelf::stretch));
+    juce::FlexBox fbButs2;
+    fbButs2.flexDirection = juce::FlexBox::Direction::column;
+    fbButs2.items.add(juce::FlexItem(logo).withFlex(1.f).withMargin(juce::FlexItem::Margin(5.f, 5.f, 5.f, 5.f)).withAlignSelf(juce::FlexItem::AlignSelf::stretch));
+    fbButs2.items.add(fi(autoButton.flex()).withFlex(1.f).withMargin(juce::FlexItem::Margin(0.f,5.f,0.f,5.f)));
+    fbButs2.items.add(fi(exportIrButton.flex()).withFlex(1.f).withMargin(juce::FlexItem::Margin(0.f,5.f,0.f,5.f)));
 
-    fb3.items.add(fi(fb31).withFlex(1.f).withMargin(juce::FlexItem::Margin(20.f,0.f,0.f,0.f)));
-    fb3.items.add(fi(fb32).withFlex(0.5f));
+    fbBottom.items.add(fi(fbButs2).withFlex(0.4f).withMargin(juce::FlexItem::Margin(0.f,0.f,0.f,0.f)));
 
-    fb20.items.add(fi(fb2).withFlex(1.f).withMargin(juce::FlexItem::Margin(20.f,10.f,0.f,0.f)));
-    fb20.items.add(fi(fb3).withFlex(1.f));
+    fb1.items.add(fi(fbBottom).withFlex(0.8f).withMargin(juce::FlexItem::Margin(0.f,0.f,0.f,0.f)));
+    fb1.items.add(fi(fbRoom).withFlex(0.5f).withMargin(juce::FlexItem::Margin(0.f,0.f,10.f,0.f)));
+    fb1.items.add(fi(fbDamp).withFlex(0.5f).withMargin(juce::FlexItem::Margin(0.f,0.f,10.f,0.f)));
+    fb1.items.add(fi(fbKn).withFlex(0.5f).withMargin(juce::FlexItem::Margin(0.f,0.f,10.f,0.f)));
 
-    fbmain.items.add(fi(fb1).withFlex(0.35f));
-    fbmain.items.add(fi(fb20).withFlex(1.f));
+    fb2.items.add(fi(padsBox).withFlex(.8f));
+    fb2.items.add(fi(fb1).withFlex(1.f));
 
-    fb3111.performLayout(getLocalBounds());
-    fb311.performLayout(getLocalBounds());
-    fb31.performLayout(getLocalBounds());
-    fb32.performLayout(getLocalBounds());
-    fb3.performLayout(getLocalBounds());
-    fb21.performLayout(getLocalBounds());
-    fb2.performLayout(getLocalBounds());
-    fb20.performLayout(getLocalBounds());
     fb1.performLayout(getLocalBounds());
-    fbmain.performLayout(getLocalBounds());
+    fb2.performLayout(getLocalBounds());
 }
 
 void ReverbAudioProcessorEditor::addController(juce::Slider& slider,

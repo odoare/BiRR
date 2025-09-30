@@ -287,7 +287,6 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
     if (dim == 1 && !xzPadIsColourSet)
         setXzPadThumbColours();
 
-
     // If the IR is being calculated, we disable room size sliders
     // This prevents eventual crashes when increasing room size
     // while calcultating, due to buffer resizing (I've not figured
@@ -331,24 +330,10 @@ void ReverbAudioProcessorEditor::paint (juce::Graphics& g)
 void ReverbAudioProcessorEditor::resized()
 {
     using fi = juce::FlexItem;
-    juce::FlexBox fbmain, fb1, fb20, fb2, fb3, fb21,
-                  fb2t, fb2b, fb2tl, fb2tc, fb2tr, fb2bl, fb2br, fb31, fb32, fb311, fb312, fb313, fb3111;
+    juce::FlexBox fb1, fb2;
 
-    fbmain.flexDirection = juce::FlexBox::Direction::column;
     fb1.flexDirection = juce::FlexBox::Direction::column;
-    fb20.flexDirection = juce::FlexBox::Direction::row;
     fb2.flexDirection = juce::FlexBox::Direction::row;
-    fb2t.flexDirection = juce::FlexBox::Direction::row;
-    fb2tc.flexDirection = juce::FlexBox::Direction::column;
-    fb2b.flexDirection = juce::FlexBox::Direction::row;
-    fb3.flexDirection = juce::FlexBox::Direction::row;
-    fb21.flexDirection = juce::FlexBox::Direction::column;
-    fb31.flexDirection = juce::FlexBox::Direction::column;
-    fb32.flexDirection = juce::FlexBox::Direction::column;
-    fb311.flexDirection = juce::FlexBox::Direction::row;
-    fb312.flexDirection = juce::FlexBox::Direction::row;
-    fb3111.flexDirection = juce::FlexBox::Direction::column;
-
 
     juce::FlexBox padsBox;
     padsBox.flexDirection = juce::FlexBox::Direction::column;
@@ -401,29 +386,15 @@ void ReverbAudioProcessorEditor::resized()
 
     fbBottom.items.add(fi(fbButs2).withFlex(0.4f).withMargin(juce::FlexItem::Margin(0.f,0.f,0.f,0.f)));
 
-    //fb3.items.add(fi(fb31).withFlex(1.f).withMargin(juce::FlexItem::Margin(20.f,0.f,0.f,0.f)));
-    //fb3.items.add(fi(fb32).withFlex(0.5f));
-
+    fb1.items.add(fi(fbBottom).withFlex(0.8f).withMargin(juce::FlexItem::Margin(0.f,0.f,0.f,0.f)));
+    fb1.items.add(fi(fbButs).withFlex(0.1f).withMargin(juce::FlexItem::Margin(0.f,0.f,10.f,0.f)));
     fb1.items.add(fi(fbRoom).withFlex(0.5f).withMargin(juce::FlexItem::Margin(0.f,0.f,10.f,0.f)));
     fb1.items.add(fi(fbDamp).withFlex(0.5f).withMargin(juce::FlexItem::Margin(0.f,0.f,10.f,0.f)));
     fb1.items.add(fi(fbKn).withFlex(0.5f).withMargin(juce::FlexItem::Margin(0.f,0.f,10.f,0.f)));
-    fb1.items.add(fi(fbButs).withFlex(0.1f).withMargin(juce::FlexItem::Margin(0.f,0.f,0.f,0.f)));
-    fb1.items.add(fi(fbBottom).withFlex(0.8f).withMargin(juce::FlexItem::Margin(0.f,0.f,0.f,0.f)));
 
     fb2.items.add(fi(padsBox).withFlex(.8f));
     fb2.items.add(fi(fb1).withFlex(1.f));
-
-
-    // fb3111.performLayout(getLocalBounds());
-    // fb311.performLayout(getLocalBounds());
-    // fb31.performLayout(getLocalBounds());
-    // fb32.performLayout(getLocalBounds());
-    // fb3.performLayout(getLocalBounds());
-    // fb21.performLayout(getLocalBounds());
-    // fb2.performLayout(getLocalBounds());
     fb2.performLayout(getLocalBounds());
-    // fb1.performLayout(getLocalBounds());
-    // fbmain.performLayout(getLocalBounds());
 }
 
 void ReverbAudioProcessorEditor::addController(juce::Slider& slider,

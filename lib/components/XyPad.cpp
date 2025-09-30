@@ -159,7 +159,9 @@ namespace Gui
     void XyPad::paint(juce::Graphics& g)
     {
         g.setColour(juce::Colours::black);
-        g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.0f);
+        g.fillRoundedRectangle(getLocalBounds().toFloat(), 5.0f);
+        g.setColour(juce::Colours::white);
+        g.drawRoundedRectangle(getLocalBounds().toFloat(), 5.0f, 1.0f);
     }
 
     void XyPad::resized()
