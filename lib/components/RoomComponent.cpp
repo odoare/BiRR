@@ -87,7 +87,7 @@ void RoomComponent::paint (juce::Graphics& g)
 
     // Draw listener orientation arrow
     const float arrowLength = 0.1f; // Length of arrow in normalized room coordinates
-    float listenerO_rad = juce::degreesToRadians(listenerO);
+    float listenerO_rad = juce::degreesToRadians(-listenerO);
 
     // Calculate the arrow tip position in 3D space
     // The orientation is a rotation in the XY plane (around the Z axis)
