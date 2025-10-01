@@ -78,6 +78,11 @@ A number of threads equal to the number of CPUs - 1 is employed for the impulse 
     * The BiRR flavor contains now 2D and 3D room calculators. The dimension can be changed as a parameter.
     * It is possible to export calculated impulse responses as wav files if one wants to use them in other convolution plugins.
 
+- v0.2: New interface
+    * There are now 3 room views : XY plane, XZ plane, and a 3D box view
+    * Fix a bug in AmbiRR if samplerate > 44100Hz
+    * IR export now works on Windows
+
 ## Compilation
 
 BiRR depends on the JUCE library (visit juce.com), with additional components from fxmejucetools, provided as a JUCE module (visit https://github.com/odoare/FxmeJuceTools). The WDL library is included as a submodule, one has to do a "git submodule update --init --recursive" after cloning.
