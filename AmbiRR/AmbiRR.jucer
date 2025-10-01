@@ -4,7 +4,7 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               pluginFormats="buildLV2,buildStandalone,buildVST,buildVST3" pluginManufacturer="FX-Mechanics"
               pluginManufacturerCode="FXME" pluginCode="ABRR" lv2Uri="http://fx-mechanics.com/lv2/AmbiRR"
-              pluginAAXCategory="8" version="0.1" companyName="FX-Mechanics"
+              pluginAAXCategory="8" version="0.2" companyName="FX-Mechanics"
               companyWebsite="fx-mechanics.com" pluginVST3Category="Fx,Reverb,Spatial"
               pluginName="AmbiRR - Ambisonics Room Reverb" pluginDesc="Room reverb, stereo input, first order ambisonics (FOA) output">
   <MAINGROUP id="BIm9jF" name="AmbiRR">

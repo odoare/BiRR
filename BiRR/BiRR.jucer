@@ -4,7 +4,7 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               pluginFormats="buildLV2,buildStandalone,buildVST,buildVST3" pluginManufacturer="FX-Mechanics"
               pluginManufacturerCode="FXME" pluginCode="BiRR" lv2Uri="http://fx-mechanics.com/lv2/BiRR"
-              pluginAAXCategory="8" version="0.1" companyName="FX-Mechanics"
+              pluginAAXCategory="8" version="0.2" companyName="FX-Mechanics"
               companyWebsite="fx-mechanics.com" pluginVST3Category="Fx,Reverb,Spatial"
               pluginName="BiRR - Binaural Room Reverb" pluginDesc="Binaural room reverb, stereo input">
   <MAINGROUP id="BIm9jF" name="BiRR">
