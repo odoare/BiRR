@@ -698,6 +698,15 @@ void BoxRoomIR::prepare(juce::dsp::ProcessSpec spec)
     //     filters[i].prepare(spec);
     // }
 
+    // Initialize the smoothed value for head azimuth
+    smoothedHeadAzim.reset(spec.sampleRate, 0.05); // 0.05 seconds smoothing time
+
+    // Allocate buffers for smoothed rotation values
+    cosAzimBuffer.setSize (1, spec.maximumBlockSize, false, true, true);
+    sinAzimBuffer.setSize (1, spec.maximumBlockSize, false, true, true);
+    negSinAzimBuffer.setSize(1, spec.maximumBlockSize, false, true, true);
+
+
     std::cout << "BoxRoomIR::prepare has finished." << std::endl;
 
 }
@@ -852,6 +861,9 @@ bool BoxRoomIR::getBufferTransferState()
 
 void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
 {
+    // Set the target for the smoothed value on every process block
+    smoothedHeadAzim.setTargetValue(p.headAzim);
+
     const juce::SpinLock::ScopedLockType lock(convolutionLock);
     if (getBufferTransferState())
     {
@@ -916,36 +928,47 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
             }
         }
 
-      // If this is an ambisonic signal, we need to process it to take into
-      // account head azimuth. We need to rotate the ambisonic signal
-      // We use inputBufferCopy because it is not in use 
-      if (p.dimension == 13 && p.headAzim != 0.f)
-      {
-        //std::cout << "Processing ambisonic signal with head azimuth: " << p.headAzim << std::endl;
-        juce::dsp::AudioBlock<float> block(buffer);
-        juce::dsp::AudioBlock<float> blockY = block.getSingleChannelBlock(1);
-        juce::dsp::AudioBlock<float> blockZ = block.getSingleChannelBlock(2);
-        juce::dsp::AudioBlock<float> blockX = block.getSingleChannelBlock(3);
+        // If this is an ambisonic signal, we need to process it to take into
+        // account head azimuth. We need to rotate the ambisonic signal.
+        if (p.dimension == 13)
+        {
+            juce::dsp::AudioBlock<float> block(buffer);
+            juce::dsp::AudioBlock<float> blockY = block.getSingleChannelBlock(1);
+            juce::dsp::AudioBlock<float> blockZ = block.getSingleChannelBlock(2);
+            juce::dsp::AudioBlock<float> blockX = block.getSingleChannelBlock(3);
 
-        inputBufferCopy.makeCopyOf(buffer, true);
-        juce::dsp::AudioBlock<float> blockCopy (inputBufferCopy);
-        juce::dsp::AudioBlock<float> blockCopyY1 = blockCopy.getSingleChannelBlock(0);
-        juce::dsp::AudioBlock<float> blockCopyY2 = blockCopy.getSingleChannelBlock(1);
-        juce::dsp::AudioBlock<float> blockCopyX1 = blockCopy.getSingleChannelBlock(2);
-        juce::dsp::AudioBlock<float> blockCopyX2 = blockCopy.getSingleChannelBlock(3);
+            // 1. Fill buffers with smoothed sin/cos values for each sample
+            auto* cosPtr = cosAzimBuffer.getWritePointer(0);
+            auto* sinPtr = sinAzimBuffer.getWritePointer(0);
+            auto* negSinPtr = negSinAzimBuffer.getWritePointer(0);
 
-        blockCopyX1.replaceWithProductOf(blockX,juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*p.headAzim));
-        blockCopyX2.replaceWithProductOf(blockX,juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*p.headAzim));
-        blockCopyY1.replaceWithProductOf(blockY,juce::dsp::FastMathApproximations::cos(PIOVEREIGHTY*p.headAzim));
-        blockCopyY2.replaceWithProductOf(blockY,-juce::dsp::FastMathApproximations::sin(PIOVEREIGHTY*p.headAzim));
+            for (int i = 0; i < numSamples; ++i)
+            {
+                const float angle = smoothedHeadAzim.getNextValue() * PIOVEREIGHTY;
+                cosPtr[i] = juce::dsp::FastMathApproximations::cos(angle);
+                sinPtr[i] = juce::dsp::FastMathApproximations::sin(angle);
+                negSinPtr[i] = -sinPtr[i];
+            }
 
-        blockX.replaceWithSumOf(blockCopyX1,blockCopyY2);
-        blockY.replaceWithSumOf(blockCopyX2,blockCopyY1);
+            inputBufferCopy.makeCopyOf(buffer, true);
+            juce::dsp::AudioBlock<float> blockCopy (inputBufferCopy);
+            juce::dsp::AudioBlock<float> blockCopyY1 = blockCopy.getSingleChannelBlock(0);
+            juce::dsp::AudioBlock<float> blockCopyY2 = blockCopy.getSingleChannelBlock(1);
+            juce::dsp::AudioBlock<float> blockCopyX1 = blockCopy.getSingleChannelBlock(2);
+            juce::dsp::AudioBlock<float> blockCopyX2 = blockCopy.getSingleChannelBlock(3);
+            juce::dsp::AudioBlock<float> cosBlock = juce::dsp::AudioBlock<float>(cosAzimBuffer);
+            juce::dsp::AudioBlock<float> sinBlock = juce::dsp::AudioBlock<float>(sinAzimBuffer);
+            juce::dsp::AudioBlock<float> negSinBlock = juce::dsp::AudioBlock<float>(negSinAzimBuffer);
+
+            blockCopyX1.replaceWithProductOf(blockX,cosBlock);
+            blockCopyX2.replaceWithProductOf(blockX,sinBlock);
+            blockCopyY1.replaceWithProductOf(blockY,cosBlock);
+            blockCopyY2.replaceWithProductOf(blockY,sinBlock);
+
+            blockX.replaceWithSumOf(blockCopyX1,blockCopyY2);
+            blockY.replaceWithSumOf(blockCopyX2,blockCopyY1);
       }
 
-
-
-      
 
       // // Filtre passe-haut de sortie
       // juce::dsp::AudioBlock<float> block(buffer);
@@ -955,10 +978,7 @@ void BoxRoomIR::process(juce::AudioBuffer<float> &buffer)
       // filter[0].process(juce::dsp::ProcessContextReplacing<float>(blockL));
       // filter[1].process(juce::dsp::ProcessContextReplacing<float>(blockR));
   }
-  else
-  {
-    // std::cout << "Transfer unfinished"  << std::endl;
-  }
+
 }
 
 void BoxRoomIR::exportIrToWav(juce::File file)

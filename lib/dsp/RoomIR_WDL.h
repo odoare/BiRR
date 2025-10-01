@@ -149,6 +149,7 @@ public:
     float directLevel, reflectionsLevel;
     bool hasInitialized{false};
 
+
 private:
     IrBoxCalculatorParams p;
     int threadsNum;
@@ -156,6 +157,11 @@ private:
     float nearestSampleRate;
 
     //std::vector<juce::dsp::IIR::Filter<float>> filters;
+    juce::SmoothedValue<float> smoothedHeadAzim;
+    juce::AudioBuffer<float> cosAzimBuffer;
+    juce::AudioBuffer<float> sinAzimBuffer;
+    juce::AudioBuffer<float> negSinAzimBuffer;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoxRoomIR)
 
