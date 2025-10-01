@@ -265,9 +265,9 @@ void IrBoxCalculator::calculate3D()
 
 void IrBoxCalculator::calculateAmbi3D()
 {
-  // Calculate the ambisonic representation
-    // inBuf is the buffer used for the non-binaural methods
-    float outBuf[NSAMP44]={0.f}, inBuf[NSAMP44]={0.f};
+    // Calculate the ambisonic representation
+    // Use the largest possible size to prevent buffer overflows at higher sample rates.
+    float outBuf[NSAMP96]={0.f}, inBuf[NSAMP96]={0.f};
     inBuf[2] = 1.f;
     float x,y,z;
     float dist, time, r, gain, rp, elev, theta, costheta, sintheta, cosphi, sinphi;
