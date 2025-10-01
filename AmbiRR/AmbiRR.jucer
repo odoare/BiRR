@@ -6,7 +6,7 @@
               pluginManufacturerCode="FXME" pluginCode="ABRR" lv2Uri="http://fx-mechanics.com/lv2/AmbiRR"
               pluginAAXCategory="8" version="0.1" companyName="FX-Mechanics"
               companyWebsite="fx-mechanics.com" pluginVST3Category="Fx,Reverb,Spatial"
-              pluginName="Ambisonics Room Reverb" pluginDesc="Room reverb, stereo input, first order ambisonics (FOA) output">
+              pluginName="AmbiRR - Ambisonics Room Reverb" pluginDesc="Room reverb, stereo input, first order ambisonics (FOA) output">
   <MAINGROUP id="BIm9jF" name="AmbiRR">
     <GROUP id="{73833252-B5AF-B4C1-E839-2064ACA9F25A}" name="assets">
       <FILE id="M2MJ3r" name="defines.h" compile="0" resource="0" file="../lib/assets/defines.h"/>
