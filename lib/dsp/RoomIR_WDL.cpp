@@ -340,7 +340,7 @@ void IrBoxCalculator::highPassFilter(float* buffer, int numSamples, float cutoff
     if (numSamples <= 0 || !buffer) return;
 
     // Calcul des coefficients (filtre RC)
-    float RC = 1.0f / (2.0f * float(M_PI) * cutoffFreq);
+    float RC = 1.0f / (6.2831853 * cutoffFreq);
     float dt = 1.0f / sampleRate;
     float alpha = RC / (RC + dt);
 
@@ -446,17 +446,17 @@ void IrBoxCalculator::lop(const float* in, float* out, const int sampleFreq, con
     }
 }
 
-// Get max (has been used for debugging puposes only)
-float IrBoxCalculator::max(const float* in)
-{
-  float max = 0;
-  for (int i=1;i<nsamp[0];i++)
-  {
-    if (in[i]>max)
-    max = in[i];
-  }
-  return max;
-}
+//// Get max (has been used for debugging puposes only)
+//float IrBoxCalculator::max(const float* in)
+//{
+//  float max = 0;
+//  for (int i=1;i<nsamp[0];i++)
+//  {
+//    if (in[i]>max)
+//    max = in[i];
+//  }
+//  return max;
+//}
 
 void IrBoxCalculator::setParams(IrBoxCalculatorParams& pa)
 {

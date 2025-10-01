@@ -92,7 +92,7 @@
     </LINUX_MAKE>
     <VS2022 targetFolder="Builds/VisualStudio2022" IPP1ALibrary="true" MKL1ALibrary="Parallel">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR3DA_stereoin"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="AmbiRR"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../JUCE/JUCE/modules"/>

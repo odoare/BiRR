@@ -86,7 +86,7 @@ class IrBoxCalculator : public juce::Thread
     int proximityIndex(const float *data, const int length, const float value, const bool wrap);
     void lop(const float* in, float* out, const int sampleFreq, const float hfDamping, const int nRebounds, const int order);
     void highPassFilter(float* buffer, int numSamples, float cutoffFreq, float sampleRate);
-    float max(const float* in);
+    //float max(const float* in);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IrBoxCalculator)
   };

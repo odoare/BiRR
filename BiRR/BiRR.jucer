@@ -91,7 +91,7 @@
     </LINUX_MAKE>
     <VS2022 targetFolder="Builds/VisualStudio2022" IPP1ALibrary="true" MKL1ALibrary="Parallel">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR3D_stereoin"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="BiRR"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../JUCE/JUCE/modules"/>
