@@ -1,5 +1,7 @@
 # Binaural Room Reverb (BiRR) and Ambisonic Room Reverb (AmbiRR)
 
+> **Note:** AmbiRR2 has been released and is available at [github.com/odoare/AmbiRR2](https://github.com/odoare/AmbiRR2). New projects should use AmbiRR2. This repository is kept available for older projects that still depend on this plugin.
+
 A realistic room simulator based on a combination of a convolution processor and a virtual room impulse response calculator.
 
 ![image info](./doc/BIRR_screen.png)
